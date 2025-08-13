@@ -1,0 +1,183 @@
+{
+  // ═══════════════════════════════════════════════════════════
+  // 🎨 WORKSPACE & UI
+  // ═══════════════════════════════════════════════════════════
+  "window.title": "${activeEditorMedium}",
+  "workbench.statusBar.visible": true,
+  "explorer.confirmDragAndDrop": false,
+
+  // ═══════════════════════════════════════════════════════════
+  // ✨ CODE FORMATTING & QUALITY
+  // ═══════════════════════════════════════════════════════════
+
+  // Global formatting settings
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "editor.inlineSuggest.enabled": true,
+
+  // Auto-fix and import management on save
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.tslint": "explicit",
+    "source.addMissingImports": "explicit"
+  },
+
+  // Language-specific formatting rules
+  "[markdown]": {
+    "editor.formatOnSave": false
+  },
+  "[javascript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[astro]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "prettier.documentSelectors": ["**/*.astro"],
+
+  // ═══════════════════════════════════════════════════════════
+  // 🔧 JAVASCRIPT & TYPESCRIPT
+  // ═══════════════════════════════════════════════════════════
+
+  // ESLint configuration
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  // JS/TS behavior settings
+  "javascript.validate.enable": false,
+  "javascript.updateImportsOnFileMove.enabled": "prompt",
+  "typescript.preferences.autoImportFileExcludePatterns": ["@radix-ui"],
+  "typescript.updateImportsOnFileMove.enabled": "never",
+  "js/ts.implicitProjectConfig.checkJs": true,
+  "debug.javascript.codelens.npmScripts": "never",
+
+  // ═══════════════════════════════════════════════════════════
+  // 🔒 SECURITY & PRIVACY
+  // ═══════════════════════════════════════════════════════════
+
+  // Hide environment variable values to prevent accidental exposure
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "name": "Hide Environment Variables",
+        "scope": "string.quoted.single.ini,constant.numeric.ini,string.quoted.double.ini",
+        "settings": {
+          // "foreground": "#ffffff00"
+        }
+      }
+    ]
+  },
+
+  // Visual security indicators for tRPC procedures
+  "todohighlight.isEnable": true,
+  "todohighlight.isCaseSensitive": true,
+  "todohighlight.keywords": [
+    {
+      "text": "ctx.prisma.stripeIntegration",
+      "color": "red",
+      "border": "1px solid red",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(0,0,0,.2)",
+      "isWholeLine": false
+    },
+    {
+      "text": "adminProcedure",
+      "color": "red",
+      "border": "1px solid red",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(0,0,0,.2)",
+      "isWholeLine": false
+    },
+    {
+      "text": "authProcedure",
+      "color": "red",
+      "border": "1px solid red",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(0,0,0,.2)",
+      "isWholeLine": false
+    },
+    {
+      "text": "publicProcedure",
+      "color": "green",
+      "border": "1px solid green",
+      "borderRadius": "4px",
+      "backgroundColor": "rgba(0,0,0,.2)",
+      "isWholeLine": false
+    }
+  ],
+
+  // ═══════════════════════════════════════════════════════════
+  // 📝 SPELL CHECKING
+  // ═══════════════════════════════════════════════════════════
+
+  // Disable spell checking for code files, enable only for documentation
+  "cSpell.enableFiletypes": [
+    "!asciidoc",
+    "!c",
+    "!cpp",
+    "!csharp",
+    "!css",
+    "!elixir",
+    "!erlang",
+    "!git-commit",
+    "!go",
+    "!graphql",
+    "!handlebars",
+    "!haskell",
+    "!html",
+    "!jade",
+    "!java",
+    "!javascript",
+    "!javascriptreact",
+    "!json",
+    "!jsonc",
+    "!jupyter",
+    "!less",
+    "!prisma",
+    "!php",
+    "!pug",
+    "!python",
+    "!restructuredtext",
+    "!rust",
+    "!scala",
+    "!scminput",
+    "!scss",
+    "!swift",
+    "!typescript",
+    "!typescriptreact",
+    "!vue",
+    "!yaml",
+    "!yml",
+    "mdx"
+  ],
+
+  // ═══════════════════════════════════════════════════════════
+  // 📦 VERSION CONTROL
+  // ═══════════════════════════════════════════════════════════
+
+  // Git and GitLens settings
+  "git.openRepositoryInParentFolders": "never",
+  "gitlens.advanced.messages": {
+    "suppressCommitHasNoPreviousCommitWarning": true
+  }
+}
