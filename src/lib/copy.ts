@@ -9,11 +9,12 @@ export const copy = {
     // Content actions
     view: "Inspect",
     edit: "Refine",
-    delete: "Archive",
-    create: "Draft",
+    delete: "Delete",
+    create: "Create",
 
     // Form actions
     save: "Commit",
+    saving: "Committing...",
     cancel: "Discard",
     confirm: "Execute",
     tryAgain: "Retry",
@@ -86,8 +87,7 @@ export const copy = {
     optional: "Optional",
     saved: "Ticket saved successfully ✓",
     title: "What's this ticket about?",
-    description: "Describe the task or issue",
-    content: "Add ticket details here",
+    content: "Describe the task or issue",
     search: "Search tickets...",
   },
 

@@ -27,11 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} overflow-x-hidden antialiased`}
       >
         <ThemeProvider>
           <Header />
-          <main className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-x-hidden overflow-y-auto px-8 py-24">
+          <main className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-auto px-8 py-24">
             {children}
           </main>
         </ThemeProvider>
