@@ -6,10 +6,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getStaggeredStyle(index: number) {
+export function getStaggeredDelay({
+  index,
+  delay = TRANSITION_CONFIG.baseDelay,
+}: {
+  index: number;
+  delay?: number;
+}) {
   return {
-    transitionDelay: `${index * TRANSITION_CONFIG.baseDelay}ms`,
-    transitionDuration: TRANSITION_CONFIG.duration,
-    transitionTimingFunction: TRANSITION_CONFIG.easing,
+    transitionDelay: `${index * delay}ms`,
   };
 }
