@@ -1,0 +1,66 @@
+import { Ticket } from "@prisma/client";
+import { LucideTrash2 } from "lucide-react";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { buttonVariants } from "@/components/ui/button";
+import { copy } from "@/lib/copy";
+import { cn } from "@/lib/utils";
+import { deleteTicket } from "../actions/delete-ticket";
+import DetailButton from "./detail-button";
+
+type TicketActionButtonsProps = {
+  ticket: Ticket;
+  isDetail?: boolean;
+};
+
+function TicketDeleteButton({
+  ticket,
+  isDetail = false,
+}: TicketActionButtonsProps) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  return (
+    <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialogTrigger asChild>
+        <DetailButton
+          index={2}
+          icon={<LucideTrash2 />}
+          label={copy.actions.delete}
+        />
+      </AlertDialogTrigger>
+
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{copy.actions.delete}</AlertDialogTitle>
+          <AlertDialogDescription>{copy.confirm.delete}</AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+          <AlertDialogAction
+            type="submit"
+            onClick={() => {
+              deleteTicket({ id: ticket.id, isDetail });
+            }}
+            className={cn(buttonVariants({ variant: "destructive" }))}
+          >
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+export default TicketDeleteButton;

@@ -7,10 +7,14 @@ import { ticketsPath } from "@/paths";
 
 type DeleteTicketProps = {
   id: string;
-  main?: boolean;
+  isDetail?: boolean;
 };
 
-export async function deleteTicket({ id, main = false }: DeleteTicketProps) {
+export async function deleteTicket({
+  id,
+  isDetail = false,
+}: DeleteTicketProps) {
+  console.log(isDetail);
   await prisma.ticket.delete({
     where: {
       id,
@@ -18,5 +22,5 @@ export async function deleteTicket({ id, main = false }: DeleteTicketProps) {
   });
 
   revalidatePath(ticketsPath());
-  if (!main) redirect(ticketsPath());
+  if (isDetail) redirect(ticketsPath());
 }

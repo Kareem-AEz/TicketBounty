@@ -1,27 +1,11 @@
 "use client";
 
 import { Ticket } from "@prisma/client";
-import {
-  LucidePencil,
-  LucideSquareArrowOutUpRight,
-  LucideTrash2,
-} from "lucide-react";
+import { LucidePencil, LucideSquareArrowOutUpRight } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import { redirect, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -34,10 +18,10 @@ import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import { useKeyDown } from "@/lib/hooks/useKeyDown";
 import { cn } from "@/lib/utils";
 import { ticketPath, ticketsPath } from "@/paths";
-import { deleteTicket } from "../actions/delete-ticket";
 import { TICKET_ICONS } from "../constants";
 import { parseDate } from "../utils/ticket-utils";
 import DetailButton from "./detail-button";
+import TicketDeleteButton from "./ticket-delete-button";
 import TicketUpsertForm from "./ticket-upsert-form";
 
 type TicketItemProps = {
@@ -49,25 +33,12 @@ function TicketItem({ ticket, isDetail = false }: TicketItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
   const isMobile = useIsMobile();
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [ref, { height }] = useMeasure();
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  useKeyDown(
-    [
-      { key: "d", ctrl: true },
-      { key: "d", meta: true },
-    ],
-    () => {
-      setIsDeleteDialogOpen(true);
-    },
-    {
-      enabled: isDetail,
-    },
-  );
   useKeyDown("Backspace", () => redirect(ticketsPath()), {
     enabled: isDetail,
     disableOnInput: true,
@@ -136,7 +107,7 @@ function TicketItem({ ticket, isDetail = false }: TicketItemProps) {
                   >
                     <Card
                       className={cn(
-                        "h-full",
+                        "h-full w-full max-w-md",
                         isDetail && "max-w-xl",
                         !isDetail && "pointer-events-none",
                       )}
@@ -219,45 +190,7 @@ function TicketItem({ ticket, isDetail = false }: TicketItemProps) {
                           onClick={() => setIsEditing(true)}
                         />
 
-                        <AlertDialog
-                          open={isDeleteDialogOpen}
-                          onOpenChange={setIsDeleteDialogOpen}
-                        >
-                          <AlertDialogTrigger asChild>
-                            <DetailButton
-                              index={2}
-                              icon={<LucideTrash2 />}
-                              label={copy.actions.delete}
-                            />
-                          </AlertDialogTrigger>
-
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                {copy.actions.delete}
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                {copy.confirm.delete}
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                              <AlertDialogAction
-                                type="submit"
-                                onClick={() => {
-                                  deleteTicket({ id: ticket.id, main: true });
-                                }}
-                                className={cn(
-                                  buttonVariants({ variant: "destructive" }),
-                                )}
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                        <TicketDeleteButton ticket={ticket} />
                       </>
                     )}
 
@@ -269,45 +202,8 @@ function TicketItem({ ticket, isDetail = false }: TicketItemProps) {
                           label={copy.actions.edit}
                           onClick={() => setIsEditing(true)}
                         />
-                        <AlertDialog
-                          open={isDeleteDialogOpen}
-                          onOpenChange={setIsDeleteDialogOpen}
-                        >
-                          <AlertDialogTrigger asChild>
-                            <DetailButton
-                              index={0}
-                              icon={<LucideTrash2 />}
-                              label={copy.actions.delete}
-                            />
-                          </AlertDialogTrigger>
 
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                {copy.actions.delete}
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                {copy.confirm.delete}
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                              <AlertDialogAction
-                                type="submit"
-                                onClick={() => {
-                                  deleteTicket({ id: ticket.id });
-                                }}
-                                className={cn(
-                                  buttonVariants({ variant: "destructive" }),
-                                )}
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                        <TicketDeleteButton ticket={ticket} isDetail />
                       </>
                     )}
                   </motion.div>
