@@ -27,9 +27,6 @@ model Ticket {
   title       String
   content     String        @db.Text
   status      TicketStatus  @default(OPEN)
-  
-  // Optional: for random sorting experiments
-  randomSeed  Float?        @default(dbgenerated("random()"))
 }
 
 enum TicketStatus {
