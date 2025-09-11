@@ -1,7 +1,11 @@
 "use client";
 
 import { Ticket } from "@prisma/client";
-import { LucidePencil, LucideSquareArrowOutUpRight } from "lucide-react";
+import {
+  LucideClipboardClock,
+  LucidePencil,
+  LucideSquareArrowOutUpRight,
+} from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import { redirect, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -14,12 +18,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { copy } from "@/lib/copy";
+import { centToCurrency } from "@/lib/currency";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import { useKeyDown } from "@/lib/hooks/useKeyDown";
 import { cn } from "@/lib/utils";
 import { ticketPath, ticketsPath } from "@/paths";
 import { TICKET_ICONS } from "../constants";
-import { parseDate } from "../utils/ticket-utils";
 import DetailButton from "./detail-button";
 import TicketDeleteButton from "./ticket-delete-button";
 import TicketUpsertForm from "./ticket-upsert-form";
@@ -158,9 +162,14 @@ function TicketItem({ ticket, isDetail = false }: TicketItemProps) {
                         </CardContent>
 
                         <CardFooter>
-                          <div className="flex items-center gap-x-2">
-                            <span className="text-muted-foreground text-xs font-bold">
-                              {parseDate(ticket)}
+                          <div className="flex w-full justify-between">
+                            <span className="text-muted-foreground flex items-center gap-x-1 text-xs font-bold">
+                              <LucideClipboardClock size={14} />
+                              {ticket.deadline}
+                            </span>
+
+                            <span className="text-muted-foreground ml-auto text-xs font-bold">
+                              {centToCurrency(ticket.bounty)}
                             </span>
                           </div>
                         </CardFooter>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Ticket } from "@prisma/client";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useActionState } from "react";
 import { toast } from "sonner";
 import { FieldError } from "@/components/form/field-error";
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { copy } from "@/lib/copy";
+import { fromCent } from "@/lib/currency";
 import { ticketPath } from "@/paths";
 import { upsertTicket } from "../actions/upsert-ticket";
 
@@ -23,6 +24,9 @@ type TicketUpsertFormProps = {
 
 function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isDetail = pathname.includes(`${ticketPath(ticket?.id ?? "")}`);
 
   const [actionState, formAction] = useActionState(
     upsertTicket.bind(null, ticket?.id),
@@ -31,7 +35,7 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
 
   useActionFeedback(actionState, {
     onSuccess: ({ actionState }) => {
-      if (actionState.message && actionState.ticketId)
+      if (actionState.message && actionState.ticketId && !isDetail)
         toast.success(actionState.message, {
           action: {
             label: "View",
@@ -75,6 +79,41 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
           }
         />
         <FieldError actionState={actionState} name="content" />
+      </div>
+
+      <div className="mb-3 flex gap-x-3">
+        {/* deadline */}
+        <div className="flex w-full flex-col gap-y-3">
+          <Label htmlFor={`deadline-${ticket?.id}`}>Deadline</Label>
+          <Input
+            id={`deadline-${ticket?.id}`}
+            name="deadline"
+            className="resize-none"
+            type="date"
+            defaultValue={
+              (actionState?.payload?.get("deadline") as string) ??
+              ticket?.deadline
+            }
+          />
+          <FieldError actionState={actionState} name="deadline" />
+        </div>
+
+        {/* bounty */}
+        <div className="flex w-full flex-col gap-y-3">
+          <Label htmlFor={`bounty-${ticket?.id}`}>Bounty ($)</Label>
+          <Input
+            id={`bounty-${ticket?.id}`}
+            name="bounty"
+            type="number"
+            step="0.1"
+            placeholder={copy.forms.bounty}
+            defaultValue={
+              (actionState?.payload?.get("bounty") as string) ??
+              fromCent(ticket?.bounty ?? 0)
+            }
+          />
+          <FieldError actionState={actionState} name="bounty" />
+        </div>
       </div>
 
       <div className="flex gap-x-2">

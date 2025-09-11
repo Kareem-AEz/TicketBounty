@@ -88,6 +88,8 @@ export const copy = {
     saved: "Ticket saved successfully ✓",
     title: "What's this ticket about?",
     content: "Describe the task or issue",
+    deadline: "When is this ticket due?",
+    bounty: "63$",
     search: "Search tickets...",
   },
 
