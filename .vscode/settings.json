@@ -14,7 +14,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
-  "editor.formatOnType": false,
+  "editor.formatOnType": true,
   "editor.inlineSuggest.enabled": true,
 
   // Auto-fix and import management on save
