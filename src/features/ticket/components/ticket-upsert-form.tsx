@@ -9,6 +9,7 @@ import { useActionFeedback } from "@/components/form/hooks/useActionFeedback";
 import SubmitButton from "@/components/form/submit-button";
 import { EMPTY_ACTION_STATE } from "@/components/form/utils/to-action-state";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -85,14 +86,11 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
         {/* deadline */}
         <div className="flex w-full flex-col gap-y-3">
           <Label htmlFor={`deadline-${ticket?.id}`}>Deadline</Label>
-          <Input
+          <DatePicker
             id={`deadline-${ticket?.id}`}
             name="deadline"
-            className="resize-none"
-            type="date"
             defaultValue={
-              (actionState?.payload?.get("deadline") as string) ??
-              ticket?.deadline
+              (actionState?.payload?.get("deadline") as string) ?? ticket?.deadline
             }
           />
           <FieldError actionState={actionState} name="deadline" />
