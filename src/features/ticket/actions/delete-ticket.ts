@@ -14,7 +14,6 @@ export async function deleteTicket({
   id,
   isDetail = false,
 }: DeleteTicketProps) {
-  console.log(isDetail);
   await prisma.ticket.delete({
     where: {
       id,
@@ -23,4 +22,5 @@ export async function deleteTicket({
 
   revalidatePath(ticketsPath());
   if (isDetail) redirect(ticketsPath());
+  return { success: true, message: "Ticket deleted" };
 }

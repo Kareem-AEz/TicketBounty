@@ -1,6 +1,7 @@
 import { Ticket } from "@prisma/client";
 import { LucideTrash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +30,13 @@ function TicketDeleteButton({
 }: TicketActionButtonsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  const handleDelete = async () => {
+    const result = await deleteTicket({ id: ticket.id, isDetail });
+    if (result.success && result.message) {
+      toast.success(result.message);
+    }
+  };
+
   return (
     <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
       <AlertDialogTrigger asChild>
@@ -50,9 +58,7 @@ function TicketDeleteButton({
 
           <AlertDialogAction
             type="submit"
-            onClick={() => {
-              deleteTicket({ id: ticket.id, isDetail });
-            }}
+            onClick={handleDelete}
             className={cn(buttonVariants({ variant: "destructive" }))}
           >
             Delete
