@@ -16,20 +16,45 @@ datasource db {
 }
 
 // ------------------------------
+// Users
+// ------------------------------
+
+model User {
+  id            String        @id @default(cuid())
+  createdAt     DateTime      @default(now()) @db.Timestamptz
+  updatedAt     DateTime      @updatedAt @db.Timestamptz
+
+  email         String        @unique
+  username      String        @unique
+  passwordHash  String
+  sessions      Session[]
+}
+
+model Session {
+  id            String        @id
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+
+  expiresAt     DateTime      @db.Timestamptz
+
+  @@index([userId])
+}
+
+// ------------------------------
 // Tickets
 // ------------------------------
 
 model Ticket {
-  id          String        @id @default(cuid())
-  createdAt   DateTime      @default(now()) @db.Timestamptz
-  updatedAt   DateTime      @updatedAt @db.Timestamptz
+  id            String        @id @default(cuid())
+  createdAt     DateTime      @default(now()) @db.Timestamptz
+  updatedAt     DateTime      @updatedAt @db.Timestamptz
 
-  title       String
-  content     String        @db.Text
-  status      TicketStatus  @default(OPEN)
+  title         String
+  content       String        @db.Text
+  status        TicketStatus  @default(OPEN)
 
-  deadline    String       
-  bounty      Int           
+  deadline      String       
+  bounty        Int           
 }
 
 enum TicketStatus {
