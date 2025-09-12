@@ -16,6 +16,7 @@ type DetailButtonProps = {
   index: number;
   icon: React.ReactElement;
   label: string;
+  animate?: boolean;
 } & (
   | {
       href?: undefined;
@@ -36,6 +37,7 @@ function DetailButton({
   label,
   onClick,
   props,
+  animate = true,
 }: DetailButtonProps) {
   const isMobile = useIsMobile();
 
@@ -52,19 +54,27 @@ function DetailButton({
   // Mobile button (simple, no complex animations)
   const mobileClassName = "active:scale-95";
 
-  // Desktop button (complex hover/focus states)
-  const desktopClassName = cn(
-    "ml-2 -translate-x-full scale-90 opacity-0",
+  const animateClassName = cn(
+    "-translate-x-full scale-90 opacity-0",
     "group-focus-within/buttons:translate-x-0 group-focus-within/buttons:scale-100 group-focus-within/buttons:opacity-100",
     "group-hover/card:translate-x-0 group-hover/card:scale-100 group-hover/card:opacity-60",
     "hover:opacity-100 active:scale-95",
   );
 
-  const desktopStyle = {
-    transitionDuration: TRANSITION_EASING.SPRING_BASE.duration,
-    transitionTimingFunction: TRANSITION_EASING.SPRING_BASE.easing,
-    ...getStaggeredDelay({ index }),
-  };
+  // Desktop button (complex hover/focus states)
+  const desktopClassName = cn(
+    "ml-2",
+
+    animate && animateClassName,
+  );
+
+  const desktopStyle = animate
+    ? {
+        transitionDuration: TRANSITION_EASING.SPRING_BASE.duration,
+        transitionTimingFunction: TRANSITION_EASING.SPRING_BASE.easing,
+        ...getStaggeredDelay({ index }),
+      }
+    : {};
 
   // Button content (either clickable or link)
   const ButtonContent = (tProps: React.ComponentProps<typeof Button>) => {
@@ -94,7 +104,7 @@ function DetailButton({
 
   // Desktop: wrapped in tooltip
   return (
-    <Tooltip disableHoverableContent>
+    <Tooltip disableHoverableContent delayDuration={1000}>
       <TooltipTrigger asChild>
         <ButtonContent />
       </TooltipTrigger>
