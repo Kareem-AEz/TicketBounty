@@ -28,7 +28,12 @@ export default function TicketDropdownMenu({
     setIsLoading(true);
     try {
       if (status === ticket.status) return;
-      const result = await updateStatus(ticket.id, status as TicketStatus);
+      const resultPromise = updateStatus(ticket.id, status as TicketStatus);
+      toast.promise(resultPromise, {
+        loading: "Updating status...",
+      });
+      const result = await resultPromise;
+      
       if (result.status === "SUCCESS") {
         toast.success(result.message);
       } else {
