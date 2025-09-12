@@ -1,11 +1,10 @@
 "use client";
 
 import { Ticket } from "@prisma/client";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useActionState } from "react";
-import { toast } from "sonner";
 import { FieldError } from "@/components/form/field-error";
-import { useActionFeedback } from "@/components/form/hooks/useActionFeedback";
+import Form from "@/components/form/form";
 import SubmitButton from "@/components/form/submit-button";
 import { EMPTY_ACTION_STATE } from "@/components/form/utils/to-action-state";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,6 @@ type TicketUpsertFormProps = {
 };
 
 function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
-  const router = useRouter();
   const pathname = usePathname();
 
   const isDetail = pathname.includes(`${ticketPath(ticket?.id ?? "")}`);
@@ -34,26 +32,13 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
     EMPTY_ACTION_STATE,
   );
 
-  useActionFeedback(actionState, {
-    onSuccess: ({ actionState }) => {
-      if (actionState.message && actionState.ticketId && !isDetail)
-        toast.success(actionState.message, {
-          action: {
-            label: "View",
-            onClick: () => {
-              router.push(ticketPath(actionState.ticketId!));
-            },
-          },
-        });
-      onClose?.();
-    },
-    onError: ({ actionState }) => {
-      if (actionState.message) toast.error(actionState.message);
-    },
-  });
-
   return (
-    <form action={formAction} className="flex flex-col gap-y-5">
+    <Form
+      action={formAction}
+      actionState={actionState}
+      isDetail={isDetail}
+      onClose={onClose}
+    >
       <input type="hidden" name="id" value={ticket?.id} />
       <div className="flex flex-col gap-y-3">
         <Label htmlFor={`title-${ticket?.id}`}>Title</Label>
@@ -87,10 +72,12 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
         <div className="flex w-full flex-col gap-y-3">
           <Label htmlFor={`deadline-${ticket?.id}`}>Deadline</Label>
           <DatePicker
+            key={actionState.timestamp}
             id={`deadline-${ticket?.id}`}
             name="deadline"
             defaultValue={
-              (actionState?.payload?.get("deadline") as string) ?? ticket?.deadline
+              (actionState?.payload?.get("deadline") as string) ??
+              ticket?.deadline
             }
           />
           <FieldError actionState={actionState} name="deadline" />
@@ -135,7 +122,7 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
           </SubmitButton>
         </div>
       </div>
-    </form>
+    </Form>
   );
 }
 

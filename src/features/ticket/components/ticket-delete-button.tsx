@@ -44,6 +44,7 @@ function TicketDeleteButton({
           index={2}
           icon={<LucideTrash2 />}
           label={copy.actions.delete}
+          animate={!isDetail}
         />
       </AlertDialogTrigger>
 

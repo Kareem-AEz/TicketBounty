@@ -11,7 +11,7 @@ export const copy = {
     edit: "Refine",
     delete: "Delete",
     create: "Create",
-
+    more: "More",
     // Form actions
     save: "Commit",
     saving: "Committing...",
