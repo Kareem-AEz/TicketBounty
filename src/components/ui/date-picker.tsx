@@ -21,6 +21,7 @@ export function DatePicker({ id, name, defaultValue }: DatePickerProps) {
   const [date, setDate] = useState<Date | undefined>(
     defaultValue ? new Date(defaultValue) : undefined,
   );
+  const [open, setOpen] = useState(false);
 
   const formattedDate = date ? (
     format(date, "yyyy-MM-dd")
@@ -28,8 +29,13 @@ export function DatePicker({ id, name, defaultValue }: DatePickerProps) {
     <span>Pick a deadline</span>
   );
 
+  const handleSelect = (date: Date | undefined) => {
+    setDate(date);
+    setOpen(false);
+  };
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger id={id} asChild>
         <Button
           variant="outline"
@@ -50,7 +56,7 @@ export function DatePicker({ id, name, defaultValue }: DatePickerProps) {
           mode="single"
           selected={date}
           disabled={{ before: new Date() }}
-          onSelect={setDate}
+          onSelect={handleSelect}
           showOutsideDays
           defaultMonth={date}
         />
