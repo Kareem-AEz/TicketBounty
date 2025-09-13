@@ -1,3 +1,5 @@
+"use client";
+
 import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
@@ -9,7 +11,7 @@ type FormProps = {
   children: React.ReactNode;
   action: (payload: FormData) => void;
   actionState: ActionState;
-  isDetail: boolean;
+  isDetail?: boolean;
   onClose?: () => void;
   onSuccess?: (actionState: ActionState) => void;
   onError?: (actionState: ActionState) => void;
@@ -19,7 +21,7 @@ export default function Form({
   children,
   action,
   actionState,
-  isDetail,
+  isDetail = false,
   onClose,
   onSuccess,
   onError,
