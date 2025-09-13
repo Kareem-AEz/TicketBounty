@@ -8,36 +8,53 @@ import Spinner from "../spinner";
 import { Button } from "../ui/button";
 
 type SubmitButtonProps = {
+  icon?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
   pendingLabel?: string;
   onFinish?: () => void;
+  pending?: boolean;
+  variant?:
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link";
+  size?: "default" | "sm" | "lg" | "icon";
 };
 
 function SubmitButton({
+  icon,
   children,
   className,
   pendingLabel,
   onFinish,
+  pending,
+  variant,
+  size,
 }: SubmitButtonProps) {
-  const { pending } = useFormStatus();
-  const prevPendingRef = useRef(pending);
+  const { pending: formPending } = useFormStatus();
+  const isWorking = formPending || pending;
+  const prevPendingRef = useRef(isWorking);
 
   useEffect(() => {
     // If pending was true and is now false, submission finished
-    if (prevPendingRef.current && !pending) {
+    if (prevPendingRef.current && !isWorking) {
       onFinish?.();
     }
-    prevPendingRef.current = pending;
-  }, [pending, onFinish]);
+    prevPendingRef.current = isWorking;
+  }, [isWorking, onFinish]);
 
   return (
     <Button
       type="submit"
+      variant={variant}
+      size={size}
       className={cn("flex items-center", className)}
-      disabled={pending}
+      disabled={isWorking}
     >
-      {pending && (
+      {isWorking && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -50,12 +67,13 @@ function SubmitButton({
 
       <motion.span
         layout="position"
-        className="select-none"
+        className="flex items-center gap-2 select-none"
         style={{
           originY: "0px",
         }}
       >
-        {(pending && pendingLabel) || children}
+        {icon}
+        {(isWorking && pendingLabel) || children}
       </motion.span>
     </Button>
   );
