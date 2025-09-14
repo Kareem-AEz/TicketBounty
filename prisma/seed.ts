@@ -1,6 +1,18 @@
+import argon2 from "@node-rs/argon2";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
+const users = [
+  {
+    username: "admin",
+    email: "admin@example.com",
+  },
+  {
+    username: "user",
+    email: "kemoahmedahmedkemo@gmail.com",
+  },
+];
 
 const tickets = [
   {
@@ -34,10 +46,28 @@ const tickets = [
 
 const seed = async () => {
   console.log("Seeding database...");
+
   const start = performance.now();
-  await prisma.ticket.deleteMany();
+  // Delete all users
+  await prisma.user.deleteMany();
+  // await prisma.ticket.deleteMany();
+
+  const passwordHash = await argon2.hash("password");
+
+  // Create users
+  const createdUsers = await prisma.user.createManyAndReturn({
+    data: users.map((user) => ({
+      ...user,
+      passwordHash,
+    })),
+  });
+
+  // Create tickets
   await prisma.ticket.createMany({
-    data: tickets,
+    data: tickets.map((ticket) => ({
+      ...ticket,
+      userId: createdUsers[0].id,
+    })),
   });
   const end = performance.now();
   console.log(`Database seeded successfully in ${(end - start).toFixed(2)}ms`);

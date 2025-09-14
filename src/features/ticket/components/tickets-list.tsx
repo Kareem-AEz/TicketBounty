@@ -1,14 +1,16 @@
 import React from "react";
+import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import { getTickets } from "../queries/get-tickets";
 import TicketItem from "./ticket-item";
 
 async function TicketsList() {
   const tickets = await getTickets();
+  const user = await getAuthOrRedirect();
 
   return (
     <div className="animate-fade-from-top flex w-full flex-1 flex-col items-center gap-y-4 overflow-y-clip mask-b-from-[calc(100%-6rem)] p-1 pt-6 pb-24">
       {tickets.map((ticket) => (
-        <TicketItem key={ticket.id} ticket={ticket} />
+        <TicketItem key={ticket.id} ticket={ticket} user={user} />
       ))}
     </div>
   );
