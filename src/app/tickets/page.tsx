@@ -15,7 +15,7 @@ import TicketUpsertForm from "@/features/ticket/components/ticket-upsert-form";
 import TicketsList from "@/features/ticket/components/tickets-list";
 import { copy } from "@/lib/copy";
 
-function page() {
+async function page() {
   return (
     <>
       <div className="flex flex-1 flex-col gap-y-8">

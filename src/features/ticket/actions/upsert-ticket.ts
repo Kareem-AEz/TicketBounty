@@ -9,6 +9,8 @@ import {
   toErrorActionState,
   toSuccessActionState,
 } from "@/components/form/utils/to-action-state";
+import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
+import { isOwner } from "@/features/auth/utils/is-owner";
 import { toCent } from "@/lib/currency";
 import { prisma } from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
@@ -45,6 +47,14 @@ export const upsertTicket = async (
   formData: FormData,
 ) => {
   try {
+    const user = await getAuthOrRedirect();
+    if (!isOwner(user.id, id ?? "")) {
+      return toErrorActionState(
+        new Error("You are not the owner of this ticket"),
+        formData,
+      );
+    }
+
     const convertedBounty = toCent(Number(formData.get("bounty")));
 
     const validatedFields = upsertTicketSchema.parse({
@@ -55,12 +65,17 @@ export const upsertTicket = async (
       bounty: convertedBounty,
     });
 
+    const dbData = {
+      ...validatedFields,
+      userId: user.id,
+    };
+
     const ticket = await prisma.ticket.upsert({
       where: {
         id: validatedFields.id || "",
       },
-      update: validatedFields,
-      create: validatedFields,
+      update: dbData,
+      create: dbData,
     });
 
     revalidatePath(ticketsPath());

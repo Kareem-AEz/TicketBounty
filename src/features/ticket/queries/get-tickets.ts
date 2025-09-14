@@ -10,5 +10,13 @@ export const getTickets = async () => {
         id: "desc", // Secondary sort for stable ordering
       },
     ],
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+        },
+      },
+    },
   });
 };

@@ -1,11 +1,13 @@
 "use client";
 
-import { Ticket } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { User } from "lucia";
 import {
   LucideClipboardClock,
   LucideMoreVertical,
   LucidePencil,
   LucideSquareArrowOutUpRight,
+  LucideUser,
 } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import { redirect, useRouter } from "next/navigation";
@@ -19,6 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { isOwner } from "@/features/auth/utils/is-owner";
 import { copy } from "@/lib/copy";
 import { centToCurrency } from "@/lib/currency";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
@@ -32,11 +35,14 @@ import TicketDropdownMenu from "./ticket-dropdown-menu";
 import TicketUpsertForm from "./ticket-upsert-form";
 
 type TicketItemProps = {
-  ticket: Ticket;
+  ticket: Prisma.TicketGetPayload<{
+    include: { user: { select: { id: true; username: true } } };
+  }>;
   isDetail?: boolean;
+  user: User;
 };
 
-function TicketItem({ ticket, isDetail = false }: TicketItemProps) {
+function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
   const isMobile = useIsMobile();
@@ -169,6 +175,9 @@ function TicketItem({ ticket, isDetail = false }: TicketItemProps) {
                             <span className="text-muted-foreground flex items-center gap-x-1 text-xs font-bold">
                               <LucideClipboardClock size={14} />
                               {ticket.deadline}
+                              <span className="mx-1">•</span>
+                              <LucideUser size={14} />
+                              {ticket.user.username}
                             </span>
 
                             <span className="text-muted-foreground ml-auto text-xs font-bold">
@@ -195,18 +204,21 @@ function TicketItem({ ticket, isDetail = false }: TicketItemProps) {
                           label={copy.actions.view}
                           href={ticketPath(ticket.id)}
                         />
-                        <DetailButton
-                          index={1}
-                          icon={<LucidePencil />}
-                          label={copy.actions.edit}
-                          onClick={() => setIsEditing(true)}
-                        />
-
-                        <TicketDeleteButton ticket={ticket} />
+                        {isOwner(user.id, ticket.userId) && (
+                          <>
+                            <DetailButton
+                              index={1}
+                              icon={<LucidePencil />}
+                              label={copy.actions.edit}
+                              onClick={() => setIsEditing(true)}
+                            />
+                            <TicketDeleteButton ticket={ticket} />
+                          </>
+                        )}
                       </>
                     )}
 
-                    {isDetail && (
+                    {isDetail && isOwner(user.id, ticket.userId) && (
                       <>
                         <DetailButton
                           index={0}
