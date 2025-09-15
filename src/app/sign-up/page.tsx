@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import React from "react";
 import { CardCompact } from "@/components/card-compact";
 import SignUpForm from "@/features/auth/components/sign-up-form";
 import { signInPath } from "@/paths";
+
+export const metadata: Metadata = {
+  title: "Sign Up",
+};
 
 export default function page() {
   return (

@@ -48,11 +48,13 @@ export const upsertTicket = async (
 ) => {
   try {
     const user = await getAuthOrRedirect();
-    if (!isOwner(user.id, id ?? "")) {
-      return toErrorActionState(
-        new Error("You are not the owner of this ticket"),
-        formData,
-      );
+    if (id) {
+      if (!isOwner(user.id, id ?? "")) {
+        return toErrorActionState(
+          new Error("You are not the owner of this ticket"),
+          formData,
+        );
+      }
     }
 
     const convertedBounty = toCent(Number(formData.get("bounty")));

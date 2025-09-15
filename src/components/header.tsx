@@ -44,7 +44,7 @@ function Header() {
   );
 
   return (
-    <nav className="supports-[backdrop-filter]:bg-background/60 bg-background/95 animate-fade-from-top fixed z-10 flex w-full items-center justify-between border-b px-5 py-2.5 supports-[backdrop-filter]:backdrop-blur">
+    <nav className="supports-[backdrop-filter]:bg-background/60 bg-background/95 animate-fade-from-top fixed z-50 flex w-full items-center justify-between border-b px-5 py-2.5 supports-[backdrop-filter]:backdrop-blur">
       <div>
         <Link
           className={buttonVariants({ variant: "ghost" })}

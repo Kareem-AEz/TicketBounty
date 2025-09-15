@@ -21,7 +21,7 @@ export const EMPTY_ACTION_STATE: ActionState = {
 
 export const toErrorActionState = (
   error: unknown,
-  formData: FormData,
+  formData?: FormData,
 ): ActionState => {
   // Zod errors
   if (error instanceof z.ZodError) {

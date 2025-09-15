@@ -39,7 +39,7 @@ type TicketItemProps = {
     include: { user: { select: { id: true; username: true } } };
   }>;
   isDetail?: boolean;
-  user: User;
+  user?: User;
 };
 
 function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
@@ -204,7 +204,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                           label={copy.actions.view}
                           href={ticketPath(ticket.id)}
                         />
-                        {isOwner(user.id, ticket.userId) && (
+                        {isOwner(user?.id ?? "", ticket.userId) && (
                           <>
                             <DetailButton
                               index={1}
@@ -218,7 +218,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                       </>
                     )}
 
-                    {isDetail && isOwner(user.id, ticket.userId) && (
+                    {isDetail && isOwner(user?.id ?? "", ticket.userId) && (
                       <>
                         <DetailButton
                           index={0}

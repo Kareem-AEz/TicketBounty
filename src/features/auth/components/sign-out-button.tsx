@@ -36,6 +36,7 @@ export default function SignOutButton() {
         className="flex items-center gap-2 select-none"
         style={{
           originY: "0px",
+          originX: "0px",
         }}
       >
         {"Sign Out"}
