@@ -12,7 +12,8 @@ export const useIsMobile = () => {
       // Device is mobile if it has coarse pointer OR is small screen with touch
       setIsMobile(
         mobileMediaQuery.matches ||
-          (smallScreenQuery.matches && "ontouchstart" in window),
+          (smallScreenQuery.matches && "ontouchstart" in window) ||
+          smallScreenQuery.matches,
       );
     };
 

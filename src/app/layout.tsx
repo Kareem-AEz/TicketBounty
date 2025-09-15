@@ -1,7 +1,9 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
 import Header from "@/components/header";
+import Sidebar from "@/components/sidebar-item/components/sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -16,7 +18,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Road to Next",
+  title: {
+    template: "%s | The Road to Next",
+    default: "The Road to Next",
+  },
   description: "My Road to Next application...",
 };
 
@@ -30,11 +35,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} overflow-x-hidden antialiased`}
       >
+        <NextTopLoader color="var(--primary)" showSpinner={false} height={2} />
+
         <ThemeProvider>
           <Header />
-          <main className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-auto px-8 py-24">
-            {children}
-          </main>
+          <div className="flex">
+            <Sidebar />
+            <main
+              id="main"
+              className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-auto px-8 py-24 pl-[7rem]"
+            >
+              {children}
+            </main>
+          </div>
           <Toaster />
         </ThemeProvider>
       </body>

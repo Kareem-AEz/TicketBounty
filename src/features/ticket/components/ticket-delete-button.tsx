@@ -32,7 +32,7 @@ function TicketDeleteButton({
 
   const handleDelete = async () => {
     const result = await deleteTicket({ id: ticket.id, isDetail });
-    if (result.success && result.message) {
+    if (result.status === "SUCCESS" && result.message) {
       toast.success(result.message);
     }
   };

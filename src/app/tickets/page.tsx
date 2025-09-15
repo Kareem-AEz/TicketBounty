@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import Heading from "@/components/heading";
@@ -11,15 +12,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import TicketUpsertForm from "@/features/ticket/components/ticket-upsert-form";
 import TicketsList from "@/features/ticket/components/tickets-list";
 import { copy } from "@/lib/copy";
 
+export const metadata: Metadata = {
+  title: "My Tickets",
+};
+
 async function page() {
+  const user = await getAuthOrRedirect();
+
   return (
     <>
       <div className="flex flex-1 flex-col gap-y-8">
-        <Heading title="Tickets" description="All your tickets in one place" />
+        <Heading
+          title="My Tickets"
+          description="All your tickets in one place"
+        />
 
         <div className="flex w-full max-w-md flex-1 flex-col items-center gap-y-10 self-center">
           <Card className="w-full">
@@ -37,7 +48,7 @@ async function page() {
 
           <ErrorBoundary fallback={<Placeholder label={copy.errors.general} />}>
             <Suspense fallback={<Spinner />}>
-              <TicketsList />
+              <TicketsList user={user} id="my" />
             </Suspense>
           </ErrorBoundary>
         </div>
