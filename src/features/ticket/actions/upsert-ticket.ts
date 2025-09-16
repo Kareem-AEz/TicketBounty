@@ -48,13 +48,17 @@ export const upsertTicket = async (
 ) => {
   try {
     const user = await getAuthOrRedirect();
-    if (id) {
-      if (!isOwner(user.id, id ?? "")) {
-        return toErrorActionState(
-          new Error("You are not the owner of this ticket"),
-          formData,
-        );
-      }
+
+    if (!id) return toErrorActionState("You are not the owner of this ticket");
+
+    const fetchedTicket = await prisma.ticket.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!isOwner(user.id, fetchedTicket?.userId)) {
+      return toErrorActionState("You are not the owner of this ticket");
     }
 
     const convertedBounty = toCent(Number(formData.get("bounty")));
