@@ -17,13 +17,13 @@ async function HomePage({ searchParams }: PageSearchParamsType) {
   const { user } = await getAuth();
 
   return (
-    <div className="flex flex-col gap-y-8">
+    <div className="flex flex-1 flex-col gap-y-8">
       <Heading
         title="All Tickets"
         description="Your one stop shop for all your ticket needs"
       />
 
-      <div className="flex flex-col items-center gap-y-8">
+      <div className="flex flex-1 flex-col items-center gap-y-8">
         <SearchInput />
 
         <ErrorBoundary fallback={<Placeholder label={copy.errors.general} />}>

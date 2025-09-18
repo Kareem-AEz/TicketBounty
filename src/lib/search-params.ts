@@ -1,3 +1,4 @@
+import { Route } from "next";
 import queryString from "query-string";
 
 export type SearchParamsKeys = "query";
@@ -40,7 +41,7 @@ export function updateUrlParams({ params, updates }: UpdateUrlParamsProps) {
       skipEmptyString: true,
       skipNull: true,
     },
-  );
+  ) as Route;
 }
 
 /**
