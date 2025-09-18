@@ -72,7 +72,7 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
         <div className="flex w-full flex-col gap-y-3">
           <Label htmlFor={`deadline-${ticket?.id}`}>Deadline</Label>
           <DatePicker
-            key={actionState.timestamp}
+            key={actionState?.timestamp ?? 0}
             id={`deadline-${ticket?.id}`}
             name="deadline"
             defaultValue={

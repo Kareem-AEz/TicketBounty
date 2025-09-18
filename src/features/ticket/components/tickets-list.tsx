@@ -14,7 +14,7 @@ async function TicketsList({
 }: {
   user?: User;
   isAllTickets?: boolean;
-  searchParams: Promise<SearchParams>;
+  searchParams?: Promise<SearchParams> | undefined;
 }) {
   const searchParamsObj = await searchParams;
 

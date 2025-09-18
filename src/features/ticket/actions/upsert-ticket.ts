@@ -49,16 +49,19 @@ export const upsertTicket = async (
   try {
     const user = await getAuthOrRedirect();
 
-    if (!id) return toErrorActionState("You are not the owner of this ticket");
+    if (id) {
+      const fetchedTicket = await prisma.ticket.findUnique({
+        where: {
+          id,
+        },
+      });
 
-    const fetchedTicket = await prisma.ticket.findUnique({
-      where: {
-        id,
-      },
-    });
-
-    if (!isOwner(user.id, fetchedTicket?.userId)) {
-      return toErrorActionState("You are not the owner of this ticket");
+      if (!fetchedTicket || !isOwner(user.id, fetchedTicket.userId)) {
+        return toErrorActionState(
+          "You are not the owner of this ticket",
+          formData,
+        );
+      }
     }
 
     const convertedBounty = toCent(Number(formData.get("bounty")));
@@ -98,5 +101,7 @@ export const upsertTicket = async (
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError)
       return toErrorActionState(error, formData);
+
+    return toErrorActionState(error, formData);
   }
 };
