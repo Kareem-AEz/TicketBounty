@@ -46,6 +46,7 @@
     "react-use-measure": "^2.1.7",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
+    "use-debounce": "^10.0.6",
     "use-scramble": "^2.2.15",
     "zod": "^4.1.8"
   },

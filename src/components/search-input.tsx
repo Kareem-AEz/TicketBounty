@@ -1,9 +1,8 @@
 "use client";
-
-import { Route } from "next";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { updateUrlParams } from "@/lib/search-params";
 import { Input } from "./ui/input";
 
@@ -12,28 +11,28 @@ export default function SearchInput() {
   const router = useRouter();
   const [query, setQuery] = useState(searchParams.get("query") || "");
 
-  const handleSearch = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setQuery(value);
+  const handleSearch = useDebouncedCallback((value: string) => {
+    const newUrl = updateUrlParams({
+      params: searchParams.toString(),
+      updates: {
+        query: value,
+      },
+    });
 
-      const newUrl = updateUrlParams({
-        params: searchParams.toString(),
-        updates: {
-          query: value,
-        },
-      });
+    router.replace(newUrl, { scroll: false });
+  }, 350);
 
-      router.replace(newUrl as Route, { scroll: false });
-    },
-    [router, searchParams],
-  );
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim();
+    setQuery(value);
+    handleSearch(value);
+  };
 
   return (
     <Input
       placeholder="Search tickets"
-      onChange={handleSearch}
-      value={query || ""}
+      value={query}
+      onChange={handleChange}
       className="w-full max-w-md"
     />
   );

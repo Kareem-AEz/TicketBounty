@@ -80,9 +80,6 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
         animate={isMounted ? { height, opacity: 1 } : false}
         exit={{ opacity: 0, height: 0 }}
         key={ticket.id}
-        style={{
-          originY: "0px",
-        }}
         className={cn(
           "w-full max-w-md self-center will-change-auto",
           isDetail && "max-w-xl",
@@ -248,7 +245,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
 
                   <motion.div
                     className={cn(
-                      "group/buttons flex shrink-0 flex-col gap-y-2 overflow-hidden mask-l-from-75% p-1 py-0 will-change-transform",
+                      "group/buttons flex shrink-0 flex-col gap-y-2 overflow-hidden mask-l-from-75% p-1 py-0 pt-2 will-change-transform",
                       isMobile && "mask-l-from-85% mask-l-to-100%",
                     )}
                     layout="position"

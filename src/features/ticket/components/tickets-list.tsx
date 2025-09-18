@@ -1,6 +1,8 @@
 import { User } from "lucia";
-import { AnimatePresence } from "motion/react";
+import * as motion from "motion/react-client";
 import React from "react";
+import Placeholder from "@/components/placeholder";
+import { copy } from "@/lib/copy";
 import { SearchParams } from "@/lib/search-params";
 import { getTickets } from "../queries/get-tickets";
 import TicketItem from "./ticket-item";
@@ -22,12 +24,19 @@ async function TicketsList({
   );
 
   return (
-    <div className="flex w-full flex-1 flex-col items-center space-y-4 overflow-y-clip mask-b-from-[calc(100%-6rem)] p-1 pb-24">
-      <AnimatePresence mode="popLayout">
-        {tickets.map((ticket) => (
+    <div className="relative flex w-full flex-1 flex-col items-center gap-y-4 overflow-y-clip mask-b-from-[calc(100%-6rem)] p-1 pb-24">
+      {tickets.length ? (
+        tickets.map((ticket) => (
           <TicketItem key={ticket.id} ticket={ticket} user={user} />
-        ))}
-      </AnimatePresence>
+        ))
+      ) : (
+        <motion.div
+          layout="position"
+          className="flex flex-1 flex-col items-center justify-center"
+        >
+          <Placeholder label={copy.errors.general} />
+        </motion.div>
+      )}
     </div>
   );
 }
