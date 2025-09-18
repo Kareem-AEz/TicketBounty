@@ -30,7 +30,8 @@ export default function Form({
 
   useActionFeedback(actionState, {
     onSuccess: ({ actionState }) => {
-      if (actionState.message && actionState.ticketId && !isDetail)
+      if (actionState.message && !isDetail) toast.success(actionState.message);
+      if (actionState.ticketId) {
         toast.success(actionState.message, {
           action: {
             label: "View",
@@ -39,6 +40,7 @@ export default function Form({
             },
           },
         });
+      }
       onSuccess?.(actionState);
       onClose?.();
     },

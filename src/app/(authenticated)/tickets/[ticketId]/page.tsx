@@ -1,15 +1,32 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import React from "react";
-import type { Metadata } from "next";
+import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
+import { Separator } from "@/components/ui/separator";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import TicketItem from "@/features/ticket/components/ticket-item";
 import { getTicket } from "@/features/ticket/queries/get-ticket";
+import { homePath, ticketsPath } from "@/paths";
 
 type TicketPageProps = {
   params: Promise<{
     ticketId: string;
   }>;
 };
+
+const breadcrumbs: Breadcrumb[] = [
+  {
+    label: "All Tickets",
+    href: homePath(),
+  },
+  {
+    label: "My Tickets",
+    href: ticketsPath(),
+  },
+  {
+    label: "Ticket",
+  },
+];
 
 export async function generateMetadata({
   params,
@@ -37,7 +54,13 @@ async function page({ params }: TicketPageProps) {
     notFound();
   }
 
-  return <TicketItem ticket={ticket} isDetail user={user} />;
+  return (
+    <div className="flex flex-col gap-y-8">
+      <Breadcrumbs breadcrumbs={breadcrumbs} />
+      <Separator className="mb-8" />
+      <TicketItem ticket={ticket} isDetail user={user} />
+    </div>
+  );
 }
 
 export default page;

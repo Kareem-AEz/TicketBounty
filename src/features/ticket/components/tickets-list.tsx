@@ -1,24 +1,33 @@
 import { User } from "lucia";
+import { AnimatePresence } from "motion/react";
 import React from "react";
+import { SearchParams } from "@/lib/search-params";
 import { getTickets } from "../queries/get-tickets";
 import TicketItem from "./ticket-item";
 
 async function TicketsList({
   user,
   isAllTickets,
-  id,
+  searchParams,
 }: {
   user?: User;
   isAllTickets?: boolean;
-  id?: string;
+  searchParams: Promise<SearchParams>;
 }) {
-  const tickets = await getTickets(isAllTickets ? undefined : user?.id);
+  const searchParamsObj = await searchParams;
+
+  const tickets = await getTickets(
+    isAllTickets ? undefined : user?.id,
+    searchParamsObj,
+  );
 
   return (
-    <div className="animate-fade-from-top flex w-full flex-1 flex-col items-center gap-y-4 overflow-y-clip mask-b-from-[calc(100%-6rem)] p-1 pt-6 pb-24">
-      {tickets.map((ticket) => (
-        <TicketItem key={`${ticket.id}-${id}`} ticket={ticket} user={user} />
-      ))}
+    <div className="flex w-full flex-1 flex-col items-center space-y-4 overflow-y-clip mask-b-from-[calc(100%-6rem)] p-1 pb-24">
+      <AnimatePresence mode="popLayout">
+        {tickets.map((ticket) => (
+          <TicketItem key={ticket.id} ticket={ticket} user={user} />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }

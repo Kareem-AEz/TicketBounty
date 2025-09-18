@@ -60,18 +60,20 @@ export const toErrorActionState = (
 export const toSuccessActionState = ({
   status,
   message,
+  payload,
   ticketId,
 }: {
   status: ActionState["status"];
   message: string;
   payload?: FormData;
-  ticketId: string;
+  ticketId?: string;
 }): ActionState => {
   return {
     status,
     message,
     fieldErrors: undefined,
     timestamp: Date.now(),
+    payload,
     ticketId,
   };
 };

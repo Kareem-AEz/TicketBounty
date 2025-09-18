@@ -16,7 +16,7 @@ function Heading({ title, description }: HeadingProps) {
         )}
       </div>
 
-      <Separator className="mb-8" />
+      <Separator className="" />
     </>
   );
 }

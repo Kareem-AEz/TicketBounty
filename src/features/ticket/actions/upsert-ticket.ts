@@ -97,7 +97,6 @@ export const upsertTicket = async (
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError)
-      console.log(error.code);
-    return toErrorActionState(error, formData);
+      return toErrorActionState(error, formData);
   }
 };
