@@ -52,7 +52,7 @@ export default function Sidebar() {
             transition={{
               type: "spring",
               duration: 0.4,
-              bounce: 0.1,
+              bounce: 0.05,
             }}
             initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
             animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}

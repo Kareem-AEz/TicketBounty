@@ -65,7 +65,7 @@
 
   // JS/TS behavior settings
   "javascript.validate.enable": false,
-  "javascript.updateImportsOnFileMove.enabled": "prompt",
+  "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.preferences.autoImportFileExcludePatterns": ["@radix-ui"],
   "typescript.updateImportsOnFileMove.enabled": "never",
   "js/ts.implicitProjectConfig.checkJs": true,

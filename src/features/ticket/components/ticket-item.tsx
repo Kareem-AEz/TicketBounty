@@ -49,7 +49,9 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
   const [ref, { height }] = useMeasure();
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
-    setIsMounted(true);
+    setTimeout(() => {
+      setIsMounted(true);
+    }, 10);
   }, []);
 
   useKeyDown("Backspace", () => redirect(ticketsPath()), {
@@ -64,14 +66,27 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
 
   return (
     <MotionConfig
-      transition={{ type: "spring", mass: 1, damping: 22, stiffness: 250 }}
+      transition={{ type: "spring", duration: 0.4681, bounce: 0.05 }}
     >
       <motion.div
-        animate={isMounted ? { height } : false}
-        initial={{ height: "auto" }}
+        initial={{
+          height: "auto",
+          opacity: 0,
+          transition: {
+            duration: 0,
+            opacity: { type: "spring", duration: 0.2, bounce: 0 },
+          },
+        }}
+        animate={isMounted ? { height, opacity: 1 } : false}
         exit={{ opacity: 0, height: 0 }}
         key={ticket.id}
-        className={cn("w-full max-w-md self-center", isDetail && "max-w-xl")}
+        style={{
+          originY: "0px",
+        }}
+        className={cn(
+          "w-full max-w-md self-center will-change-auto",
+          isDetail && "max-w-xl",
+        )}
       >
         <div ref={ref}>
           <AnimatePresence mode="popLayout" initial={false}>
@@ -87,9 +102,30 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                   <motion.div
                     layoutId={`ticket-${ticket.id}-content${isDetail ? "-detail" : ""}`}
                     layout="position"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    initial={{
+                      opacity: 0,
+                      filter: "blur(6px)",
+                      transition: {
+                        duration: 0.2,
+                        bounce: 0,
+                      },
+                    }}
+                    animate={{
+                      opacity: 1,
+                      filter: "blur(0px)",
+                      transition: {
+                        duration: 0.2,
+                        bounce: 0,
+                      },
+                    }}
+                    exit={{
+                      opacity: 0,
+                      filter: "blur(6px)",
+                      transition: {
+                        duration: 0.2,
+                        bounce: 0,
+                      },
+                    }}
                     className="flex flex-col gap-y-4 will-change-transform"
                   >
                     <CardHeader>
@@ -116,7 +152,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                 <>
                   <motion.div
                     layoutId={`ticket-${ticket.id}-background${isDetail ? "-detail" : ""}`}
-                    className="w-full max-w-xl"
+                    className="w-full max-w-xl will-change-auto"
                   >
                     <Card
                       className={cn(
@@ -132,10 +168,31 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                       <motion.div
                         layoutId={`ticket-${ticket.id}-content${isDetail ? "-detail" : ""}`}
                         layout="position"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="flex flex-col gap-y-4"
+                        initial={{
+                          opacity: 0,
+                          filter: "blur(10px)",
+                          transition: {
+                            duration: 0.2,
+                            bounce: 0,
+                          },
+                        }}
+                        animate={{
+                          opacity: 1,
+                          filter: "blur(0px)",
+                          transition: {
+                            duration: 0.2,
+                            bounce: 0,
+                          },
+                        }}
+                        exit={{
+                          opacity: 0,
+                          filter: "blur(10px)",
+                          transition: {
+                            duration: 0.2,
+                            bounce: 0,
+                          },
+                        }}
+                        className="flex flex-col gap-y-4 will-change-transform"
                       >
                         <CardHeader>
                           <CardTitle
@@ -191,7 +248,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
 
                   <motion.div
                     className={cn(
-                      "group/buttons flex shrink-0 flex-col gap-y-2 overflow-hidden mask-l-from-75% p-1 py-0",
+                      "group/buttons flex shrink-0 flex-col gap-y-2 overflow-hidden mask-l-from-75% p-1 py-0 will-change-transform",
                       isMobile && "mask-l-from-85% mask-l-to-100%",
                     )}
                     layout="position"

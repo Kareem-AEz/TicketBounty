@@ -1,7 +1,11 @@
-export const homePath = () => "/";
-export const ticketsPath = () => "/tickets";
-export const ticketPath = (ticketId: string) => `/tickets/${ticketId}`;
+export const homePath = () => "/" as const;
+export const ticketsPath = () => "/tickets" as const;
+export const ticketPath = (ticketId: string) => `/tickets/${ticketId}` as const;
 
-export const signInPath = () => "/sign-in";
-export const signUpPath = () => "/sign-up";
-export const passwordForgotPath = () => "/password-forgot";
+export const signInPath = () => "/sign-in" as const;
+export const signUpPath = () => "/sign-up" as const;
+export const passwordForgotPath = () => "/password-forgot" as const;
+
+export const accountPath = () => "/account" as const;
+export const accountProfilePath = () => "/account/profile" as const;
+export const accountPasswordPath = () => "/account/password" as const;
