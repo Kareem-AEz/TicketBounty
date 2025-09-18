@@ -1,13 +1,13 @@
 import { Route } from "next";
 import queryString from "query-string";
 
-export type SearchParamsKeys = "query";
+export type SearchParamsKeys = "query" | "sort";
 
-export type SearchParams = Partial<Record<"query", string | undefined>>;
-
+export type SearchParams = Partial<
+  Record<SearchParamsKeys, string | string[] | undefined>
+>;
 type UpdateUrlParamsProps = {
   params: string;
-} & {
   updates: SearchParams;
 };
 

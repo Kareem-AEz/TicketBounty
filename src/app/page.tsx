@@ -4,6 +4,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import Heading from "@/components/heading";
 import Placeholder from "@/components/placeholder";
 import SearchInput from "@/components/search-input";
+import SelectInput from "@/components/select-input";
 import Spinner from "@/components/spinner";
 import { getAuth } from "@/features/auth/queries/get-auth";
 import TicketsList from "@/features/ticket/components/tickets-list";
@@ -24,7 +25,10 @@ async function HomePage({ searchParams }: PageSearchParamsType) {
       />
 
       <div className="flex flex-1 flex-col items-center gap-y-8">
-        <SearchInput />
+        <div className="flex w-full max-w-md gap-x-4">
+          <SearchInput />
+          <SelectInput />
+        </div>
 
         <ErrorBoundary fallback={<Placeholder label={copy.errors.general} />}>
           <Suspense fallback={<Spinner />}>

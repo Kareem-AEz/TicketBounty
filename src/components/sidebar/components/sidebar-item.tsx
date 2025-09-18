@@ -1,5 +1,6 @@
 "use client";
 
+import { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -28,7 +29,7 @@ export default function SideBarItem({
     <>
       {item.separator && <Separator className="my-2" />}
       <Link
-        href={item.href}
+        href={item.href as Route}
         className={cn(
           buttonVariants({ variant: "ghost" }),
           "group relative flex h-12 justify-center",

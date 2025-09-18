@@ -48,7 +48,7 @@ async function page() {
 
           <ErrorBoundary fallback={<Placeholder label={copy.errors.general} />}>
             <Suspense fallback={<Spinner />}>
-              <TicketsList user={user} id="my" />
+              <TicketsList user={user} />
             </Suspense>
           </ErrorBoundary>
         </div>
