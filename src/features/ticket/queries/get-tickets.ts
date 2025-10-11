@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { SearchParams } from "@/lib/search-params";
+import { ParsedSearchParams } from "@/lib/search-params";
 
 const buildOrderBy = (
   sort?: string,
@@ -40,7 +40,7 @@ const buildSearchFilter = (query: string): Prisma.TicketWhereInput => ({
 
 const buildWhereClause = (
   userId?: string,
-  searchParams?: SearchParams,
+  searchParams?: ParsedSearchParams,
 ): Prisma.TicketWhereInput => {
   const where: Prisma.TicketWhereInput = {};
 
@@ -57,8 +57,9 @@ const buildWhereClause = (
 
 export const getTickets = async (
   userId?: string,
-  searchParams?: SearchParams,
+  searchParams?: ParsedSearchParams,
 ) => {
+  console.log("searchParams", searchParams);
   return await prisma.ticket.findMany({
     orderBy: buildOrderBy(searchParams?.sort as string),
     where: buildWhereClause(userId, searchParams),

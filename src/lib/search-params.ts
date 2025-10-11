@@ -1,19 +1,28 @@
 import { Route } from "next";
+import {
+  createSearchParamsCache,
+  parseAsString,
+  parseAsStringLiteral,
+} from "nuqs/server";
 import queryString from "query-string";
 
-export type SearchParamsKeys = "query" | "sort";
+export const searchParamsCache = createSearchParamsCache({
+  query: parseAsString.withDefault(""),
+  sort: parseAsStringLiteral(["newest", "bounty"]).withDefault("newest"),
+});
 
-export type SearchParams = Partial<
-  Record<SearchParamsKeys, string | string[] | undefined>
+export type ParsedSearchParams = Awaited<
+  ReturnType<typeof searchParamsCache.parse>
 >;
+
 type UpdateUrlParamsProps = {
   params: string;
-  updates: SearchParams;
+  updates: Partial<ParsedSearchParams>;
 };
 
 type DeleteUrlParamsProps = {
   params: string;
-  keys: SearchParamsKeys[];
+  keys: (keyof ParsedSearchParams)[];
 };
 
 /**
@@ -65,15 +74,4 @@ export function deleteUrlParams({ params, keys }: DeleteUrlParamsProps) {
       skipNull: true,
     },
   );
-}
-
-/**
- * Parse search params into typed object
- */
-export function parseUrlParams(params: string) {
-  return queryString.parse(params, {
-    arrayFormat: "comma",
-    parseBooleans: true,
-    parseNumbers: false,
-  });
 }
