@@ -15,13 +15,13 @@ import {
 const SORT_OPTIONS = [
   { label: "Newest", value: "newest" },
   { label: "Bounty", value: "bounty" },
-];
+] as const;
 
 export default function SelectInput() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const handleSort = (value: string) => {
+  const handleSort = (value: (typeof SORT_OPTIONS)[number]["value"]) => {
     let newUrl = "";
 
     if (value === "newest") {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SearchParams } from "nuqs/server";
 import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import Heading from "@/components/heading";
@@ -9,12 +10,17 @@ import Spinner from "@/components/spinner";
 import { getAuth } from "@/features/auth/queries/get-auth";
 import TicketsList from "@/features/ticket/components/tickets-list";
 import { copy } from "@/lib/copy";
+import { searchParamsCache } from "@/lib/search-params";
 
 export const metadata: Metadata = {
   title: "All Tickets",
 };
 
-async function HomePage({ searchParams }: PageSearchParamsType) {
+type HomePagePropsType = {
+  searchParams: Promise<SearchParams>;
+};
+
+async function HomePage({ searchParams }: HomePagePropsType) {
   const { user } = await getAuth();
 
   return (
@@ -35,7 +41,7 @@ async function HomePage({ searchParams }: PageSearchParamsType) {
             <TicketsList
               user={user ?? undefined}
               isAllTickets
-              searchParams={searchParams}
+              searchParams={searchParamsCache.parse(await searchParams)}
             />
           </Suspense>
         </ErrorBoundary>

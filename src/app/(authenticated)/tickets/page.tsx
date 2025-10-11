@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SearchParams } from "nuqs/server";
 import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import Heading from "@/components/heading";
@@ -16,12 +17,17 @@ import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect"
 import TicketUpsertForm from "@/features/ticket/components/ticket-upsert-form";
 import TicketsList from "@/features/ticket/components/tickets-list";
 import { copy } from "@/lib/copy";
+import { searchParamsCache } from "@/lib/search-params";
 
 export const metadata: Metadata = {
   title: "My Tickets",
 };
 
-async function page() {
+type TicketsPagePropsType = {
+  searchParams: Promise<SearchParams>;
+};
+
+async function page({ searchParams }: TicketsPagePropsType) {
   const user = await getAuthOrRedirect();
 
   return (
@@ -48,7 +54,10 @@ async function page() {
 
           <ErrorBoundary fallback={<Placeholder label={copy.errors.general} />}>
             <Suspense fallback={<Spinner />}>
-              <TicketsList user={user} />
+              <TicketsList
+                user={user}
+                searchParams={searchParamsCache.parse(await searchParams)}
+              />
             </Suspense>
           </ErrorBoundary>
         </div>

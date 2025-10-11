@@ -3,7 +3,7 @@ import * as motion from "motion/react-client";
 import React from "react";
 import Placeholder from "@/components/placeholder";
 import { copy } from "@/lib/copy";
-import { SearchParams } from "@/lib/search-params";
+import { ParsedSearchParams } from "@/lib/search-params";
 import { getTickets } from "../queries/get-tickets";
 import TicketItem from "./ticket-item";
 
@@ -14,13 +14,11 @@ async function TicketsList({
 }: {
   user?: User;
   isAllTickets?: boolean;
-  searchParams?: Promise<SearchParams> | undefined;
+  searchParams?: ParsedSearchParams;
 }) {
-  const searchParamsObj = await searchParams;
-
   const tickets = await getTickets(
     isAllTickets ? undefined : user?.id,
-    searchParamsObj,
+    searchParams,
   );
 
   return (
