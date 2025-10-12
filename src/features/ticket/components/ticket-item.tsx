@@ -81,7 +81,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
         exit={{ opacity: 0, height: 0 }}
         key={ticket.id}
         className={cn(
-          "w-full max-w-md self-center will-change-auto",
+          "w-full max-w-lg self-center will-change-auto",
           isDetail && "max-w-xl",
         )}
       >
