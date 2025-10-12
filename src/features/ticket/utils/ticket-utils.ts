@@ -1,4 +1,4 @@
-import { Ticket } from "@prisma/client";
+import { Ticket } from "@/generated/client";
 import { format, isEqual } from "date-fns";
 
 export const parseDate = (ticket: Ticket) => {

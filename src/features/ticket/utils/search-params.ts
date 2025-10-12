@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import {
   Options,
   parseAsInteger,
@@ -6,6 +5,7 @@ import {
   parseAsStringEnum,
 } from "nuqs/server";
 import { createSearchParamsCache } from "nuqs/server";
+import { Prisma } from "@/generated/client";
 
 // -------------------------------------------------------
 //                Ticket Query Options

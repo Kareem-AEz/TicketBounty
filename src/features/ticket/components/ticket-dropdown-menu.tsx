@@ -1,6 +1,6 @@
 "use client";
 
-import { Ticket, TicketStatus } from "@prisma/client";
+import { Ticket, TicketStatus } from "@/generated/client";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -33,7 +33,7 @@ export default function TicketDropdownMenu({
         loading: "Updating status...",
       });
       const result = await resultPromise;
-      
+
       if (result.status === "SUCCESS") {
         toast.success(result.message);
       } else {

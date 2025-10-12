@@ -1,7 +1,7 @@
 "use server";
 
 import argon2 from "@node-rs/argon2";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/client";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import z from "zod";

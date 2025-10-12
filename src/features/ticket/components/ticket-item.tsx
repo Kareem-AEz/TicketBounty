@@ -1,6 +1,5 @@
 "use client";
 
-import { Prisma } from "@prisma/client";
 import { User } from "lucia";
 import {
   LucideClipboardClock,
@@ -22,6 +21,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { isOwner } from "@/features/auth/utils/is-owner";
+import { Prisma } from "@/generated/client";
 import { copy } from "@/lib/copy";
 import { centToCurrency } from "@/lib/currency";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
@@ -48,6 +48,9 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
   const isMobile = useIsMobile();
   const [ref, { height }] = useMeasure();
   const [isMounted, setIsMounted] = useState(false);
+
+  const isMine = user?.id === ticket.userId;
+
   useEffect(() => {
     setTimeout(() => {
       setIsMounted(true);
@@ -243,62 +246,64 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                     </Card>
                   </motion.div>
 
-                  <motion.div
-                    className={cn(
-                      "group/buttons flex shrink-0 flex-col gap-y-2 overflow-hidden mask-l-from-75% p-1 py-0 pt-2 will-change-transform",
-                      isMobile && "mask-l-from-85% mask-l-to-100%",
-                    )}
-                    layout="position"
-                  >
-                    {!isDetail && (
-                      <>
-                        <DetailButton
-                          index={0}
-                          icon={<LucideSquareArrowOutUpRight />}
-                          label={copy.actions.view}
-                          href={ticketPath(ticket.id)}
-                        />
-                        {isOwner(user?.id ?? "", ticket.userId) && (
-                          <>
-                            <DetailButton
-                              index={1}
-                              icon={<LucidePencil />}
-                              label={copy.actions.edit}
-                              onClick={() => setIsEditing(true)}
-                            />
-                            <TicketDeleteButton ticket={ticket} />
-                          </>
-                        )}
-                      </>
-                    )}
+                  {!isMine && isDetail ? null : (
+                    <motion.div
+                      className={cn(
+                        "group/buttons flex shrink-0 flex-col gap-y-2 overflow-hidden mask-l-from-75% p-1 py-0 pt-2 will-change-transform",
+                        isMobile && "mask-l-from-85% mask-l-to-100%",
+                      )}
+                      layout="position"
+                    >
+                      {!isDetail && (
+                        <>
+                          <DetailButton
+                            index={0}
+                            icon={<LucideSquareArrowOutUpRight />}
+                            label={copy.actions.view}
+                            href={ticketPath(ticket.id)}
+                          />
+                          {isOwner(user?.id ?? "", ticket.userId) && (
+                            <>
+                              <DetailButton
+                                index={1}
+                                icon={<LucidePencil />}
+                                label={copy.actions.edit}
+                                onClick={() => setIsEditing(true)}
+                              />
+                              <TicketDeleteButton ticket={ticket} />
+                            </>
+                          )}
+                        </>
+                      )}
 
-                    {isDetail && isOwner(user?.id ?? "", ticket.userId) && (
-                      <>
-                        <DetailButton
-                          index={0}
-                          icon={<LucidePencil />}
-                          label={copy.actions.edit}
-                          onClick={() => setIsEditing(true)}
-                          animate={false}
-                        />
+                      {isDetail && isOwner(user?.id ?? "", ticket.userId) && (
+                        <>
+                          <DetailButton
+                            index={0}
+                            icon={<LucidePencil />}
+                            label={copy.actions.edit}
+                            onClick={() => setIsEditing(true)}
+                            animate={false}
+                          />
 
-                        <TicketDeleteButton ticket={ticket} isDetail />
+                          <TicketDeleteButton ticket={ticket} isDetail />
 
-                        <TicketDropdownMenu
-                          ticket={ticket}
-                          trigger={
-                            <Button
-                              variant={"outline"}
-                              size={"icon"}
-                              className="ml-2"
-                            >
-                              <LucideMoreVertical />
-                            </Button>
-                          }
-                        />
-                      </>
-                    )}
-                  </motion.div>
+                          <TicketDropdownMenu
+                            ticket={ticket}
+                            trigger={
+                              <Button
+                                variant={"outline"}
+                                size={"icon"}
+                                className="ml-2"
+                              >
+                                <LucideMoreVertical />
+                              </Button>
+                            }
+                          />
+                        </>
+                      )}
+                    </motion.div>
+                  )}
                 </>
               </div>
             )}

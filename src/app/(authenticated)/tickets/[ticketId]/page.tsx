@@ -4,6 +4,7 @@ import React from "react";
 import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
 import { Separator } from "@/components/ui/separator";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
+import Comments from "@/features/comment/components/comments";
 import TicketItem from "@/features/ticket/components/ticket-item";
 import { getTicket } from "@/features/ticket/queries/get-ticket";
 import { homePath, ticketsPath } from "@/paths";
@@ -22,9 +23,6 @@ const breadcrumbs: Breadcrumb[] = [
   {
     label: "My Tickets",
     href: ticketsPath(),
-  },
-  {
-    label: "Ticket",
   },
 ];
 
@@ -56,9 +54,10 @@ async function page({ params }: TicketPageProps) {
 
   return (
     <div className="flex flex-col gap-y-8">
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
+      <Breadcrumbs breadcrumbs={[...breadcrumbs, { label: ticket.title }]} />
       <Separator className="mb-8" />
       <TicketItem ticket={ticket} isDetail user={user} />
+      <Comments ticketId={ticketId} />
     </div>
   );
 }

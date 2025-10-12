@@ -1,7 +1,7 @@
 "use server";
 
-import { TicketStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { TicketStatus } from "@/generated/client";
 import { prisma } from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
 

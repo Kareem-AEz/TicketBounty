@@ -1,4 +1,4 @@
-import { Ticket } from "@prisma/client";
+import { Ticket } from "@/generated/client";
 import { LucideTrash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
