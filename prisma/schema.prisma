@@ -7,6 +7,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output = "../src/generated/client"
 }
 
 datasource db {
@@ -29,6 +30,7 @@ model User {
   passwordHash  String
   sessions      Session[]
   tickets       Ticket[]
+  comments      TicketComment[]
 }
 
 model Session {
@@ -55,6 +57,7 @@ model Ticket {
   status        TicketStatus  @default(OPEN)
   userId        String
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments      TicketComment[]
 
   deadline      String       
   bounty        Int
@@ -68,3 +71,17 @@ enum TicketStatus {
   DONE
 }
 
+model TicketComment {
+  id            String        @id @default(cuid())
+  createdAt     DateTime      @default(now()) @db.Timestamptz
+
+  content       String        @db.Text
+  ticketId      String
+  ticket        Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  userId        String?
+  user          User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([ticketId])
+  @@index([userId])
+}

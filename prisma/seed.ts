@@ -1,5 +1,5 @@
 import argon2 from "@node-rs/argon2";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/generated/client";
 
 const prisma = new PrismaClient();
 
@@ -9,7 +9,7 @@ const users = [
     email: "admin@example.com",
   },
   {
-    username: "user",
+    username: "Kareem Ahmed",
     email: "kemoahmedahmedkemo@gmail.com",
   },
 ];
@@ -44,31 +44,59 @@ const tickets = [
   },
 ];
 
+const comments = [
+  {
+    content: "This is a first comment",
+    ticketId: "1",
+  },
+  {
+    content: "This is a second comment",
+    ticketId: "2",
+  },
+  {
+    content: "This is a third comment",
+    ticketId: "3",
+  },
+];
+
 const seed = async () => {
   console.log("Seeding database...");
 
   const start = performance.now();
   // Delete all users
   await prisma.user.deleteMany();
-  // await prisma.ticket.deleteMany();
+  await prisma.ticket.deleteMany();
+  await prisma.ticketComment.deleteMany();
 
   const passwordHash = await argon2.hash("password");
 
-  // Create users
-  const createdUsers = await prisma.user.createManyAndReturn({
-    data: users.map((user) => ({
-      ...user,
-      passwordHash,
-    })),
+  prisma.$transaction(async (tx) => {
+    // Create users
+    const createdUsers = await tx.user.createManyAndReturn({
+      data: users.map((user) => ({
+        ...user,
+        passwordHash,
+      })),
+    });
+
+    // Create tickets
+    const createdTickets = await tx.ticket.createManyAndReturn({
+      data: tickets.map((ticket) => ({
+        ...ticket,
+        userId: createdUsers[0].id,
+      })),
+    });
+
+    // Create comments
+    await tx.ticketComment.createMany({
+      data: comments.map((comment) => ({
+        ...comment,
+        ticketId: createdTickets[0].id,
+        userId: createdUsers[1].id,
+      })),
+    });
   });
 
-  // Create tickets
-  await prisma.ticket.createMany({
-    data: tickets.map((ticket) => ({
-      ...ticket,
-      userId: createdUsers[0].id,
-    })),
-  });
   const end = performance.now();
   console.log(`Database seeded successfully in ${(end - start).toFixed(2)}ms`);
 };

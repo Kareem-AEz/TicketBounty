@@ -1,6 +1,6 @@
 "use client";
 
-import { Ticket } from "@prisma/client";
+import { Ticket } from "@/generated/client";
 import { usePathname } from "next/navigation";
 import React, { useActionState } from "react";
 import { FieldError } from "@/components/form/field-error";
