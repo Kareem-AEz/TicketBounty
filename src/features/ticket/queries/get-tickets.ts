@@ -1,67 +1,15 @@
-import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { ParsedSearchParams } from "@/lib/search-params";
-
-const buildOrderBy = (
-  sort?: string,
-): Prisma.TicketOrderByWithRelationInput[] => {
-  if (sort === "bounty") {
-    return [{ bounty: "desc" }];
-  }
-
-  // Default sorting
-  return [{ createdAt: "desc" }, { id: "desc" }];
-};
-
-const buildSearchFilter = (query: string): Prisma.TicketWhereInput => ({
-  OR: [
-    {
-      title: {
-        contains: query,
-        mode: "insensitive",
-      },
-    },
-    {
-      content: {
-        contains: query,
-        mode: "insensitive",
-      },
-    },
-    {
-      user: {
-        username: {
-          contains: query,
-          mode: "insensitive",
-        },
-      },
-    },
-  ],
-});
-
-const buildWhereClause = (
-  userId?: string,
-  searchParams?: ParsedSearchParams,
-): Prisma.TicketWhereInput => {
-  const where: Prisma.TicketWhereInput = {};
-
-  if (userId) {
-    where.userId = userId;
-  }
-
-  if (typeof searchParams?.query === "string") {
-    Object.assign(where, buildSearchFilter(searchParams.query));
-  }
-
-  return where;
-};
+import { TicketParsedSearchParams } from "../utils/search-params";
 
 export const getTickets = async (
   userId?: string,
-  searchParams?: ParsedSearchParams,
+  searchParams?: TicketParsedSearchParams,
 ) => {
   return await prisma.ticket.findMany({
-    orderBy: buildOrderBy(searchParams?.sort as string),
-    where: buildWhereClause(userId, searchParams),
+    orderBy: searchParams
+      ? { [searchParams.sortKey]: searchParams.sortOrder }
+      : { createdAt: "desc" },
+
     include: {
       user: {
         select: {
@@ -69,6 +17,33 @@ export const getTickets = async (
           username: true,
         },
       },
+    },
+    where: {
+      userId,
+      ...(searchParams?.query && {
+        OR: [
+          {
+            title: {
+              contains: searchParams.query,
+              mode: "insensitive",
+            },
+          },
+          {
+            content: {
+              contains: searchParams.query,
+              mode: "insensitive",
+            },
+          },
+          {
+            user: {
+              username: {
+                contains: searchParams.query,
+                mode: "insensitive",
+              },
+            },
+          },
+        ],
+      }),
     },
   });
 };

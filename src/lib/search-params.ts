@@ -1,50 +1,15 @@
 import { Route } from "next";
-import {
-  createSearchParamsCache,
-  Options,
-  parseAsString,
-  parseAsStringEnum,
-} from "nuqs/server";
+import { SearchParams } from "nuqs";
 import queryString from "query-string";
-
-export const ticketSearchOptions: Options = {
-  shallow: false,
-  history: "replace",
-  limitUrlUpdates: {
-    method: "debounce",
-    timeMs: 350,
-  },
-};
-
-export enum TicketSort {
-  Newest = "newest",
-  Bounty = "bounty",
-}
-
-export const ticketSearchParsers = {
-  query: parseAsString.withDefault("").withOptions(ticketSearchOptions),
-  sort: parseAsStringEnum<TicketSort>(Object.values(TicketSort))
-    .withDefault(TicketSort.Newest)
-    .withOptions({
-      shallow: false,
-      history: "replace",
-    }),
-};
-
-export const searchParamsCache = createSearchParamsCache(ticketSearchParsers);
-
-export type ParsedSearchParams = Awaited<
-  ReturnType<typeof searchParamsCache.parse>
->;
 
 type UpdateUrlParamsProps = {
   params: string;
-  updates: Partial<ParsedSearchParams>;
+  updates: Partial<SearchParams>;
 };
 
 type DeleteUrlParamsProps = {
   params: string;
-  keys: (keyof ParsedSearchParams)[];
+  keys: (keyof SearchParams)[];
 };
 
 /**
