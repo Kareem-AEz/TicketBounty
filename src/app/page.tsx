@@ -6,6 +6,7 @@ import Heading from "@/components/heading";
 import Placeholder from "@/components/placeholder";
 import Spinner from "@/components/spinner";
 import { getAuth } from "@/features/auth/queries/get-auth";
+import TicketPagination from "@/features/ticket/components/ticket-pagination";
 import TicketQueryInput from "@/features/ticket/components/ticket-query-input";
 import TicketSortSelect from "@/features/ticket/components/ticket-sort-select";
 import TicketsList from "@/features/ticket/components/tickets-list";
@@ -44,7 +45,13 @@ async function HomePage({ searchParams }: HomePagePropsType) {
         </div>
 
         <ErrorBoundary fallback={<Placeholder label={copy.errors.general} />}>
-          <Suspense fallback={<Spinner />}>
+          <Suspense
+            fallback={
+              <div className="flex min-h-screen w-full flex-1 items-center justify-center">
+                <Spinner />
+              </div>
+            }
+          >
             <TicketsList
               user={user ?? undefined}
               isAllTickets
@@ -52,6 +59,10 @@ async function HomePage({ searchParams }: HomePagePropsType) {
             />
           </Suspense>
         </ErrorBoundary>
+
+        <div className="flex w-full max-w-md flex-1 flex-col items-center">
+          <TicketPagination />
+        </div>
       </div>
     </div>
   );

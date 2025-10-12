@@ -1,5 +1,10 @@
 import { Prisma } from "@prisma/client";
-import { Options, parseAsString, parseAsStringEnum } from "nuqs/server";
+import {
+  Options,
+  parseAsInteger,
+  parseAsString,
+  parseAsStringEnum,
+} from "nuqs/server";
 import { createSearchParamsCache } from "nuqs/server";
 
 // -------------------------------------------------------
@@ -16,7 +21,7 @@ const ticketQueryOptions: Options = {
   },
 };
 
-const ticketSortOptions: Options = {
+const ticketGeneralOptions: Options = {
   shallow: false,
   history: "replace",
 };
@@ -32,17 +37,23 @@ export const ticketQueryParser = parseAsString
 export const ticketSortParser = {
   sortKey: parseAsStringEnum(Object.values(Prisma.TicketScalarFieldEnum))
     .withDefault("createdAt")
-    .withOptions(ticketSortOptions),
+    .withOptions(ticketGeneralOptions),
 
   sortOrder: parseAsStringEnum(Object.values(Prisma.SortOrder))
     .withDefault(Prisma.SortOrder.desc)
-    .withOptions(ticketSortOptions),
+    .withOptions(ticketGeneralOptions),
+};
+
+export const ticketPageParser = {
+  page: parseAsInteger.withDefault(0).withOptions(ticketGeneralOptions),
+  size: parseAsInteger.withDefault(10).withOptions(ticketGeneralOptions),
 };
 
 export const ticketSearchParamsCache = createSearchParamsCache({
   query: ticketQueryParser,
 
   ...ticketSortParser,
+  ...ticketPageParser,
 });
 
 export type TicketParsedSearchParams = Awaited<

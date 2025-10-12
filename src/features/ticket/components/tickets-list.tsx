@@ -22,7 +22,7 @@ async function TicketsList({
   );
 
   return (
-    <div className="relative flex w-full flex-1 flex-col items-center gap-y-4 overflow-y-clip mask-b-from-[calc(100%-6rem)] p-1 pb-24">
+    <div className="relative flex w-full flex-1 flex-col items-center gap-y-4 overflow-y-clip p-1">
       {tickets.length ? (
         tickets.map((ticket) => (
           <TicketItem key={ticket.id} ticket={ticket} user={user} />
