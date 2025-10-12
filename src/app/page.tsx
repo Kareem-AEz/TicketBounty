@@ -4,13 +4,13 @@ import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import Heading from "@/components/heading";
 import Placeholder from "@/components/placeholder";
-import SearchInput from "@/components/search-input";
-import SelectInput from "@/components/select-input";
 import Spinner from "@/components/spinner";
 import { getAuth } from "@/features/auth/queries/get-auth";
+import TicketQueryInput from "@/features/ticket/components/ticket-query-input";
+import TicketSortSelect from "@/features/ticket/components/ticket-sort-select";
 import TicketsList from "@/features/ticket/components/tickets-list";
+import { ticketSearchParamsCache } from "@/features/ticket/utils/search-params";
 import { copy } from "@/lib/copy";
-import { searchParamsCache } from "@/lib/search-params";
 
 export const metadata: Metadata = {
   title: "All Tickets",
@@ -32,8 +32,15 @@ async function HomePage({ searchParams }: HomePagePropsType) {
 
       <div className="flex flex-1 flex-col items-center gap-y-8">
         <div className="flex w-full max-w-md gap-x-4">
-          <SearchInput />
-          <SelectInput />
+          <TicketQueryInput />
+          <TicketSortSelect
+            options={[
+              { sortKey: "createdAt", sortOrder: "desc", label: "Newest" },
+              { sortKey: "createdAt", sortOrder: "asc", label: "Oldest" },
+              { sortKey: "bounty", sortOrder: "desc", label: "Bounty" },
+              { sortKey: "title", sortOrder: "asc", label: "Title" },
+            ]}
+          />
         </div>
 
         <ErrorBoundary fallback={<Placeholder label={copy.errors.general} />}>
@@ -41,7 +48,7 @@ async function HomePage({ searchParams }: HomePagePropsType) {
             <TicketsList
               user={user ?? undefined}
               isAllTickets
-              searchParams={searchParamsCache.parse(await searchParams)}
+              searchParams={ticketSearchParamsCache.parse(await searchParams)}
             />
           </Suspense>
         </ErrorBoundary>

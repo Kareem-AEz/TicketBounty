@@ -16,8 +16,8 @@ import {
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import TicketUpsertForm from "@/features/ticket/components/ticket-upsert-form";
 import TicketsList from "@/features/ticket/components/tickets-list";
+import { ticketSearchParamsCache } from "@/features/ticket/utils/search-params";
 import { copy } from "@/lib/copy";
-import { searchParamsCache } from "@/lib/search-params";
 
 export const metadata: Metadata = {
   title: "My Tickets",
@@ -56,7 +56,7 @@ async function page({ searchParams }: TicketsPagePropsType) {
             <Suspense fallback={<Spinner />}>
               <TicketsList
                 user={user}
-                searchParams={searchParamsCache.parse(await searchParams)}
+                searchParams={ticketSearchParamsCache.parse(await searchParams)}
               />
             </Suspense>
           </ErrorBoundary>

@@ -1,8 +1,6 @@
 "use client";
 
-import { useQueryState } from "nuqs";
 import React from "react";
-import { ticketSearchParsers, TicketSort } from "@/lib/search-params";
 import {
   Select,
   SelectContent,
@@ -11,26 +9,39 @@ import {
   SelectValue,
 } from "./ui/select";
 
-const SORT_OPTIONS = Object.values(TicketSort).map((sort) => ({
-  label: sort.charAt(0).toUpperCase() + sort.slice(1),
-  value: sort,
-}));
+type SelectInputProps<T extends { sortKey: string; sortOrder: string }> = {
+  options: {
+    sortKey: string;
+    sortOrder: string;
+    label: string;
+  }[];
+  value: T;
+  setValue: (value: T) => void;
+};
 
-export default function SelectInput() {
-  const [sort, setSort] = useQueryState("sort", ticketSearchParsers.sort);
+export default function SelectInput<
+  T extends { sortKey: string; sortOrder: string },
+>({ options, value, setValue }: SelectInputProps<T>) {
+  const handleSort = (compositeSortKey: string) => {
+    const [sortKey, sortOrder] = compositeSortKey.split("_");
 
-  const handleSort = (value: TicketSort) => {
-    setSort(value);
+    setValue({ sortKey, sortOrder } as T);
   };
 
   return (
-    <Select onValueChange={handleSort} value={sort}>
+    <Select
+      onValueChange={handleSort}
+      defaultValue={`${value.sortKey}_${value.sortOrder}`}
+    >
       <SelectTrigger className="user-select-none w-[180px]">
         <SelectValue className="user-select-none" />
       </SelectTrigger>
       <SelectContent>
-        {SORT_OPTIONS.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
+        {options.map((option) => (
+          <SelectItem
+            key={`${option.sortKey}_${option.sortOrder}`}
+            value={`${option.sortKey}_${option.sortOrder}`}
+          >
             {option.label}
           </SelectItem>
         ))}

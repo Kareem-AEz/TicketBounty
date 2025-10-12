@@ -1,12 +1,13 @@
 "use client";
-import { useQueryState } from "nuqs";
 import React from "react";
-import { ticketSearchParsers } from "@/lib/search-params";
 import { Input } from "./ui/input";
 
-export default function SearchInput() {
-  const [query, setQuery] = useQueryState("query", ticketSearchParsers.query);
+type QueryInputProps = {
+  query: string;
+  setQuery: (query: string) => void;
+};
 
+export default function QueryInput({ query, setQuery }: QueryInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);

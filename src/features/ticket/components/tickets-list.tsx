@@ -3,8 +3,8 @@ import * as motion from "motion/react-client";
 import React from "react";
 import Placeholder from "@/components/placeholder";
 import { copy } from "@/lib/copy";
-import { ParsedSearchParams } from "@/lib/search-params";
 import { getTickets } from "../queries/get-tickets";
+import { TicketParsedSearchParams } from "../utils/search-params";
 import TicketItem from "./ticket-item";
 
 async function TicketsList({
@@ -14,7 +14,7 @@ async function TicketsList({
 }: {
   user?: User;
   isAllTickets?: boolean;
-  searchParams?: ParsedSearchParams;
+  searchParams?: TicketParsedSearchParams;
 }) {
   const tickets = await getTickets(
     isAllTickets ? undefined : user?.id,
