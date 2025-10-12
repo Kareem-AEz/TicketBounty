@@ -6,12 +6,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getAuth } from "@/features/auth/queries/get-auth";
 import { getComments } from "../queries/get-comments";
 import CommentForm from "./comment-form";
 import CommentItem from "./comment-item";
 
 export default async function Comments({ ticketId }: { ticketId: string }) {
   const comments = await getComments(ticketId);
+  const { user } = await getAuth();
 
   return (
     <div className="animate-fade-from-bottom flex w-full max-w-xl flex-col gap-y-5 self-center">
@@ -27,9 +29,13 @@ export default async function Comments({ ticketId }: { ticketId: string }) {
         </CardContent>
       </Card>
 
-      <div className="space-y-5 pl-4">
+      <div className="space-y-5">
         {comments.map((comment) => (
-          <CommentItem key={comment.id} comment={comment} />
+          <CommentItem
+            key={comment.id}
+            comment={comment}
+            isOwner={user?.id === comment.userId}
+          />
         ))}
       </div>
     </div>

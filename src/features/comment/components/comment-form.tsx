@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -12,29 +13,43 @@ import {
   FieldGroup,
 } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
-import commentCreate from "../actions/comment-create";
+import commentUpsert from "../actions/comment-create";
 import { formSchema, MAX_COMMENT_LENGTH } from "../schema";
+import { Comment } from "../type";
 
-export default function CommentForm({ ticketId }: { ticketId: string }) {
+export default function CommentForm({
+  ticketId,
+  comment,
+  onSuccess,
+}: {
+  ticketId: string;
+  comment?: Comment;
+  onSuccess?: () => void;
+}) {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      content: "",
+      content: comment?.content || "",
     },
   });
 
   const isSubmitting = form.formState.isSubmitting;
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    const { success, error } = await commentCreate({
+    const { success, error } = await commentUpsert({
       content: data.content,
       ticketId: ticketId,
+      commentId: comment?.id,
     });
 
     if (!success) {
       toast.error(error || "An unknown error occurred");
     } else {
-      toast.success("Comment created");
+      router.refresh();
+      toast.success(comment ? "Comment updated" : "Comment created");
+      form.reset();
+      onSuccess?.();
     }
   }
 
@@ -67,7 +82,9 @@ export default function CommentForm({ ticketId }: { ticketId: string }) {
           </Field>
         )}
       />
-      <SubmitButton pending={isSubmitting}>Submit</SubmitButton>
+      <SubmitButton pending={isSubmitting} pendingLabel="Submitting...">
+        Submit
+      </SubmitButton>
     </form>
   );
 }

@@ -9,6 +9,8 @@ export const getComments = async (ticketId: string) => {
       id: true,
       content: true,
       createdAt: true,
+      userId: true,
+      ticketId: true,
       user: {
         select: {
           username: true,
