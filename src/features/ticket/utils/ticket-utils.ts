@@ -1,5 +1,5 @@
-import { Ticket } from "@/generated/client";
 import { format, isEqual } from "date-fns";
+import { Ticket } from "@/generated/client";
 
 export const parseDate = (ticket: Ticket) => {
   const createdAt = new Date(ticket.createdAt);

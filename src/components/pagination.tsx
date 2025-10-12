@@ -59,7 +59,7 @@ export default function Pagination({
           value={page.size.toString()}
           onValueChange={(value) => setPage({ page: 0, size: Number(value) })}
         >
-          <SelectTrigger className="w-[80px]">
+          <SelectTrigger className="w-[80px]" aria-label="Page size">
             <SelectValue className="select-none" />
           </SelectTrigger>
           <SelectContent>

@@ -1,4 +1,3 @@
-import { Ticket } from "@/generated/client";
 import { LucideTrash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,6 +13,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
+import { Ticket } from "@/generated/client";
 import { copy } from "@/lib/copy";
 import { cn } from "@/lib/utils";
 import { deleteTicket } from "../actions/delete-ticket";

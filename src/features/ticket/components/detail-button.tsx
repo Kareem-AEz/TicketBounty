@@ -87,7 +87,7 @@ function DetailButton({
 
     if (href) {
       return (
-        <Button {...buttonProps} asChild>
+        <Button {...buttonProps} asChild aria-label={label}>
           <Link href={href} {...props}>
             {icon}
           </Link>
@@ -96,7 +96,7 @@ function DetailButton({
     }
 
     return (
-      <Button {...buttonProps} onClick={onClick}>
+      <Button {...buttonProps} onClick={onClick} aria-label={label}>
         {icon}
       </Button>
     );

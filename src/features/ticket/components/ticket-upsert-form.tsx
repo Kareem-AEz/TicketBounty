@@ -1,6 +1,5 @@
 "use client";
 
-import { Ticket } from "@/generated/client";
 import { usePathname } from "next/navigation";
 import React, { useActionState } from "react";
 import { FieldError } from "@/components/form/field-error";
@@ -12,6 +11,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Ticket } from "@/generated/client";
 import { copy } from "@/lib/copy";
 import { fromCent } from "@/lib/currency";
 import { ticketPath } from "@/paths";

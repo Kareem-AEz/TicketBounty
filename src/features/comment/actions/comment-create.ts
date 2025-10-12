@@ -6,15 +6,17 @@ import { prisma } from "@/lib/prisma";
 import { ticketPath } from "@/paths";
 import { formSchema } from "../schema";
 
-type CommentCreatePropsType = {
+type CommentUpsertPropsType = {
   content: string;
   ticketId: string;
+  commentId?: string;
 };
 
-export default async function commentCreate({
+export default async function commentUpsert({
   content,
   ticketId,
-}: CommentCreatePropsType) {
+  commentId,
+}: CommentUpsertPropsType) {
   const user = await getAuthOrRedirect();
 
   try {
@@ -22,8 +24,14 @@ export default async function commentCreate({
       content,
     });
 
-    const comment = await prisma.ticketComment.create({
-      data: {
+    const comment = await prisma.ticketComment.upsert({
+      where: {
+        id: commentId || "",
+      },
+      update: {
+        content: validatedContent,
+      },
+      create: {
         content: validatedContent,
         ticketId,
         userId: user.id,

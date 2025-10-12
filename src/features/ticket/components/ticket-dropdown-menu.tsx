@@ -1,6 +1,5 @@
 "use client";
 
-import { Ticket, TicketStatus } from "@/generated/client";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -10,6 +9,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Ticket, TicketStatus } from "@/generated/client";
 import { updateStatus } from "../actions/update-status";
 import { TICKET_STATUS_LABELS } from "../constants";
 
@@ -47,7 +47,11 @@ export default function TicketDropdownMenu({
   return (
     <div>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild disabled={isLoading}>
+        <DropdownMenuTrigger
+          asChild
+          disabled={isLoading}
+          aria-label="Ticket status"
+        >
           {trigger}
         </DropdownMenuTrigger>
 

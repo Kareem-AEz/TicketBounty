@@ -35,6 +35,7 @@ export default function SideBarItem({
           "group relative flex h-12 justify-center",
           isActive && "bg-muted hover:bg-muted font-bold",
         )}
+        aria-label={item.label}
       >
         <div className="flex h-5 w-5 items-center justify-center">
           {item.icon}

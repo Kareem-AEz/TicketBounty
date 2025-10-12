@@ -33,7 +33,10 @@ export default function SelectInput<
       onValueChange={handleSort}
       defaultValue={`${value.sortKey}_${value.sortOrder}`}
     >
-      <SelectTrigger className="user-select-none w-[180px]">
+      <SelectTrigger
+        className="user-select-none w-[180px]"
+        aria-label="Select input"
+      >
         <SelectValue className="user-select-none" />
       </SelectTrigger>
       <SelectContent>
