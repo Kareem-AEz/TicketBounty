@@ -59,7 +59,6 @@ export const getTickets = async (
   userId?: string,
   searchParams?: ParsedSearchParams,
 ) => {
-  console.log("searchParams", searchParams);
   return await prisma.ticket.findMany({
     orderBy: buildOrderBy(searchParams?.sort as string),
     where: buildWhereClause(userId, searchParams),
