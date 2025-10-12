@@ -6,9 +6,6 @@ import Heading from "@/components/heading";
 import Placeholder from "@/components/placeholder";
 import Spinner from "@/components/spinner";
 import { getAuth } from "@/features/auth/queries/get-auth";
-import TicketPagination from "@/features/ticket/components/ticket-pagination";
-import TicketQueryInput from "@/features/ticket/components/ticket-query-input";
-import TicketSortSelect from "@/features/ticket/components/ticket-sort-select";
 import TicketsList from "@/features/ticket/components/tickets-list";
 import { ticketSearchParamsCache } from "@/features/ticket/utils/search-params";
 import { copy } from "@/lib/copy";
@@ -32,18 +29,6 @@ async function HomePage({ searchParams }: HomePagePropsType) {
       />
 
       <div className="flex flex-1 flex-col items-center gap-y-8">
-        <div className="flex w-full max-w-md gap-x-4">
-          <TicketQueryInput />
-          <TicketSortSelect
-            options={[
-              { sortKey: "createdAt", sortOrder: "desc", label: "Newest" },
-              { sortKey: "createdAt", sortOrder: "asc", label: "Oldest" },
-              { sortKey: "bounty", sortOrder: "desc", label: "Bounty" },
-              { sortKey: "title", sortOrder: "asc", label: "Title" },
-            ]}
-          />
-        </div>
-
         <ErrorBoundary fallback={<Placeholder label={copy.errors.general} />}>
           <Suspense
             fallback={
@@ -59,10 +44,6 @@ async function HomePage({ searchParams }: HomePagePropsType) {
             />
           </Suspense>
         </ErrorBoundary>
-
-        <div className="flex w-full max-w-md flex-1 flex-col items-center">
-          <TicketPagination />
-        </div>
       </div>
     </div>
   );

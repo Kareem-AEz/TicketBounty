@@ -11,3 +11,5 @@ export const TICKET_STATUS_LABELS = {
   IN_PROGRESS: "In Progress",
   DONE: "Done",
 };
+
+export const TICKET_PAGE_SIZE = [10, 20, 50, 100];
