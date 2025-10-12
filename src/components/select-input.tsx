@@ -1,9 +1,8 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import React from "react";
-import { deleteUrlParams, updateUrlParams } from "@/lib/search-params";
+import { ticketSearchParsers, TicketSort } from "@/lib/search-params";
 import {
   Select,
   SelectContent,
@@ -12,40 +11,20 @@ import {
   SelectValue,
 } from "./ui/select";
 
-const SORT_OPTIONS = [
-  { label: "Newest", value: "newest" },
-  { label: "Bounty", value: "bounty" },
-] as const;
+const SORT_OPTIONS = Object.values(TicketSort).map((sort) => ({
+  label: sort.charAt(0).toUpperCase() + sort.slice(1),
+  value: sort,
+}));
 
 export default function SelectInput() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
+  const [sort, setSort] = useQueryState("sort", ticketSearchParsers.sort);
 
-  const handleSort = (value: (typeof SORT_OPTIONS)[number]["value"]) => {
-    let newUrl = "";
-
-    if (value === "newest") {
-      newUrl = deleteUrlParams({
-        params: searchParams.toString(),
-        keys: ["sort"],
-      });
-    } else {
-      newUrl = updateUrlParams({
-        params: searchParams.toString(),
-        updates: {
-          sort: value,
-        },
-      });
-    }
-
-    router.replace(newUrl, { scroll: false });
+  const handleSort = (value: TicketSort) => {
+    setSort(value);
   };
 
   return (
-    <Select
-      onValueChange={handleSort}
-      defaultValue={searchParams.get("sort") || "newest"}
-    >
+    <Select onValueChange={handleSort} value={sort}>
       <SelectTrigger className="user-select-none w-[180px]">
         <SelectValue className="user-select-none" />
       </SelectTrigger>

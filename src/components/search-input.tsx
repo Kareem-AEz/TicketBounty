@@ -1,31 +1,15 @@
 "use client";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
-import { updateUrlParams } from "@/lib/search-params";
+import { useQueryState } from "nuqs";
+import React from "react";
+import { ticketSearchParsers } from "@/lib/search-params";
 import { Input } from "./ui/input";
 
 export default function SearchInput() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const [query, setQuery] = useState(searchParams.get("query") || "");
-
-  const handleSearch = useDebouncedCallback((value: string) => {
-    const newUrl = updateUrlParams({
-      params: searchParams.toString(),
-      updates: {
-        query: value,
-      },
-    });
-
-    router.replace(newUrl, { scroll: false });
-  }, 350);
+  const [query, setQuery] = useQueryState("query", ticketSearchParsers.query);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.trim();
+    const value = e.target.value;
     setQuery(value);
-    handleSearch(value);
   };
 
   return (
