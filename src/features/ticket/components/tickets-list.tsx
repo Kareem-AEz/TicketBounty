@@ -46,7 +46,7 @@ async function TicketsList({
               <motion.div
                 key={ticket.id}
                 layout="position"
-                transition={{ type: "spring", duration: 0.4, bounce: 0.05 }}
+                transition={{ type: "spring", duration: 0.513, bounce: 0.05 }}
               >
                 <TicketItem ticket={ticket} user={user} />
               </motion.div>

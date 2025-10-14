@@ -1,6 +1,7 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 
-export const getTicket = async (id: string) => {
+export const getTicket = cache(async (id: string) => {
   const ticket = await prisma.ticket.findUnique({
     where: {
       id,
@@ -15,6 +16,5 @@ export const getTicket = async (id: string) => {
     },
   });
 
-
   return ticket;
-};
+});

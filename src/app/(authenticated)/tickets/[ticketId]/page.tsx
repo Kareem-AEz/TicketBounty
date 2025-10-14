@@ -45,9 +45,12 @@ export async function generateMetadata({
 
 async function page({ params }: TicketPageProps) {
   const { ticketId } = await params;
-  const userPromise = getAuthOrRedirect();
-  const ticketPromise = getTicket(ticketId);
-  const [user, ticket] = await Promise.all([userPromise, ticketPromise]);
+
+  // Auth check first (fast)
+  const user = await getAuthOrRedirect();
+
+  // Then fetch ticket (cached from generateMetadata)
+  const ticket = await getTicket(ticketId);
 
   if (!ticket) {
     notFound();
