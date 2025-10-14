@@ -47,10 +47,12 @@ async function page({ params }: TicketPageProps) {
   const { ticketId } = await params;
 
   // Auth check first (fast)
-  const user = await getAuthOrRedirect();
+  const userPromise = getAuthOrRedirect();
 
   // Then fetch ticket (cached from generateMetadata)
-  const ticket = await getTicket(ticketId);
+  const ticketPromise = getTicket(ticketId);
+
+  const [ticket, user] = await Promise.all([ticketPromise, userPromise]);
 
   if (!ticket) {
     notFound();

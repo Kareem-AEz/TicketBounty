@@ -31,6 +31,8 @@ model User {
   sessions      Session[]
   tickets       Ticket[]
   comments      TicketComment[]
+
+  @@index([id])
 }
 
 model Session {
@@ -41,6 +43,7 @@ model Session {
   expiresAt     DateTime      @db.Timestamptz
 
   @@index([userId])
+  @@index([id])
 }
 
 // ------------------------------

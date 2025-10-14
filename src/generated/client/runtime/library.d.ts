@@ -753,82 +753,84 @@ export declare type DevTypeMapFnDef = {
 
 export declare namespace DMMF {
     export {
-        Datamodel,
-        DatamodelEnum,
         datamodelEnumToSchemaEnum,
-        Deprecation,
         Document_2 as Document,
+        Mappings,
+        OtherOperationMappings,
+        DatamodelEnum,
+        SchemaEnum,
         EnumValue,
+        Datamodel,
+        uniqueIndex,
+        PrimaryKey,
+        Model,
+        FieldKind,
+        FieldNamespace,
+        FieldLocation,
         Field,
         FieldDefault,
         FieldDefaultScalar,
-        FieldKind,
-        FieldLocation,
-        FieldNamespace,
-        FieldRefAllowType,
-        FieldRefType,
         Index,
-        IndexField,
         IndexType,
-        InputType,
-        InputTypeRef,
-        Mappings,
-        Model,
-        ModelAction,
-        ModelMapping,
-        OtherOperationMappings,
-        OutputType,
-        OutputTypeRef,
-        PrimaryKey,
+        IndexField,
+        SortOrder,
+        Schema,
         Query,
         QueryOutput,
-        Schema,
-        SchemaArg,
-        SchemaEnum,
-        SchemaField,
-        SortOrder,
         TypeRef,
-        uniqueIndex    }
+        InputTypeRef,
+        SchemaArg,
+        OutputType,
+        SchemaField,
+        OutputTypeRef,
+        Deprecation,
+        InputType,
+        FieldRefType,
+        FieldRefAllowType,
+        ModelMapping,
+        ModelAction
+    }
 }
 
 declare namespace DMMF_2 {
     export {
-        Datamodel,
-        DatamodelEnum,
         datamodelEnumToSchemaEnum,
-        Deprecation,
         Document_2 as Document,
+        Mappings,
+        OtherOperationMappings,
+        DatamodelEnum,
+        SchemaEnum,
         EnumValue,
+        Datamodel,
+        uniqueIndex,
+        PrimaryKey,
+        Model,
+        FieldKind,
+        FieldNamespace,
+        FieldLocation,
         Field,
         FieldDefault,
         FieldDefaultScalar,
-        FieldKind,
-        FieldLocation,
-        FieldNamespace,
-        FieldRefAllowType,
-        FieldRefType,
         Index,
-        IndexField,
         IndexType,
-        InputType,
-        InputTypeRef,
-        Mappings,
-        Model,
-        ModelAction,
-        ModelMapping,
-        OtherOperationMappings,
-        OutputType,
-        OutputTypeRef,
-        PrimaryKey,
+        IndexField,
+        SortOrder,
+        Schema,
         Query,
         QueryOutput,
-        Schema,
-        SchemaArg,
-        SchemaEnum,
-        SchemaField,
-        SortOrder,
         TypeRef,
-        uniqueIndex    }
+        InputTypeRef,
+        SchemaArg,
+        OutputType,
+        SchemaField,
+        OutputTypeRef,
+        Deprecation,
+        InputType,
+        FieldRefType,
+        FieldRefAllowType,
+        ModelMapping,
+        ModelAction
+    }
 }
 
 export declare function dmmfToRuntimeDataModel(dmmfDataModel: DMMF_2.Datamodel): RuntimeDataModel;
@@ -1273,41 +1275,41 @@ export { Extensions }
 
 declare namespace Extensions_2 {
     export {
-        AllModelsToStringIndex,
-        ClientBuiltInProp,
-        ClientOptionDef,
-        ClientOtherOps,
+        InternalArgs,
         DefaultArgs,
-        DevTypeMapDef,
-        DevTypeMapFnDef,
-        DynamicClientExtensionArgs,
-        DynamicClientExtensionThis,
-        DynamicClientExtensionThisBuiltin,
-        DynamicModelExtensionArgs,
-        DynamicModelExtensionFluentApi,
-        DynamicModelExtensionFnResult,
-        DynamicModelExtensionFnResultBase,
-        DynamicModelExtensionFnResultNull,
-        DynamicModelExtensionOperationFn,
-        DynamicModelExtensionThis,
+        GetPayloadResultExtensionKeys,
+        GetPayloadResultExtensionObject,
+        GetPayloadResult,
+        GetSelect,
+        GetOmit,
         DynamicQueryExtensionArgs,
         DynamicQueryExtensionCb,
         DynamicQueryExtensionCbArgs,
         DynamicQueryExtensionCbArgsArgs,
         DynamicResultExtensionArgs,
-        DynamicResultExtensionData,
         DynamicResultExtensionNeeds,
+        DynamicResultExtensionData,
+        DynamicModelExtensionArgs,
+        DynamicModelExtensionThis,
+        DynamicModelExtensionOperationFn,
+        DynamicModelExtensionFnResult,
+        DynamicModelExtensionFnResultBase,
+        DynamicModelExtensionFluentApi,
+        DynamicModelExtensionFnResultNull,
+        DynamicClientExtensionArgs,
+        DynamicClientExtensionThis,
+        ClientBuiltInProp,
+        DynamicClientExtensionThisBuiltin,
         ExtendsHook,
-        GetOmit,
-        GetPayloadResult,
-        GetPayloadResultExtensionKeys,
-        GetPayloadResultExtensionObject,
-        GetSelect,
-        InternalArgs,
         MergeExtArgs,
-        ModelKey,
-        TypeMapCbDef,
+        AllModelsToStringIndex,
         TypeMapDef,
+        DevTypeMapDef,
+        DevTypeMapFnDef,
+        ClientOptionDef,
+        ClientOtherOps,
+        TypeMapCbDef,
+        ModelKey,
         RequiredExtensionArgs as UserArgs
     }
 }
@@ -2808,11 +2810,12 @@ export { Public }
 declare namespace Public_2 {
     export {
         Args,
-        Exact,
-        Operation,
+        Result,
         Payload,
         PrismaPromise,
-        Result    }
+        Operation,
+        Exact
+    }
 }
 
 declare type Query = ReadonlyDeep_2<{
@@ -2900,7 +2903,7 @@ declare type QueryEngineProtocol = 'graphql' | 'json';
 
 declare type QueryEngineRequest = {
     query: string;
-    variables: object;
+    variables: Object;
 };
 
 declare type QueryEngineResultData<T> = {
@@ -3221,21 +3224,22 @@ export declare type Result_2<T, A, F extends Operation> = Result<T, A, F>;
 
 declare namespace Result_3 {
     export {
-        Aggregate,
-        ApplyOmit,
         Count,
-        DefaultSelection,
-        ExtractGlobalOmit,
-        GetAggregateResult,
-        GetBatchResult,
-        GetCountResult,
         GetFindResult,
-        GetGroupByResult,
-        GetResult,
-        OmitValue,
         SelectablePayloadFields,
         SelectField,
-        UnwrapPayload    }
+        DefaultSelection,
+        UnwrapPayload,
+        ApplyOmit,
+        OmitValue,
+        GetCountResult,
+        Aggregate,
+        GetAggregateResult,
+        GetBatchResult,
+        GetGroupByResult,
+        GetResult,
+        ExtractGlobalOmit
+    }
 }
 
 declare type Result_4<T> = {
@@ -3784,9 +3788,9 @@ declare interface Transaction extends AdapterInfo, SqlQueryable {
 
 declare namespace Transaction_2 {
     export {
-        InteractiveTransactionInfo,
-        IsolationLevel_2 as IsolationLevel,
         Options,
+        IsolationLevel_2 as IsolationLevel,
+        InteractiveTransactionInfo,
         TransactionHeaders
     }
 }
@@ -3830,15 +3834,16 @@ declare type TypeRef<AllowedLocations extends FieldLocation> = {
 
 declare namespace Types {
     export {
-        Extensions_2 as Extensions,
-        isSkip,
-        OperationPayload as Payload,
-        Public_2 as Public,
         Result_3 as Result,
+        Extensions_2 as Extensions,
+        Utils,
+        Public_2 as Public,
+        isSkip,
         Skip,
         skip,
         UnknownTypedSql,
-        Utils    }
+        OperationPayload as Payload
+    }
 }
 export { Types }
 
@@ -3879,36 +3884,37 @@ declare type UserArgs_2 = any;
 
 declare namespace Utils {
     export {
-        Call,
-        Cast,
-        Compute,
-        ComputeDeep,
         EmptyToUnknown,
-        Equals,
-        Exact,
-        Fn,
-        JsPromise,
-        Narrow,
-        Narrowable,
         NeverToUnknown,
-        Omit_2 as Omit,
-        Optional,
-        OptionalFlat,
-        OptionalKeys,
-        Or,
         PatchFlat,
-        Path,
-        PayloadToResult,
+        Omit_2 as Omit,
         Pick_2 as Pick,
+        ComputeDeep,
+        Compute,
+        OptionalFlat,
         ReadonlyDeep,
+        Narrowable,
+        Narrow,
+        Exact,
+        Cast,
         Record_2 as Record,
-        RenameAndNestPayloadKeys,
-        RequiredKeys,
-        Return,
-        Select,
-        ToTuple,
         UnwrapPromise,
-        UnwrapTuple    }
+        UnwrapTuple,
+        Path,
+        Fn,
+        Call,
+        RequiredKeys,
+        OptionalKeys,
+        Optional,
+        Return,
+        ToTuple,
+        RenameAndNestPayloadKeys,
+        PayloadToResult,
+        Select,
+        Equals,
+        Or,
+        JsPromise
+    }
 }
 
 declare type ValidationError = {
