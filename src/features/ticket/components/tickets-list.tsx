@@ -43,7 +43,13 @@ async function TicketsList({
         <div className="flex flex-1 flex-col items-center gap-y-4 pb-24">
           {tickets.length ? (
             tickets.map((ticket) => (
-              <TicketItem key={ticket.id} ticket={ticket} user={user} />
+              <motion.div
+                key={ticket.id}
+                layout="position"
+                transition={{ type: "spring", duration: 0.4, bounce: 0.05 }}
+              >
+                <TicketItem ticket={ticket} user={user} />
+              </motion.div>
             ))
           ) : (
             <motion.div
