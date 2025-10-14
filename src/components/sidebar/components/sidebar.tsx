@@ -27,7 +27,7 @@ export default function Sidebar() {
     <>
       <div
         id="sidebar-overlay"
-        className="pointer-events-none absolute top-0 left-0 z-30 h-full w-full bg-black/50 opacity-0 backdrop-blur-xs duration-200 ease-[cubic-bezier(0.424,0.154,0.526,0.836)]"
+        className="pointer-events-none fixed top-0 left-0 z-30 h-full w-full bg-black/50 opacity-0 backdrop-blur-xs duration-200 ease-[cubic-bezier(0.424,0.154,0.526,0.836)]"
       />
       <nav
         id="sidebar"
