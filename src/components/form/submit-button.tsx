@@ -22,6 +22,7 @@ type SubmitButtonProps = {
     | "ghost"
     | "link";
   size?: "default" | "sm" | "lg" | "icon";
+  onClick?: () => void;
 };
 
 function SubmitButton({
@@ -33,7 +34,8 @@ function SubmitButton({
   pending,
   variant,
   size,
-}: SubmitButtonProps) {
+  ...props
+}: SubmitButtonProps & React.ComponentProps<"button">) {
   const { pending: formPending } = useFormStatus();
   const isWorking = formPending || pending;
   const prevPendingRef = useRef(isWorking);
@@ -52,7 +54,8 @@ function SubmitButton({
       variant={variant}
       size={size}
       className={cn("flex items-center", className)}
-      disabled={isWorking}
+      disabled={props.disabled || isWorking}
+      {...props}
     >
       {isWorking && (
         <motion.div

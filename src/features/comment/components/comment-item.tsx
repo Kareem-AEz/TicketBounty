@@ -20,9 +20,11 @@ import CommentItemButtons from "./comment-item-buttons";
 export default function CommentItem({
   comment,
   isOwner,
+  onDelete,
 }: {
   comment: Comment;
   isOwner: boolean;
+  onDelete?: () => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const isDeleted = !comment.user;
@@ -176,6 +178,7 @@ export default function CommentItem({
                   isMine={isOwner}
                   onEdit={handleEdit}
                   commentId={comment.id}
+                  onDelete={onDelete}
                 />
               </div>
             )}

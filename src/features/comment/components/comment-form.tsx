@@ -24,7 +24,7 @@ export default function CommentForm({
 }: {
   ticketId: string;
   comment?: Comment;
-  onSuccess?: () => void;
+  onSuccess?: (comment: Comment | undefined) => void;
 }) {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -37,7 +37,11 @@ export default function CommentForm({
   const isSubmitting = form.formState.isSubmitting;
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    const { success, error } = await commentUpsert({
+    const {
+      success,
+      error,
+      data: commentData,
+    } = await commentUpsert({
       content: data.content,
       ticketId: ticketId,
       commentId: comment?.id,
@@ -49,7 +53,7 @@ export default function CommentForm({
       router.refresh();
       toast.success(comment ? "Comment updated" : "Comment created");
       form.reset();
-      onSuccess?.();
+      onSuccess?.(commentData);
     }
   }
 
@@ -70,6 +74,12 @@ export default function CommentForm({
               placeholder="Write a comment"
               autoComplete="off"
               disabled={isSubmitting}
+              onKeyDown={(e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                  e.preventDefault();
+                  form.handleSubmit(onSubmit)();
+                }
+              }}
             />
 
             <FieldGroup className="flex flex-row items-center justify-between">

@@ -36,6 +36,18 @@ export default async function commentUpsert({
         ticketId,
         userId: user.id,
       },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        userId: true,
+        ticketId: true,
+        user: {
+          select: {
+            username: true,
+          },
+        },
+      },
     });
 
     revalidatePath(ticketPath(ticketId));

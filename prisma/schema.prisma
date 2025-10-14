@@ -32,7 +32,8 @@ model User {
   tickets       Ticket[]
   comments      TicketComment[]
 
-  @@index([id])
+  // Performance indexes for text search (temporarily disabled)
+  // @@index([username(ops: raw("gin_trgm_ops"))], type: Gin)
 }
 
 model Session {
@@ -43,7 +44,7 @@ model Session {
   expiresAt     DateTime      @db.Timestamptz
 
   @@index([userId])
-  @@index([id])
+  @@index([expiresAt])
 }
 
 // ------------------------------
@@ -65,7 +66,22 @@ model Ticket {
   deadline      String       
   bounty        Int
 
+  // Core performance indexes
   @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([bounty])
+  
+  // Composite indexes for common query patterns
+  @@index([userId, status])
+  @@index([userId, createdAt])
+  @@index([userId, bounty])
+  @@index([status, createdAt])
+  @@index([status, bounty])
+  
+  // Text search indexes (temporarily disabled - enable pg_trgm first)
+  // @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+  // @@index([content(ops: raw("gin_trgm_ops"))], type: Gin)
 }
 
 enum TicketStatus {
@@ -85,6 +101,8 @@ model TicketComment {
   userId        String?
   user          User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
 
+  // Optimized indexes for comment queries
   @@index([ticketId])
   @@index([userId])
+  @@index([ticketId, createdAt])
 }

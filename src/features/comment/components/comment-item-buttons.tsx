@@ -10,12 +10,14 @@ type CommentItemButtonsProps = {
   commentId: string;
   isMine: boolean;
   onEdit?: () => void;
+  onDelete?: () => void;
 };
 
 export default function CommentItemButtons({
   commentId,
   isMine,
   onEdit,
+  onDelete,
 }: CommentItemButtonsProps) {
   if (!isMine) return null;
 
@@ -42,6 +44,7 @@ export default function CommentItemButtons({
         onDelete={async () => {
           const result = await commentDelete(commentId);
           if (result.success) {
+            onDelete?.();
             return { success: true, message: result.message };
           }
           return {

@@ -5,6 +5,7 @@ import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
 import { Separator } from "@/components/ui/separator";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import Comments from "@/features/comment/components/comments";
+import { getComments } from "@/features/comment/queries/get-comments";
 import TicketItem from "@/features/ticket/components/ticket-item";
 import { getTicket } from "@/features/ticket/queries/get-ticket";
 import { homePath, ticketsPath } from "@/paths";
@@ -46,13 +47,15 @@ export async function generateMetadata({
 async function page({ params }: TicketPageProps) {
   const { ticketId } = await params;
 
-  // Auth check first (fast)
   const userPromise = getAuthOrRedirect();
-
-  // Then fetch ticket (cached from generateMetadata)
   const ticketPromise = getTicket(ticketId);
+  const commentsPromise = getComments(ticketId);
 
-  const [ticket, user] = await Promise.all([ticketPromise, userPromise]);
+  const [ticket, user, comments] = await Promise.all([
+    ticketPromise,
+    userPromise,
+    commentsPromise,
+  ]);
 
   if (!ticket) {
     notFound();
@@ -66,7 +69,7 @@ async function page({ params }: TicketPageProps) {
 
       <Separator className="mx-auto max-w-3xl mask-r-from-90% mask-r-to-100% mask-l-from-90% mask-l-to-100%" />
 
-      <Comments ticketId={ticketId} />
+      <Comments ticketId={ticketId} paginatedComments={comments} user={user} />
     </div>
   );
 }
