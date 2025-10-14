@@ -10,8 +10,9 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import { redirect, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
+import DeleteButton from "@/components/delete-button";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,9 +29,9 @@ import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import { useKeyDown } from "@/lib/hooks/useKeyDown";
 import { cn } from "@/lib/utils";
 import { ticketPath, ticketsPath } from "@/paths";
+import { deleteTicket } from "../actions/delete-ticket";
 import { TICKET_STATUS_ICONS } from "../constants";
 import DetailButton from "./detail-button";
-import TicketDeleteButton from "./ticket-delete-button";
 import TicketDropdownMenu from "./ticket-dropdown-menu";
 import TicketUpsertForm from "./ticket-upsert-form";
 
@@ -52,9 +53,11 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
   const isMine = user?.id === ticket.userId;
 
   useEffect(() => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       setIsMounted(true);
     }, 10);
+
+    return () => clearTimeout(timeout);
   }, []);
 
   useKeyDown("Backspace", () => redirect(ticketsPath()), {
@@ -270,7 +273,26 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                                 label={copy.actions.edit}
                                 onClick={() => setIsEditing(true)}
                               />
-                              <TicketDeleteButton ticket={ticket} />
+                              <DeleteButton
+                                onDelete={async () => {
+                                  const result = await deleteTicket({
+                                    id: ticket.id,
+                                    isDetail,
+                                  });
+                                  if (result.status === "SUCCESS") {
+                                    return {
+                                      success: true,
+                                      message: result.message,
+                                    };
+                                  }
+                                  return {
+                                    success: false,
+                                    message: result.message,
+                                  };
+                                }}
+                                index={2}
+                                animate={true}
+                              />
                             </>
                           )}
                         </>
@@ -286,7 +308,25 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                             animate={false}
                           />
 
-                          <TicketDeleteButton ticket={ticket} isDetail />
+                          <DeleteButton
+                            onDelete={async () => {
+                              const result = await deleteTicket({
+                                id: ticket.id,
+                                isDetail,
+                              });
+                              if (result.status === "SUCCESS") {
+                                return {
+                                  success: true,
+                                  message: result.message,
+                                };
+                              }
+                              return {
+                                success: false,
+                                message: result.message,
+                              };
+                            }}
+                            animate={false}
+                          />
 
                           <TicketDropdownMenu
                             ticket={ticket}
@@ -314,4 +354,6 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
   );
 }
 
-export default TicketItem;
+export default memo(TicketItem, (prevProps, nextProps) => {
+  return prevProps.ticket.id === nextProps.ticket.id;
+});

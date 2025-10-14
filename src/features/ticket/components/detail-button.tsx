@@ -3,11 +3,6 @@
 import Link from "next/link";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { TRANSITION_EASING } from "@/lib/constants";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import { cn, getStaggeredDelay } from "@/lib/utils";
@@ -76,43 +71,26 @@ function DetailButton({
       }
     : {};
 
-  // Button content (either clickable or link)
-  const ButtonContent = (tProps: React.ComponentProps<typeof Button>) => {
-    const buttonProps = {
-      ...commonProps,
-      className: isMobile ? mobileClassName : desktopClassName,
-      style: isMobile ? undefined : desktopStyle,
-      ...tProps,
-    };
-
-    if (href) {
-      return (
-        <Button {...buttonProps} asChild aria-label={label}>
-          <Link href={href} {...props}>
-            {icon}
-          </Link>
-        </Button>
-      );
-    }
-
-    return (
-      <Button {...buttonProps} onClick={onClick} aria-label={label}>
-        {icon}
-      </Button>
-    );
+  const buttonProps = {
+    ...commonProps,
+    className: isMobile ? mobileClassName : desktopClassName,
+    style: isMobile ? undefined : desktopStyle,
   };
 
-  // Desktop: wrapped in tooltip
-  return (
-    <Tooltip disableHoverableContent delayDuration={1000}>
-      <TooltipTrigger asChild>
-        <ButtonContent />
-      </TooltipTrigger>
+  if (href) {
+    return (
+      <Button {...buttonProps} asChild aria-label={label}>
+        <Link href={href} {...props}>
+          {icon}
+        </Link>
+      </Button>
+    );
+  }
 
-      <TooltipContent side="right" className="pointer-events-none select-none">
-        {label}
-      </TooltipContent>
-    </Tooltip>
+  return (
+    <Button {...buttonProps} onClick={onClick} aria-label={label}>
+      {icon}
+    </Button>
   );
 }
 

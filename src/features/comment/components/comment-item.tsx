@@ -2,7 +2,7 @@
 
 import { LucideSkull, LucideUser } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,13 +28,17 @@ export default function CommentItem({
   const isDeleted = !comment.user;
   const [ref, { height }] = useMeasure();
 
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsMounted(true);
+    }, 10);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   const handleEdit = () => {
     setIsEditing(true);
-  };
-
-  const handleDelete = () => {
-    // TODO: Implement delete
-    console.log("Delete comment", comment.id);
   };
 
   return (
@@ -46,7 +50,7 @@ export default function CommentItem({
           height: "auto",
           opacity: 0,
         }}
-        animate={{ height, opacity: 1 }}
+        animate={isMounted ? { height, opacity: 1 } : false}
         exit={{ opacity: 0, height: 0 }}
         key={comment.id}
         className="w-full overflow-hidden will-change-auto"
@@ -171,7 +175,7 @@ export default function CommentItem({
                 <CommentItemButtons
                   isMine={isOwner}
                   onEdit={handleEdit}
-                  onDelete={handleDelete}
+                  commentId={comment.id}
                 />
               </div>
             )}
