@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TRANSITION_EASING } from "@/lib/constants";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
@@ -12,6 +12,7 @@ type DetailButtonProps = {
   icon: React.ReactElement;
   label: string;
   animate?: boolean;
+  prefetchOnHover?: boolean;
 } & (
   | {
       href?: undefined;
@@ -33,8 +34,10 @@ function DetailButton({
   onClick,
   props,
   animate = true,
+  prefetchOnHover = false,
 }: DetailButtonProps) {
   const isMobile = useIsMobile();
+  const [shouldPrefetch, setShouldPrefetch] = useState(!prefetchOnHover);
 
   // Common button props
   const commonProps = {
@@ -80,7 +83,12 @@ function DetailButton({
   if (href) {
     return (
       <Button {...buttonProps} asChild aria-label={label}>
-        <Link href={href} {...props}>
+        <Link
+          href={href}
+          prefetch={shouldPrefetch ? true : false}
+          onMouseEnter={() => prefetchOnHover && setShouldPrefetch(true)}
+          {...props}
+        >
           {icon}
         </Link>
       </Button>

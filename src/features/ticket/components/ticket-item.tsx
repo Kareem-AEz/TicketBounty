@@ -9,8 +9,8 @@ import {
   LucideUser,
 } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
-import { redirect, useRouter } from "next/navigation";
-import React, { memo, useEffect, useState } from "react";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
 import DeleteButton from "@/components/delete-button";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,6 @@ type TicketItemProps = {
 
 function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const router = useRouter();
   const isMobile = useIsMobile();
   const [ref, { height }] = useMeasure();
   const [isMounted, setIsMounted] = useState(false);
@@ -148,10 +147,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
 
           <AnimatePresence mode="popLayout" initial={false}>
             {!isEditing && (
-              <div
-                className="group/card z-[1] flex w-full justify-center gap-x-1 self-center"
-                onMouseEnter={() => router.prefetch(ticketPath(ticket.id))}
-              >
+              <div className="group/card z-[1] flex w-full justify-center gap-x-1 self-center">
                 <>
                   <motion.div
                     layoutId={`ticket-${ticket.id}-background${isDetail ? "-detail" : ""}`}
@@ -264,6 +260,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                             icon={<LucideSquareArrowOutUpRight />}
                             label={copy.actions.view}
                             href={ticketPath(ticket.id)}
+                            prefetchOnHover={true}
                           />
                           {isOwner(user?.id ?? "", ticket.userId) && (
                             <>
@@ -354,6 +351,4 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
   );
 }
 
-export default memo(TicketItem, (prevProps, nextProps) => {
-  return prevProps.ticket.id === nextProps.ticket.id;
-});
+export default TicketItem;

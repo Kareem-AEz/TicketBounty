@@ -19,11 +19,13 @@ const ticketQueryOptions: Options = {
     method: "debounce",
     timeMs: 350,
   },
+  scroll: false,
 };
 
 const ticketGeneralOptions: Options = {
   shallow: false,
   history: "replace",
+  scroll: false,
 };
 
 // -------------------------------------------------------
