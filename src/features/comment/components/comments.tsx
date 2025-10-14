@@ -12,8 +12,12 @@ import CommentForm from "./comment-form";
 import CommentItem from "./comment-item";
 
 export default async function Comments({ ticketId }: { ticketId: string }) {
-  const comments = await getComments(ticketId);
-  const { user } = await getAuth();
+  const commentsPromise = getComments(ticketId);
+  const userPromise = getAuth();
+  const [comments, { user }] = await Promise.all([
+    commentsPromise,
+    userPromise,
+  ]);
 
   return (
     <div className="animate-fade-from-bottom flex w-full max-w-xl flex-col gap-y-5 self-center">

@@ -39,8 +39,8 @@ async function TicketsList({
         />
       </div>
 
-      <ScrollArea className="h-screen pr-1">
-        <div className="flex flex-1 flex-col items-center gap-y-4">
+      <ScrollArea className="h-screen w-full max-w-xl p-1">
+        <div className="flex flex-1 flex-col items-center gap-y-4 pb-24">
           {tickets.length ? (
             tickets.map((ticket) => (
               <TicketItem key={ticket.id} ticket={ticket} user={user} />
