@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     description: "Sign up to create an account to get started",
     images: [
       {
-        url: "/og-image 1x.png",
+        url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
         alt: "Sign Up - The Road to Next",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     description: "Sign up to create an account to get started",
     images: [
       {
-        url: "/og-image 1x.png",
+        url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
         alt: "Sign Up - The Road to Next",

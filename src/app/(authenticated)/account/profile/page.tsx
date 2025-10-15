@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     description: "Manage your profile",
     images: [
       {
-        url: "/og-image 1x.png",
+        url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
         alt: "Profile - The Road to Next",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     description: "Manage your profile",
     images: [
       {
-        url: "/og-image 1x.png",
+        url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
         alt: "Profile - The Road to Next",

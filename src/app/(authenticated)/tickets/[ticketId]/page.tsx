@@ -55,7 +55,7 @@ export async function generateMetadata({
       description: ticket.content,
       images: [
         {
-          url: "/og-image 1x.png",
+          url: "/og-image 1x.jpg",
           width: 1200,
           height: 630,
           alt: `${ticket.title} - The Road to Next`,
@@ -72,7 +72,7 @@ export async function generateMetadata({
       description: ticket.content,
       images: [
         {
-          url: "/og-image 1x.png",
+          url: "/og-image 1x.jpg",
           width: 1200,
           height: 630,
           alt: `${ticket.title} - The Road to Next`,

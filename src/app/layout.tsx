@@ -76,7 +76,7 @@ export const metadata: Metadata = {
       "A modern ticket management system built with Next.js, featuring authentication, real-time updates, and intuitive user interface.",
     images: [
       {
-        url: "/og-image 1x.png",
+        url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
         alt: "The Road to Next - Ticket Management System",
@@ -90,7 +90,7 @@ export const metadata: Metadata = {
       "A modern ticket management system built with Next.js, featuring authentication, real-time updates, and intuitive user interface.",
     images: [
       {
-        url: "/og-image 1x.png",
+        url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
         alt: "The Road to Next - Ticket Management System",

@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     description: "All your tickets in one place",
     images: [
       {
-        url: "/og-image 1x.png",
+        url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
         alt: "My Tickets - The Road to Next",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     description: "All your tickets in one place",
     images: [
       {
-        url: "/og-image 1x.png",
+        url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
         alt: "My Tickets - The Road to Next",

@@ -2,16 +2,16 @@
  * Utility functions for generating canonical URLs and SEO metadata
  */
 
-const BASE_URL = 'https://ticket-bounty-pi.vercel.app'
+const BASE_URL = "https://ticket-bounty-pi.vercel.app";
 
 /**
  * Generate canonical URL for a given path
  * @param path - The path to generate canonical URL for
  * @returns Canonical URL string
  */
-export function getCanonicalUrl(path: string = '/'): string {
-  const cleanPath = path.startsWith('/') ? path : `/${path}`
-  return `${BASE_URL}${cleanPath}`
+export function getCanonicalUrl(path: string = "/"): string {
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${BASE_URL}${cleanPath}`;
 }
 
 /**
@@ -19,8 +19,8 @@ export function getCanonicalUrl(path: string = '/'): string {
  * @param path - The path to generate OG URL for
  * @returns Open Graph URL string
  */
-export function getOpenGraphUrl(path: string = '/'): string {
-  return getCanonicalUrl(path)
+export function getOpenGraphUrl(path: string = "/"): string {
+  return getCanonicalUrl(path);
 }
 
 /**
@@ -28,17 +28,19 @@ export function getOpenGraphUrl(path: string = '/'): string {
  * @param items - Array of breadcrumb items
  * @returns Structured data object
  */
-export function generateBreadcrumbStructuredData(items: Array<{ name: string; url: string }>) {
+export function generateBreadcrumbStructuredData(
+  items: Array<{ name: string; url: string }>,
+) {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
     itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
+      "@type": "ListItem",
       position: index + 1,
       name: item.name,
       item: getCanonicalUrl(item.url),
     })),
-  }
+  };
 }
 
 /**
@@ -47,22 +49,22 @@ export function generateBreadcrumbStructuredData(items: Array<{ name: string; ur
  */
 export function generateOrganizationStructuredData() {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'The Road to Next',
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "The Road to Next",
     url: BASE_URL,
-    logo: `${BASE_URL}/og-image 1x.png`,
-    description: 'A modern ticket management system built with Next.js',
+    logo: `${BASE_URL}/og-image 1x.jpg`,
+    description: "A modern ticket management system built with Next.js",
     founder: {
-      '@type': 'Person',
-      name: 'Kareem Ahmed',
+      "@type": "Person",
+      name: "Kareem Ahmed",
     },
     sameAs: [
       // Add your social media URLs here
       // 'https://twitter.com/kareemahmed',
       // 'https://linkedin.com/in/kareemahmed',
     ],
-  }
+  };
 }
 
 /**
@@ -71,22 +73,22 @@ export function generateOrganizationStructuredData() {
  */
 export function generateWebsiteStructuredData() {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: 'The Road to Next',
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "The Road to Next",
     url: BASE_URL,
-    description: 'A modern ticket management system built with Next.js',
+    description: "A modern ticket management system built with Next.js",
     publisher: {
-      '@type': 'Organization',
-      name: 'The Road to Next',
+      "@type": "Organization",
+      name: "The Road to Next",
     },
     potentialAction: {
-      '@type': 'SearchAction',
+      "@type": "SearchAction",
       target: {
-        '@type': 'EntryPoint',
+        "@type": "EntryPoint",
         urlTemplate: `${BASE_URL}/tickets?search={search_term_string}`,
       },
-      'query-input': 'required name=search_term_string',
+      "query-input": "required name=search_term_string",
     },
-  }
+  };
 }
