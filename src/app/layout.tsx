@@ -103,7 +103,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "your-google-verification-code", // Replace with your actual verification code
+    google: "xK3F81o95uwWXajBIzUCyzp0NfMB8QrH9EPbxwKUz0s", // Replace with your actual verification code
   },
   category: "technology",
   classification: "Business",
