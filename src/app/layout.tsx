@@ -1,4 +1,5 @@
 import "./globals.css";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
@@ -7,6 +8,7 @@ import Header from "@/components/header";
 import Sidebar from "@/components/sidebar/components/sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import ReactQueryProvider from "./_providers/react-query/react-query-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,18 +43,22 @@ export default function RootLayout({
         <NextTopLoader color="var(--primary)" showSpinner={false} height={2} />
 
         <ThemeProvider>
-          <Header />
-          <div className="flex">
-            <Sidebar />
+          <ReactQueryProvider>
+            <ReactQueryDevtools />
 
-            <main
-              id="main"
-              className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-auto px-8 py-24 pl-[7rem]"
-            >
-              <NuqsAdapter>{children}</NuqsAdapter>
-            </main>
-          </div>
-          <Toaster />
+            <Header />
+            <div className="flex">
+              <Sidebar />
+
+              <main
+                id="main"
+                className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-clip px-8 py-24 pl-[7rem]"
+              >
+                <NuqsAdapter>{children}</NuqsAdapter>
+              </main>
+            </div>
+            <Toaster />
+          </ReactQueryProvider>
         </ThemeProvider>
       </body>
     </html>

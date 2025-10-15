@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -26,7 +25,6 @@ export default function CommentForm({
   comment?: Comment;
   onSuccess?: (comment: Comment | undefined) => void;
 }) {
-  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,7 +48,6 @@ export default function CommentForm({
     if (!success) {
       toast.error(error || "An unknown error occurred");
     } else {
-      router.refresh();
       toast.success(comment ? "Comment updated" : "Comment created");
       form.reset();
       onSuccess?.(commentData);
