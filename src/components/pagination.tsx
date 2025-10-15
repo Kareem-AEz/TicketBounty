@@ -15,6 +15,7 @@ import {
 } from "./ui/select";
 
 export type PaginationMetadata = {
+  cursor?: { id: string; createdAt: number };
   total: number;
   hasNextPage: boolean;
 };

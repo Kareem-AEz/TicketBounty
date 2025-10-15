@@ -21,10 +21,12 @@ export default function CommentItem({
   comment,
   isOwner,
   onDelete,
+  onUpdate,
 }: {
   comment: Comment;
   isOwner: boolean;
-  onDelete?: () => void;
+  onDelete?: (commentId: string) => void;
+  onUpdate?: (comment?: Comment) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const isDeleted = !comment.user;
@@ -107,7 +109,10 @@ export default function CommentItem({
                       <CommentForm
                         ticketId={comment.ticketId}
                         comment={comment}
-                        onSuccess={() => setIsEditing(false)}
+                        onSuccess={(updatedComment) => {
+                          setIsEditing(false);
+                          onUpdate?.(updatedComment);
+                        }}
                       />
                       <Button
                         variant={"outline"}

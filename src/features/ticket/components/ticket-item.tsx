@@ -94,7 +94,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
           <AnimatePresence mode="popLayout" initial={false}>
             {isEditing && (
               <motion.div
-                layoutId={`ticket-${ticket.id}-background${isDetail ? "-detail" : ""}`}
+                layoutId={`ticket-${ticket.id}-background${isDetail ? "-detail" : "normal"}`}
                 className="relative z-[2]"
                 style={{
                   borderRadius: "calc(var(--radius) /* 0.25rem */ + 0.125rem",
@@ -102,31 +102,23 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
               >
                 <Card className="w-full overflow-hidden">
                   <motion.div
-                    layoutId={`ticket-${ticket.id}-content${isDetail ? "-detail" : ""}`}
+                    layoutId={`ticket-${ticket.id}-content${isDetail ? "-detail" : "normal"}`}
                     layout="position"
                     initial={{
                       opacity: 0,
                       filter: "blur(6px)",
-                      transition: {
-                        duration: 0.2,
-                        bounce: 0,
-                      },
                     }}
                     animate={{
                       opacity: 1,
                       filter: "blur(0px)",
-                      transition: {
-                        duration: 0.2,
-                        bounce: 0,
-                      },
                     }}
                     exit={{
                       opacity: 0,
                       filter: "blur(6px)",
-                      transition: {
-                        duration: 0.2,
-                        bounce: 0,
-                      },
+                    }}
+                    transition={{
+                      duration: 0.2,
+                      bounce: 0,
                     }}
                     className="flex flex-col gap-y-4 will-change-transform"
                   >
@@ -150,7 +142,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
               <div className="group/card z-[1] flex w-full justify-center gap-x-1 self-center">
                 <>
                   <motion.div
-                    layoutId={`ticket-${ticket.id}-background${isDetail ? "-detail" : ""}`}
+                    layoutId={`ticket-${ticket.id}-background${isDetail ? "-detail" : "normal"}`}
                     className="w-full max-w-xl will-change-auto"
                   >
                     <Card
@@ -165,31 +157,23 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                       }}
                     >
                       <motion.div
-                        layoutId={`ticket-${ticket.id}-content${isDetail ? "-detail" : ""}`}
+                        layoutId={`ticket-${ticket.id}-content${isDetail ? "-detail" : "normal"}`}
                         layout="position"
                         initial={{
                           opacity: 0,
                           filter: "blur(10px)",
-                          transition: {
-                            duration: 0.2,
-                            bounce: 0,
-                          },
                         }}
                         animate={{
                           opacity: 1,
                           filter: "blur(0px)",
-                          transition: {
-                            duration: 0.2,
-                            bounce: 0,
-                          },
                         }}
                         exit={{
                           opacity: 0,
                           filter: "blur(10px)",
-                          transition: {
-                            duration: 0.2,
-                            bounce: 0,
-                          },
+                        }}
+                        transition={{
+                          duration: 0.2,
+                          bounce: 0,
                         }}
                         className="flex flex-col gap-y-4 will-change-transform"
                       >

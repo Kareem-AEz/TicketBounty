@@ -38,7 +38,7 @@ async function page({ searchParams }: TicketsPagePropsType) {
           description="All your tickets in one place"
         />
 
-        <div className="flex w-full max-w-md flex-1 flex-col items-center gap-y-10 self-center">
+        <div className="flex w-full max-w-lg flex-1 flex-col items-center gap-y-10 self-center">
           <Card className="w-full">
             <CardHeader>
               <CardTitle>{"Create a new ticket"}</CardTitle>

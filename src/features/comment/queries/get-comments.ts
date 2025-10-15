@@ -2,14 +2,19 @@
 
 import { prisma } from "@/lib/prisma";
 
-export const getComments = async (ticketId: string, offset?: number) => {
+export const getComments = async (
+  ticketId: string,
+  cursor?: { id: string; createdAt: number },
+) => {
   const take = 3;
-  const skip = offset ?? 0;
 
   const commentsPromise = prisma.ticketComment.findMany({
     where: {
       ticketId,
     },
+    cursor: cursor
+      ? { id: cursor.id, createdAt: new Date(cursor.createdAt) }
+      : undefined,
     select: {
       id: true,
       content: true,
@@ -22,11 +27,9 @@ export const getComments = async (ticketId: string, offset?: number) => {
         },
       },
     },
-    orderBy: {
-      createdAt: "desc",
-    },
-    skip,
-    take,
+    orderBy: [{ id: "desc" }, { createdAt: "desc" }],
+    skip: cursor ? 1 : 0,
+    take: take + 1,
   });
   const totalPromise = prisma.ticketComment.count({
     where: {
@@ -39,8 +42,19 @@ export const getComments = async (ticketId: string, offset?: number) => {
     totalPromise,
   ]);
 
+  const hasNextPage = comments.length > take;
+  const data = hasNextPage ? comments.slice(0, -1) : comments;
+  const lastComment = data.at(-1);
+  const cursorValue = lastComment
+    ? { id: lastComment.id, createdAt: lastComment.createdAt.valueOf() }
+    : undefined;
+
   return {
-    data: comments,
-    metadata: { total, hasNextPage: total > (skip ?? 0) + (take ?? 0) },
+    data,
+    metadata: {
+      total,
+      hasNextPage,
+      cursor: cursorValue,
+    },
   };
 };

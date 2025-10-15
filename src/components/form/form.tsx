@@ -42,7 +42,11 @@ export default function Form({
         });
       }
       onSuccess?.(actionState);
-      onClose?.();
+
+      // Delay onClose to allow exit animation to complete before revalidation updates DOM
+      setTimeout(() => {
+        onClose?.();
+      }, 10);
     },
     onError: ({ actionState }) => {
       onError?.(actionState);
