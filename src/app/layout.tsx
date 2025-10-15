@@ -88,8 +88,15 @@ export const metadata: Metadata = {
     title: "The Road to Next - Ticket Management System",
     description:
       "A modern ticket management system built with Next.js, featuring authentication, real-time updates, and intuitive user interface.",
-    images: ["/og-image 1x.png"],
-    creator: "@kareemahmed",
+    images: [
+      {
+        url: "/og-image 1x.png",
+        width: 1200,
+        height: 630,
+        alt: "The Road to Next - Ticket Management System",
+      },
+    ],
+    creator: "@KareemAhmedEz",
   },
   robots: {
     index: true,
