@@ -1,4 +1,5 @@
 import React from "react";
+import AuthGuard from "@/components/auth-guard";
 
 export default function AuthenticatedLayout({
   children,
@@ -6,5 +7,5 @@ export default function AuthenticatedLayout({
   children: React.ReactNode;
 }) {
   // TODO: Add auth guard with React Query
-  return <>{children}</>;
+  return <AuthGuard>{children}</AuthGuard>;
 }
