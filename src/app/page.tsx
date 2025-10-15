@@ -33,7 +33,7 @@ export const metadata: Metadata = {
       "Manage and track all your tickets in one place. View, create, and organize tickets with our intuitive ticket management system.",
     images: [
       {
-        url: "/og-image 1x.png",
+        url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
         alt: "All Tickets - The Road to Next Ticket Management System",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
       "Manage and track all your tickets in one place. View, create, and organize tickets with our intuitive ticket management system.",
     images: [
       {
-        url: "/og-image 1x.png",
+        url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
         alt: "All Tickets - The Road to Next Ticket Management System",

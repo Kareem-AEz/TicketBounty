@@ -21,7 +21,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Sign In - The Road to Next",
     description: "Sign in to your account to get started",
-    images: ["/og-image 1x.png"],
+    images: [
+      {
+        url: "/og-image 1x.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Sign In - The Road to Next",
+      },
+    ],
     url: "https://ticket-bounty-pi.vercel.app/sign-in",
     siteName: "The Road to Next",
     locale: "en_US",
@@ -33,7 +40,7 @@ export const metadata: Metadata = {
     description: "Sign in to your account to get started",
     images: [
       {
-        url: "/og-image 1x.png",
+        url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
         alt: "Sign In - The Road to Next",
