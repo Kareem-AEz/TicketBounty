@@ -2,8 +2,10 @@ import "./globals.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import NextTopLoader from "nextjs-toploader";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import AnalyticsTracker from "@/components/analytics-tracker";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar/components/sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
@@ -45,6 +47,7 @@ export default function RootLayout({
         <ThemeProvider>
           <ReactQueryProvider>
             <ReactQueryDevtools />
+            <AnalyticsTracker />
 
             <Header />
             <div className="flex">
@@ -60,6 +63,12 @@ export default function RootLayout({
             <Toaster />
           </ReactQueryProvider>
         </ThemeProvider>
+        <Script
+          src="/spaghetti/u"
+          data-website-id="62c38894-1534-4cd7-81a4-1764a97ad356"
+          strategy="afterInteractive"
+          data-do-not-track="true"
+        />
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import React, { useActionState } from "react";
+import React, { useActionState, useState } from "react";
 import { FieldError } from "@/components/form/field-error";
 import Form from "@/components/form/form";
 import SubmitButton from "@/components/form/submit-button";
@@ -30,6 +30,11 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
   const [actionState, formAction] = useActionState(
     upsertTicket.bind(null, ticket?.id),
     EMPTY_ACTION_STATE,
+  );
+
+  // Track form values for analytics
+  const [bounty, setBounty] = useState(
+    fromCent(ticket?.bounty ?? 0).toString(),
   );
 
   return (
@@ -96,6 +101,7 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
               (actionState?.payload?.get("bounty") as string) ??
               fromCent(ticket?.bounty ?? 0)
             }
+            onChange={(e) => setBounty(e.target.value)}
           />
           <FieldError actionState={actionState} name="bounty" />
         </div>
@@ -117,6 +123,26 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
           <SubmitButton
             className="flex flex-1 items-center justify-center"
             pendingLabel={copy.actions.saving}
+            data-umami-event={ticket ? "ticket-update" : "ticket-create"}
+            data-umami-event-status={ticket?.status ?? "OPEN"}
+            data-umami-event-has-bounty={
+              parseFloat(bounty || "0") > 0 ? "true" : "false"
+            }
+            data-umami-event-bounty-range={
+              parseFloat(bounty || "0") === 0
+                ? "none"
+                : parseFloat(bounty || "0") < 50
+                  ? "low"
+                  : parseFloat(bounty || "0") < 200
+                    ? "medium"
+                    : "high"
+            }
+            data-umami-event-has-deadline={
+              ticket?.deadline ||
+              (actionState?.payload?.get("deadline") as string)
+                ? "true"
+                : "false"
+            }
           >
             {copy.actions.save}
           </SubmitButton>

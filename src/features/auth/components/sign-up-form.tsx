@@ -47,7 +47,7 @@ export default function SignUpForm() {
         }
       />
       <FieldError actionState={actionState} name="passwordConfirmation" />
-      <SubmitButton>Sign Up</SubmitButton>
+      <SubmitButton data-umami-event="sign-up-submit">Sign Up</SubmitButton>
     </Form>
   );
 }

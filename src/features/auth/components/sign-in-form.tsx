@@ -30,7 +30,7 @@ export default function SignInForm() {
       />
       <FieldError actionState={actionState} name="password" />
 
-      <SubmitButton>Sign In</SubmitButton>
+      <SubmitButton data-umami-event="sign-in-submit">Sign In</SubmitButton>
     </Form>
   );
 }

@@ -21,9 +21,11 @@ async function TicketsList({
     isAllTickets ? undefined : user?.id,
     searchParams,
   );
+  const key = `ticket-`;
+  console.log(key);
 
   return (
-    <div className="relative flex h-full w-full flex-1 flex-col items-center gap-y-8 overflow-y-clip p-1 pb-24">
+    <motion.div className="relative flex h-full w-full flex-1 flex-col items-center gap-y-8 overflow-y-clip p-1 pb-24">
       <div className="flex w-full max-w-lg gap-x-4">
         <TicketQueryInput />
         <TicketSortSelect
@@ -40,7 +42,7 @@ async function TicketsList({
       <div className="flex flex-1 flex-col items-center gap-y-4 pb-24">
         {tickets.map((ticket) => (
           <motion.div
-            key={ticket.id}
+            key={`${key}-${ticket.id}`}
             layout="position"
             transition={{ type: "spring", duration: 0.513, bounce: 0.05 }}
           >
@@ -53,7 +55,7 @@ async function TicketsList({
       <div className="flex w-full max-w-lg flex-1 flex-col items-center">
         <TicketPagination paginationMetadata={metadata} />
       </div>
-    </div>
+    </motion.div>
   );
 }
 

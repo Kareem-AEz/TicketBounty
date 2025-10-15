@@ -89,7 +89,21 @@ export default function CommentForm({
           </Field>
         )}
       />
-      <SubmitButton pending={isSubmitting} pendingLabel="Submitting...">
+      <SubmitButton
+        pending={isSubmitting}
+        pendingLabel="Submitting..."
+        data-umami-event={comment ? "comment-update" : "comment-create"}
+        data-umami-event-length={
+          form.getValues("content").length < 50
+            ? "short"
+            : form.getValues("content").length < 200
+              ? "medium"
+              : "long"
+        }
+        data-umami-event-has-code={
+          form.getValues("content").includes("```") ? "true" : "false"
+        }
+      >
         Submit
       </SubmitButton>
     </form>
