@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { SearchParams } from "nuqs/server";
 import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -9,60 +8,19 @@ import { getAuth } from "@/features/auth/queries/get-auth";
 import TicketsList from "@/features/ticket/components/tickets-list";
 import { ticketSearchParamsCache } from "@/features/ticket/utils/search-params";
 import { copy } from "@/lib/copy";
-import { generateWebsiteStructuredData, getCanonicalUrl } from "@/lib/seo";
+import { generateWebsiteStructuredData } from "@/lib/seo";
+import { getSEOTags } from "@/lib/seo-tags";
 
-export const metadata: Metadata = {
+export const metadata = getSEOTags({
   title: "All Tickets",
   description:
     "Manage and track all your tickets in one place. View, create, and organize tickets with our intuitive ticket management system.",
-  keywords: [
-    "ticket management",
-    "ticket tracking",
-    "ticket system",
-    "project management",
-    "task management",
-    "issue tracking",
-    "support tickets",
-    "bug tracking",
-    "road to next",
-    "the road to next",
-  ],
   openGraph: {
     title: "All Tickets - The Road to Next",
-    description:
-      "Manage and track all your tickets in one place. View, create, and organize tickets with our intuitive ticket management system.",
-    images: [
-      {
-        url: "/og-image 1x.jpg",
-        width: 1200,
-        height: 630,
-        alt: "All Tickets - The Road to Next Ticket Management System",
-      },
-    ],
-    url: "https://ticket-bounty-pi.vercel.app/",
-    siteName: "The Road to Next",
-    locale: "en_US",
-    type: "website",
+    images: ["/og-image 1x.jpg"],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "All Tickets - The Road to Next",
-    description:
-      "Manage and track all your tickets in one place. View, create, and organize tickets with our intuitive ticket management system.",
-    images: [
-      {
-        url: "/og-image 1x.jpg",
-        width: 1200,
-        height: 630,
-        alt: "All Tickets - The Road to Next Ticket Management System",
-      },
-    ],
-    creator: "@KareemAhmedEz",
-  },
-  alternates: {
-    canonical: getCanonicalUrl("/"),
-  },
-};
+  canonicalUrlRelative: "/",
+});
 
 type HomePagePropsType = {
   searchParams: Promise<SearchParams>;
