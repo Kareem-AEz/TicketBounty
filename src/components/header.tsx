@@ -23,6 +23,7 @@ function Header() {
       <Link
         className={buttonVariants({ variant: "outline" })}
         href={signUpPath()}
+        data-umami-event="sign-up route"
       >
         Sign Up
       </Link>
@@ -30,6 +31,7 @@ function Header() {
       <Link
         className={buttonVariants({ variant: "outline" })}
         href={signInPath()}
+        data-umami-event="sign-in route"
       >
         Sign In
       </Link>
@@ -42,6 +44,7 @@ function Header() {
         <Link
           className={buttonVariants({ variant: "ghost" })}
           href={homePath()}
+          data-umami-event="home route"
         >
           <LucideKanban className="size-6" />
           <h1 className="text-lg font-semibold">TicketBounty</h1>

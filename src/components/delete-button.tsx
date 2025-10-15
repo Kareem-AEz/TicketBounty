@@ -88,6 +88,7 @@ function DeleteButton({
             disabled={isDeleting}
             variant="destructive"
             type="button"
+            data-umami-event="delete-confirm"
           >
             {isDeleting ? "Deleting..." : "Delete"}
           </Button>

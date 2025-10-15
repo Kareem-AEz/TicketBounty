@@ -19,7 +19,12 @@ export default function SignOutButton() {
   };
 
   return (
-    <Button onClick={handleSignOut} disabled={isPending} className="">
+    <Button
+      onClick={handleSignOut}
+      disabled={isPending}
+      className=""
+      data-umami-event="sign-out"
+    >
       {/* {isPending && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
