@@ -2,10 +2,12 @@ import "./globals.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 import NextTopLoader from "nextjs-toploader";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import AnalyticsTracker from "@/components/analytics-tracker";
+import Footer from "@/components/footer";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar/components/sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
@@ -21,6 +23,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const pixellari = localFont({
+  src: "../../public/Pixellari.ttf",
+  variable: "--font-pixellari",
   display: "swap",
 });
 
@@ -111,7 +119,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} overflow-x-hidden antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${pixellari.variable} overflow-x-hidden antialiased`}
       >
         <NextTopLoader color="var(--primary)" showSpinner={false} height={2} />
 
@@ -124,12 +132,15 @@ export default function RootLayout({
             <div className="flex">
               <Sidebar />
 
-              <main
-                id="main"
-                className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-clip px-8 py-24 pl-[7rem]"
-              >
-                <NuqsAdapter>{children}</NuqsAdapter>
-              </main>
+              <div className="flex flex-1 flex-col">
+                <main
+                  id="main"
+                  className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-clip px-8 py-24 pl-[7rem]"
+                >
+                  <NuqsAdapter>{children}</NuqsAdapter>
+                </main>
+                <Footer />
+              </div>
             </div>
             <Toaster />
           </ReactQueryProvider>
