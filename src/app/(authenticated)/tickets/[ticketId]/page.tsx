@@ -8,6 +8,7 @@ import Comments from "@/features/comment/components/comments";
 import { getComments } from "@/features/comment/queries/get-comments";
 import TicketItem from "@/features/ticket/components/ticket-item";
 import { getTicket } from "@/features/ticket/queries/get-ticket";
+import { getCanonicalUrl } from "@/lib/seo";
 import { homePath, ticketsPath } from "@/paths";
 
 type TicketPageProps = {
@@ -41,6 +42,46 @@ export async function generateMetadata({
 
   return {
     title: ticket.title,
+    description: ticket.content,
+    keywords: [
+      ticket.title,
+      "tickets",
+      "ticket management",
+      "ticket system",
+      "ticket tracking",
+    ],
+    openGraph: {
+      title: ticket.title,
+      description: ticket.content,
+      images: [
+        {
+          url: "/og-image 1x.png",
+          width: 1200,
+          height: 630,
+          alt: `${ticket.title} - The Road to Next`,
+        },
+      ],
+      url: `https://ticket-bounty-pi.vercel.app/tickets/${ticketId}`,
+      siteName: "The Road to Next",
+      locale: "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: ticket.title,
+      description: ticket.content,
+      images: [
+        {
+          url: "/og-image 1x.png",
+          width: 1200,
+          height: 630,
+          alt: `${ticket.title} - The Road to Next`,
+        },
+      ],
+    },
+    alternates: {
+      canonical: getCanonicalUrl(`/tickets/${ticketId}`),
+    },
   };
 }
 
