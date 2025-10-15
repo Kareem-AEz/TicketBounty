@@ -76,7 +76,6 @@ export const updatePassword = async (
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.log(error);
       return toErrorActionState(error, formData);
     }
 

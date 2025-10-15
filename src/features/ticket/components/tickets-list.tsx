@@ -22,7 +22,6 @@ async function TicketsList({
     searchParams,
   );
   const key = `ticket-`;
-  console.log(key);
 
   return (
     <motion.div className="relative flex h-full w-full flex-1 flex-col items-center gap-y-8 overflow-y-clip p-1 pb-24">

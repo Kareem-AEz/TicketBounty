@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { User } from "lucia";
 import { LucideLock, LucideLogOut, LucideUser } from "lucide-react";
 import Link from "next/link";
@@ -20,6 +21,8 @@ type AccountDropDownProps = {
 };
 
 export default function AccountDropDown({ user }: AccountDropDownProps) {
+  const queryClient = useQueryClient();
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger>
@@ -54,6 +57,9 @@ export default function AccountDropDown({ user }: AccountDropDownProps) {
               variant="ghost"
               size="sm"
               className="w-full justify-start p-0"
+              onClick={() => {
+                queryClient.removeQueries({ queryKey: ["auth", "guard"] });
+              }}
             >
               <LucideLogOut />
               <span>Sign Out</span>

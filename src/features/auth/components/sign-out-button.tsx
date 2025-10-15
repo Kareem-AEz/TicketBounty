@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -8,10 +9,17 @@ import { signInPath } from "@/paths";
 import { signOut } from "../actions/sign-out";
 
 export default function SignOutButton() {
+  // Hooks
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
+  // Event handlers
   const handleSignOut = () => {
+    // Clear auth cache immediately to prevent stale data
+    queryClient.setQueryData(["auth", "guard"], null);
+    queryClient.removeQueries({ queryKey: ["auth", "guard"] });
+
     startTransition(async () => {
       await signOut();
       router.push(signInPath());
@@ -22,20 +30,8 @@ export default function SignOutButton() {
     <Button
       onClick={handleSignOut}
       disabled={isPending}
-      className=""
       data-umami-event="sign-out"
     >
-      {/* {isPending && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Spinner size="sm" />
-        </motion.div>
-      )} */}
-
       <motion.span
         layout="position"
         className="flex items-center gap-2 select-none"
@@ -44,7 +40,7 @@ export default function SignOutButton() {
           originX: "0px",
         }}
       >
-        {"Sign Out"}
+        Sign Out
       </motion.span>
     </Button>
   );
