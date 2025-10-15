@@ -27,9 +27,80 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: {
     template: "%s | The Road to Next",
-    default: "The Road to Next",
+    default: "The Road to Next - Ticket Management System",
   },
-  description: "My Road to Next application...",
+  description:
+    "A modern ticket management system built with Next.js, featuring authentication, real-time updates, and intuitive user interface.",
+  keywords: [
+    "ticket management",
+    "Next.js",
+    "React",
+    "TypeScript",
+    "Prisma",
+    "authentication",
+    "web application",
+    "ticket system",
+    "project management",
+  ],
+  authors: [{ name: "Kareem Ahmed" }],
+  creator: "Kareem Ahmed",
+  publisher: "The Road to Next",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL("https://ticket-bounty-pi.vercel.app"),
+  alternates: {
+    canonical: "/",
+    languages: {
+      "en-US": "/en-US",
+      en: "/en",
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://ticket-bounty-pi.vercel.app",
+    siteName: "The Road to Next",
+    title: "The Road to Next - Ticket Management System",
+    description:
+      "A modern ticket management system built with Next.js, featuring authentication, real-time updates, and intuitive user interface.",
+    images: [
+      {
+        url: "/og-image 1x.png",
+        width: 1200,
+        height: 630,
+        alt: "The Road to Next - Ticket Management System",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Road to Next - Ticket Management System",
+    description:
+      "A modern ticket management system built with Next.js, featuring authentication, real-time updates, and intuitive user interface.",
+    images: ["/og-image 1x.png"],
+    creator: "@kareemahmed",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "your-google-verification-code", // Replace with your actual verification code
+  },
+  category: "technology",
+  classification: "Business",
+  referrer: "origin-when-cross-origin",
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({
