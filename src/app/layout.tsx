@@ -108,7 +108,6 @@ export const metadata: Metadata = {
   category: "technology",
   classification: "Business",
   referrer: "origin-when-cross-origin",
-  colorScheme: "light dark",
 };
 
 export default function RootLayout({
