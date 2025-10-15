@@ -4,13 +4,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @layer utilities {
-  #sidebar[data-open="true"] ~ #main {
+  #sidebar[data-open="true"] ~ * #main {
     @apply translate-x-[5.5rem] max-md:translate-x-0;
   }
   #sidebar-overlay:has(+ #sidebar[data-open="true"]) {
     @apply opacity-100;
   }
-  #main {
+  #main,
+  #main ~ * footer {
     @apply duration-400 ease-[linear(0,0.003_0.5%,0.012_1%,0.028_1.6%,0.048_2.2%,0.076_2.9%,0.11_3.7%,0.304_7.9%,0.396_10.1%,0.449_11.5%,0.498_12.9%,0.546_14.4%,0.589_15.9%,0.631_17.5%,0.67_19.2%,0.708_21%,0.741_22.8%,0.772_24.7%,0.801_26.7%,0.827_28.8%,0.851_31%,0.872_33.3%,0.892_35.8%,0.909_38.4%,0.924_41.1%,0.937_44%,0.949_47.1%,0.959_50.4%,0.968_54%,0.981_61.9%,0.99_71.5%,0.996_83.5%,1)] will-change-transform;
   }
 }
@@ -184,6 +185,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-pixellari: var(--font-pixellari);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
