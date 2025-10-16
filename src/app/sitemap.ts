@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import config from "@/config";
 
 // This is a basic sitemap. For a production app, you might want to:
 // 1. Fetch tickets from your database dynamically
@@ -6,7 +7,7 @@ import type { MetadataRoute } from "next";
 // 3. Add lastModified dates based on actual ticket update times
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://ticket-bounty-pi.vercel.app";
+  const baseUrl = `https://${config.domainName}`;
   const currentDate = new Date();
 
   // Static pages

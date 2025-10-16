@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import config from "@/config";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://ticket-bounty-pi.vercel.app";
+  const baseUrl = `https://${config.domainName}`;
 
   return {
     rules: {
