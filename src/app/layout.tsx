@@ -12,6 +12,11 @@ import Sidebar from "@/components/sidebar/components/sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { getSEOTags } from "@/lib/seo-tags";
+import {
+  generateOrganizationStructuredData,
+  generateSoftwareApplicationStructuredData,
+  generateWebsiteStructuredData,
+} from "@/lib/structured-data";
 import ReactQueryProvider from "./_providers/react-query/react-query-provider";
 
 const geistSans = Geist({
@@ -45,11 +50,36 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Generate structured data
+  const organizationData = generateOrganizationStructuredData();
+  const websiteData = generateWebsiteStructuredData();
+  const softwareData = generateSoftwareApplicationStructuredData();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${pixellari.variable} overflow-x-hidden antialiased`}
       >
+        {/* Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationData),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteData),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(softwareData),
+          }}
+        />
+
         <NextTopLoader color="var(--primary)" showSpinner={false} height={2} />
 
         <ThemeProvider>
