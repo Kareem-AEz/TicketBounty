@@ -23,7 +23,6 @@ This is a complete ticket management system that actually works and doesn't look
 - **Dark mode** — Because staring at bright screens at 2am is painful
 - **Nice animations** — Buttons appear with a subtle stagger. Timed at 68ms because details matter
 - **Clean UI** — Uses shadcn/ui components, looks professional without trying too hard
-- **Privacy-first analytics** — Know what's happening without creeping on your users
 - **Keyboard friendly** — Tab through everything, screen readers work, focus indicators are visible
 
 ---
@@ -63,10 +62,6 @@ Sonner             ━━━  Toast notifications that don't get in the way
 Lucide React       ━━━  Icons that are actually nice
 ```
 
-### Analytics & Monitoring
-```
-Umami Analytics    ━━━  Privacy-friendly analytics (no cookies)
-```
 
 ### Developer Experience
 ```
@@ -91,9 +86,7 @@ src/
 │   ├── ui/               # Reusable components (buttons, inputs, etc.)
 │   ├── sidebar/          # Left sidebar navigation
 │   ├── theme/            # Dark/light mode switcher
-│   └── analytics-tracker.tsx  # Privacy-friendly analytics
 ├── lib/
-│   ├── umami.ts          # Analytics utilities (trackEvent, identifyUser)
 │   ├── lucia.ts          # Authentication config
 │   ├── prisma.ts         # Database client
 │   └── utils.ts          # Helper functions
@@ -138,28 +131,6 @@ Uses PostgreSQL with four main tables:
 - High contrast colors so text is actually readable
 - Focus indicators that are visible but not obnoxious
 
-### Analytics That Respect Your Users
-Built-in privacy-friendly analytics with Umami. No cookies, no creepy tracking, just the insights you actually need.
-
-**What's being tracked:**
-- User journeys (sign-up → first ticket → engagement)
-- 11 events with rich metadata (bounty ranges, comment lengths, ticket statuses)
-- Cross-session user identification (so you can see who comes back)
-
-**What's NOT being tracked:**
-- Third-party cookies
-- Personal browsing history
-- Anything that would make privacy advocates nervous
-
-**The clever bits:**
-- Proxied through `/spaghetti/u` to bypass ad blockers (because legitimate analytics shouldn't be blocked)
-- Auto-excludes localhost (your dev testing won't pollute production data)
-- Respects "Do Not Track" browser settings
-- User data stays in your Umami instance, not scattered across the internet
-
-**Implementation details:** Check `docs/UMAMI_*.md` for the full story — there's a 1,400-line documentation suite because we believe in explaining things properly. The analytics layer is fully reusable: copy two files, change one import, deploy. Works with Next-Auth, Clerk, Supabase, or whatever auth system you prefer.
-
-*Analytics that answer "what happened?" without feeling like surveillance.*
 
 ---
 
@@ -220,13 +191,11 @@ npm run seed         # Add sample data to database
 - [x] Accessibility features (keyboard nav, screen readers)
 - [x] Form validation (tells you when you mess up)
 - [x] Clean UI design (looks professional)
-- [x] Privacy-friendly analytics (tracks what matters, respects users)
 - [x] Optimistic updates (instant feedback with React Query)
 - [ ] Mobile responsive (mostly works, could be better)
 
 ### 🔄 Recently Added
 - [x] React Compiler (automatic memoization, faster renders)
-- [x] Comprehensive analytics (11 tracked events with metadata)
 - [x] Documentation suite (1,400+ lines of guides)
 - [x] Sidebar navigation (easier to get around)
 - [x] Toast notifications (feedback that doesn't block you)
@@ -270,7 +239,6 @@ This project follows **[The Road to Next](https://www.road-to-next.com)** by Rob
 - TypeScript patterns that actually help
 - Building UIs that look professional
 - Making apps accessible to everyone
-- Privacy-friendly analytics (know what's happening without being creepy)
 - Feature-based architecture (organize by what it does, not what it is)
 
 ---
@@ -281,17 +249,11 @@ Feel free to suggest improvements or report bugs. Just keep the code clean, main
 
 **Good areas to help with:** Making things faster, improving accessibility, adding useful features that fit the current vibe, better mobile responsiveness, more test coverage.
 
-**Please don't:** Add tracking that violates privacy, break keyboard navigation, remove animations without good reason, make error messages boring.
+**Please don't:** Break keyboard navigation, remove animations without good reason, make error messages boring.
 
 ---
 
 ## Documentation
-
-### Analytics Documentation
-- **[Umami Overview](docs/UMAMI_README.md)** — Start here: understand the documentation structure
-- **[Analytics Guide](docs/UMAMI_ANALYTICS_GUIDE.md)** — How analytics works in *this* project
-- **[Setup Guide](docs/UMAMI_SETUP_GUIDE.md)** — Set up Umami in *new* projects
-- **[Package Reference](docs/UMAMI_PACKAGE_README.md)** — API reference for reusable components
 
 ### React Patterns
 - **[React Query Guide](REACT_QUERY_GUIDE.md)** — Server state management patterns

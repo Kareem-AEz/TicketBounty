@@ -11,7 +11,6 @@ import {
 import { Prisma } from "@/generated/client";
 import { lucia } from "@/lib/lucia";
 import { prisma } from "@/lib/prisma";
-import { identifyUser } from "@/lib/umami";
 import { ticketsPath } from "@/paths";
 
 const signUpSchema = z
@@ -68,12 +67,6 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
       sessionCookie.value,
       sessionCookie.attributes,
     );
-
-    // Identify the user
-    identifyUser(user.id, {
-      username: user.username,
-      session_start: new Date().toISOString(),
-    });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
