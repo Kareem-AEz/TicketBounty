@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   rewrites: async () => {
     return [
       {
-        source: "/spaghetti/u",
+        source: "/spaghetti/um",
         destination: "https://cloud.umami.is/script.js",
       },
     ];

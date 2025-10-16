@@ -105,8 +105,8 @@ export default function RootLayout({
           </ReactQueryProvider>
         </ThemeProvider>
         <Script
-          src="/spaghetti/u"
-          data-website-id={process.env.UMAMI_WEBSITE_ID}
+          src="/spaghetti/um"
+          data-website-id="41548687-2c1f-4a5a-9393-0776994b84aa"
           strategy="afterInteractive"
           data-do-not-track="true"
         />
