@@ -2,6 +2,8 @@
  * Utility functions for generating canonical URLs and SEO metadata
  */
 
+import { WebSite, WithContext } from "schema-dts";
+
 const BASE_URL = "https://ticket-bounty-pi.vercel.app";
 
 /**
@@ -68,7 +70,7 @@ export function generateOrganizationStructuredData() {
  * @returns Website structured data
  */
 export function generateWebsiteStructuredData() {
-  return {
+  const jsonLd: WithContext<WebSite> = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "The Road to Next",
@@ -84,7 +86,7 @@ export function generateWebsiteStructuredData() {
         "@type": "EntryPoint",
         urlTemplate: `${BASE_URL}/tickets?search={search_term_string}`,
       },
-      "query-input": "required name=search_term_string",
     },
   };
+  return jsonLd;
 }
