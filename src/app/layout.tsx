@@ -106,7 +106,7 @@ export default function RootLayout({
         </ThemeProvider>
         <Script
           src="/spaghetti/u"
-          data-website-id="62c38894-1534-4cd7-81a4-1764a97ad356"
+          data-website-id={process.env.UMAMI_WEBSITE_ID}
           strategy="afterInteractive"
           data-do-not-track="true"
         />
