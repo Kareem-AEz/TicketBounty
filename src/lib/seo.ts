@@ -59,11 +59,7 @@ export function generateOrganizationStructuredData() {
       "@type": "Person",
       name: "Kareem Ahmed",
     },
-    sameAs: [
-      // Add your social media URLs here
-      // 'https://twitter.com/kareemahmed',
-      // 'https://linkedin.com/in/kareemahmed',
-    ],
+    sameAs: ["https://x.com/KareemAhmedEz", "https://github.com/Kareem-AEz"],
   };
 }
 

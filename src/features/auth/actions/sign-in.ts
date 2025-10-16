@@ -10,6 +10,7 @@ import {
 } from "@/components/form/utils/to-action-state";
 import { lucia } from "@/lib/lucia";
 import { prisma } from "@/lib/prisma";
+import { identifyUser } from "@/lib/umami";
 import { ticketsPath } from "@/paths";
 
 const signInSchema = z.object({
@@ -49,6 +50,12 @@ export const signIn = async (_actionState: ActionState, formData: FormData) => {
       sessionCookie.value,
       sessionCookie.attributes,
     );
+
+    // Identify the user
+    identifyUser(user.id, {
+      username: user.username,
+      session_start: new Date().toISOString(),
+    });
   } catch (error) {
     return toErrorActionState(error, formData);
   }

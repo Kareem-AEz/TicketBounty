@@ -5,6 +5,7 @@ import Heading from "@/components/heading";
 import Placeholder from "@/components/placeholder";
 import RedirectToast from "@/components/redirect-toast";
 import Spinner from "@/components/spinner";
+import { BreadcrumbStructuredData } from "@/components/structured-data/breadcrumb-structured-data";
 import {
   Card,
   CardContent,
@@ -47,6 +48,14 @@ async function page({ searchParams }: TicketsPagePropsType) {
 
   return (
     <>
+      {/* Breadcrumb Structured Data */}
+      <BreadcrumbStructuredData
+        items={[
+          { name: "Home", url: "/" },
+          { name: "My Tickets", url: "/tickets" },
+        ]}
+      />
+
       <div className="flex flex-1 flex-col gap-y-8">
         <Heading
           title="My Tickets"
