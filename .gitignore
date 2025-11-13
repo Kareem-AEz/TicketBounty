@@ -41,10 +41,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# prisma
-/src/generated
-
-
+/src/generated/prisma
 /X_POSTS_LOG_IMPROVED.md
 /X_POSTS_LOG.md
 /X
