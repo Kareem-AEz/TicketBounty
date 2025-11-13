@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import React from "react";
 import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
 import { CardCompact } from "@/components/card-compact";
 import { Separator } from "@/components/ui/separator";
