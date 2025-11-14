@@ -85,6 +85,7 @@ export default function RootLayout({
             <ReactQueryDevtools />
 
             <Header />
+
             <div className="flex">
               <Sidebar />
 

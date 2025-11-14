@@ -30,7 +30,13 @@ export const forgotPassword = async (
 
     const userId = user?.id;
 
-    if (!userId) return;
+    if (!userId) {
+      return toSuccessActionState({
+        status: "SUCCESS",
+        message:
+          "If an account with this email exists, you will receive a password reset email.",
+      });
+    }
 
     const passwordResetLink = await generatePasswordResetLink(userId);
     console.log("Password reset link:", passwordResetLink);
