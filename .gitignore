@@ -44,7 +44,6 @@ next-env.d.ts
 # prisma
 /src/generated
 
-
 /X_POSTS_LOG_IMPROVED.md
 /X_POSTS_LOG.md
 /X

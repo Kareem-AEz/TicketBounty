@@ -28,25 +28,12 @@ model User {
   email         String        @unique
   username      String        @unique
   passwordHash  String
-  passwordResetToken PasswordResetToken[]
-
   sessions      Session[]
   tickets       Ticket[]
   comments      TicketComment[]
 
   // Performance indexes for text search (temporarily disabled)
   // @@index([username(ops: raw("gin_trgm_ops"))], type: Gin)
-}
-
-model PasswordResetToken {
-  tokenHash     String        @id
-  createdAt     DateTime      @default(now()) @db.Timestamptz
-  expiresAt     DateTime      @db.Timestamptz
-
-  userId        String
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
 }
 
 model Session {
