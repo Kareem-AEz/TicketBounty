@@ -3,7 +3,9 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Separator } from "./ui/separator";
 
-export default function Footer({ ...props }: React.ComponentProps<"footer">) {
+export default async function Footer({
+  ...props
+}: React.ComponentProps<"footer">) {
   return (
     <footer
       className="font-pixellari bg-secondary/20 flex flex-col items-center justify-center pl-[7rem] tracking-wider"
@@ -15,6 +17,7 @@ export default function Footer({ ...props }: React.ComponentProps<"footer">) {
         <p className="text-muted-foreground flex items-center gap-x-1 text-sm">
           <span>Built with </span>
           <LucideHeart className="size-5 stroke-3 text-red-500 dark:stroke-2" />
+
           <span>
             by
             <span className="text-primary font-extrabold dark:font-bold">
