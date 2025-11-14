@@ -6,14 +6,10 @@ export const sendEmailPasswordReset = async (
   toEmail: string,
   url: string,
 ) => {
-  const { error } = await resend.emails.send({
+  return await resend.emails.send({
     from: "Ticket Bounty <no-reply@app.nab3water.com>",
     to: toEmail,
     subject: "Password Reset Request",
     react: <PasswordResetEmail toName={toName} url={url} />,
   });
-
-  if (error) {
-    throw new Error(`Failed to send email: ${error}`);
-  }
 };
