@@ -7,6 +7,7 @@ import {
   toSuccessActionState,
 } from "@/components/form/utils/to-action-state";
 import { prisma } from "@/lib/prisma";
+import { sendEmailPasswordReset } from "../emails/send-email-password-reset";
 import { generatePasswordResetLink } from "../utils/generate-password-reset-link";
 
 const forgotPasswordSchema = z.object({
@@ -23,14 +24,12 @@ export const forgotPassword = async (
     );
 
     const { email } = validatedFields;
-    const user = await prisma.user.findUnique({
+    const userFound = await prisma.user.findUnique({
       where: { email },
-      select: { id: true },
+      select: { id: true, username: true, email: true },
     });
 
-    const userId = user?.id;
-
-    if (!userId) {
+    if (!userFound) {
       return toSuccessActionState({
         status: "SUCCESS",
         message:
@@ -38,10 +37,11 @@ export const forgotPassword = async (
       });
     }
 
-    const passwordResetLink = await generatePasswordResetLink(userId);
-    console.log("Password reset link:", passwordResetLink);
+    const { id, username, email: userEmail } = userFound;
 
-    // TODO: Send password reset email
+    const passwordResetLink = await generatePasswordResetLink(id);
+
+    await sendEmailPasswordReset(username, userEmail, passwordResetLink);
 
     return toSuccessActionState({
       status: "SUCCESS",
