@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import z from "zod";
 import { setCookie } from "@/actions/cookies";
@@ -9,8 +10,9 @@ import {
 } from "@/components/form/utils/to-action-state";
 import { hashToken } from "@/lib/generate-random-token";
 import { hashPassword } from "@/lib/hash-and-verify";
+import { lucia } from "@/lib/lucia";
 import { prisma } from "@/lib/prisma";
-import { signInPath } from "@/paths";
+import { ticketsPath } from "@/paths";
 
 const resetPasswordSchema = z
   .object({
@@ -66,9 +68,21 @@ export const resetPassword = async (
       data: { passwordHash: await hashPassword(password) },
     });
 
-    await setCookie("toast", "Password reset successfully");
+    const session = await lucia.createSession(passwordResetToken.userId, {});
+    const sessionCookie = lucia.createSessionCookie(session.id);
+
+    (await cookies()).set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
+
+    await setCookie(
+      "toast",
+      "Password reset successfully, you are now logged in",
+    );
   } catch (error) {
     return toErrorActionState(error, formData);
   }
-  redirect(signInPath());
+  redirect(ticketsPath());
 };
