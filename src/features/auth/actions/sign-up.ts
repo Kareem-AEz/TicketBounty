@@ -9,6 +9,7 @@ import {
   toErrorActionState,
 } from "@/components/form/utils/to-action-state";
 import { Prisma } from "@/generated/client";
+import { inngest } from "@/lib/inngest";
 import { lucia } from "@/lib/lucia";
 import { prisma } from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
@@ -67,6 +68,14 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
       sessionCookie.value,
       sessionCookie.attributes,
     );
+
+    // send welcome email after 15 minutes
+    await inngest.send({
+      name: "app/auth.sign-up-welcome-email-function",
+      data: {
+        userId: user.id,
+      },
+    });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {

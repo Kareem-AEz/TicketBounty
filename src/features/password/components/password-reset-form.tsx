@@ -14,11 +14,11 @@ import PasswordStrengthMeter, {
 } from "./password-strength-meter";
 
 export default function PasswordResetForm({ tokenId }: { tokenId: string }) {
-  const [passwordStrength, setPasswordStrength] = useState<StrengthLevel>(0);
   const [actionState, action] = useActionState(
     resetPassword.bind(null, tokenId),
     EMPTY_ACTION_STATE,
   );
+  const [passwordStrength, setPasswordStrength] = useState<StrengthLevel>(0);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const password = e.target.value;
