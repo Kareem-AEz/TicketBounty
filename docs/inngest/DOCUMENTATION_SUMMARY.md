@@ -10,13 +10,15 @@
 
 ### ⭐ NEW: Production Pitfalls & Tips
 We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle-tested guide featuring:
-- 14 critical production pitfalls with real cost estimates
-- $12K+ in actual losses prevented by following these tips
+- 14 critical production pitfalls based on common patterns
+- Illustrative examples showing typical costs and impacts
 - Do's and Don'ts quick reference
 - Production checklist
-- Real metrics from production environments
+- Performance metrics based on industry best practices
 
 **Why this matters:** Learning what NOT to do saves more time than learning best practices.
+
+> **Note:** Examples and metrics throughout the documentation are illustrative, based on common production patterns and industry best practices.
 
 ---
 
@@ -30,7 +32,7 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 **Time:** 30-45 minutes  
 **Key topics:**
 - 14 critical production pitfalls with real costs
-- Not wrapping in steps ($12K lost)
+- Not wrapping in steps (can lead to significant revenue loss)
 - Blocking API responses (99% → 94% conversion drop)
 - Missing timeouts (resource leaks)
 - No idempotency (duplicate charges)
@@ -198,15 +200,15 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 - ✅ Advanced patterns: Comprehensive
 - ✅ Real-world examples: 20+ with code
 - ✅ Production pitfalls: 14 documented with costs
-- ✅ Performance metrics: Real data from production
+- ✅ Performance metrics: Based on typical production patterns
 - ✅ Cost optimization: Multiple strategies
 - ✅ Project-specific guidance: Detailed roadmap
 
 ### Real-World Value
-- 💰 **Cost savings:** $12K+ in documented avoided losses
-- ⚡ **Performance improvements:** 96% API response time reduction
-- 📈 **Conversion improvements:** 94% → 99.8% success rate
-- 🔧 **Production-ready:** Battle-tested in real applications
+- 💰 **Cost patterns:** Illustrates typical production issues and their impacts
+- ⚡ **Performance improvements:** Shows common optimization results (96% response time reduction)
+- 📈 **Success patterns:** Demonstrates typical improvements (94% → 99.8% success rate)
+- 🔧 **Production-ready:** Based on battle-tested patterns
 - 🎯 **Actionable:** Every pitfall has a fix with code
 
 ---
@@ -321,7 +323,7 @@ Before deploying to production, ensure you've:
 
 ---
 
-**Remember:** These docs are living documents based on real production experience. The costs and metrics shown are from actual incidents and deployments. Use them to avoid repeating expensive mistakes.
+**Remember:** These docs are based on common production patterns and industry best practices. The examples, costs, and metrics are illustrative of typical scenarios teams encounter when building event-driven systems. Use them to build more reliable applications.
 
 ---
 

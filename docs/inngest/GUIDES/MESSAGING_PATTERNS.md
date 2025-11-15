@@ -861,7 +861,7 @@ export const step1 = inngest.createFunction(
 
 ### Performance Metrics by Pattern
 
-Based on real production data:
+Based on typical production implementations:
 
 | Pattern | Avg Execution | Failure Rate | Resource Usage | Best For Scale |
 |---------|--------------|--------------|----------------|----------------|

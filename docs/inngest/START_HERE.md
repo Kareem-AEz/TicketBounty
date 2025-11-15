@@ -130,7 +130,7 @@ Learning resources and project-specific guidance:
 
 **The #1 mistake:** Not wrapping operations in `step.run()`
 - Results in: Lost payments, duplicate emails, inconsistent data
-- Impact: $12K lost in one incident (real case)
+- Common impact: Significant revenue loss from unreconciled transactions
 
 **The #2 mistake:** Blocking API responses
 - Results in: 5-second signups instead of 200ms
@@ -140,7 +140,7 @@ Learning resources and project-specific guidance:
 - Results in: Workflows that never complete
 - Impact: Resource leaks, zombie processes
 
-👉 **Learn from 14+ real production incidents: [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)**
+👉 **Learn from 14+ common production patterns: [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)**
 
 ### 📐 Routing Architecture
 

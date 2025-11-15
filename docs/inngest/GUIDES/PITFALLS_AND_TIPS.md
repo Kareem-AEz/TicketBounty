@@ -2,6 +2,8 @@
 
 A battle-tested guide to avoiding common mistakes and building reliable event-driven workflows in production.
 
+> **Note on Examples:** The scenarios, costs, and metrics in this guide are illustrative examples based on common production patterns and industry best practices. They represent typical issues and improvements teams experience when implementing event-driven systems.
+
 ---
 
 ## Table of Contents
@@ -66,7 +68,13 @@ export const goodFunction = inngest.createFunction(
 ```
 
 **Real-World Impact:**
-> "We lost $12K in payments because Stripe charges went through but our database writes failed. We had no way to recover because nothing was wrapped in steps." - Production incident report
+Based on common production patterns, scenarios like this occur:
+> Example: "We lost $12K in payments because Stripe charges went through but our database writes failed. We had no way to recover because nothing was wrapped in steps."
+
+This pattern commonly leads to:
+- Payment processing inconsistencies
+- Revenue loss from unreconciled transactions
+- No recovery path when operations fail mid-process
 
 ---
 
@@ -122,7 +130,8 @@ export const onUserCreated = inngest.createFunction(
 );
 ```
 
-**Metrics:**
+**Common Impact Metrics:**
+Based on typical implementations:
 - API response time: 5s → 180ms (96% improvement)
 - User signup success rate: 94% → 99.8%
 
@@ -200,7 +209,7 @@ export const orderWorkflow = inngest.createFunction(
 );
 ```
 
-**Best Practice:** Always set timeouts. Common values:
+**Best Practice:** Always set timeouts. Typical values based on use case:
 - Payment: `24h` - `7d`
 - User actions: `1h` - `24h`
 - External webhooks: `5m` - `1h`
@@ -350,7 +359,13 @@ export const sendNotification = inngest.createFunction(
 ```
 
 **Real-World Example:**
-> "We sent 50,000 welcome emails in 2 minutes when a batch import succeeded. SendGrid blocked us for 24 hours." - SaaS founder
+Based on common production incidents with email service providers:
+> Example scenario: "We sent 50,000 welcome emails in 2 minutes when a batch import succeeded. SendGrid blocked us for 24 hours."
+
+This pattern commonly leads to:
+- Email service rate limit violations
+- Temporary or permanent API blocks
+- Customer communication failures
 
 ---
 
@@ -410,7 +425,7 @@ export const processOrder = inngest.createFunction(
 );
 ```
 
-**Performance Impact:** 3x faster execution, 66% cost reduction
+**Typical Performance Impact:** 3x faster execution, 66% cost reduction
 
 ---
 
@@ -1111,7 +1126,7 @@ Do I need to enable/disable features independently?
 
 ---
 
-**Remember:** These aren't theoretical best practices. They're lessons learned from production incidents, customer complaints, and late-night debugging sessions. Follow them to save yourself the pain.
+**Note:** These patterns and examples are based on common production scenarios and industry best practices. Metrics shown are illustrative of typical improvements when following these patterns.
 
 ---
 
