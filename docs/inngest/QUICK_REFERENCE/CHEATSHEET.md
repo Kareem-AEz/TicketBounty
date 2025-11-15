@@ -2,7 +2,7 @@
 
 One-page reference for the most common tasks and patterns.
 
-> **⚠️ AVOID COSTLY MISTAKES:** Read [PITFALLS_AND_TIPS.md](../GUIDES/PITFALLS_AND_TIPS.md) for 14 production pitfalls that cost real money ($12K+ in lost revenue from real incidents).
+> **⚠️ AVOID COSTLY MISTAKES:** Read [PITFALLS_AND_TIPS.md](../GUIDES/PITFALLS_AND_TIPS.md) for 14 common production pitfalls based on real-world patterns.
 
 ---
 
@@ -261,8 +261,8 @@ app/[feature].[action]
 
 ## ✅ Before Shipping
 
-**Critical (causes production incidents):**
-- [ ] All operations wrapped in `step.run()` (prevents $12K losses)
+**Critical (prevents common production issues):**
+- [ ] All operations wrapped in `step.run()` (prevents revenue loss)
 - [ ] Timeouts set on `waitForEvent()` (prevents zombie workflows)
 - [ ] Idempotency keys for side effects (prevents duplicate charges)
 - [ ] No blocking of API responses (prevents conversion drops)
@@ -284,10 +284,10 @@ app/[feature].[action]
 
 ## 🚨 Common Mistakes
 
-> **💰 Real costs from production:** Not wrapping in steps lost $12K in one incident. Blocking API responses dropped conversion from 99% to 94%. See [PITFALLS_AND_TIPS.md](../GUIDES/PITFALLS_AND_TIPS.md) for 14 mistakes with real impact.
+> **💡 Common Production Patterns:** These mistakes represent typical issues teams face. See [PITFALLS_AND_TIPS.md](../GUIDES/PITFALLS_AND_TIPS.md) for 14 pitfalls with detailed examples and fixes.
 
 ### ❌ Not Wrapping in Steps
-**Impact:** Lost payments, duplicate emails, $12K in one incident
+**Common Impact:** Lost payments, duplicate emails, data inconsistencies
 ```typescript
 // BAD - No retries
 const data = await fetchData();
@@ -299,7 +299,7 @@ const data = await step.run("fetch", async () => {
 ```
 
 ### ❌ Blocking API Responses
-**Impact:** 5s response time, 94% conversion (was 99%)
+**Common Impact:** 5s response times, conversion rate drops
 ```typescript
 // BAD - Slow
 app.post("/signup", async (req, res) => {
@@ -317,7 +317,7 @@ app.post("/signup", async (req, res) => {
 ```
 
 ### ❌ Missing Timeout
-**Impact:** Resource leaks, zombie workflows
+**Common Impact:** Resource leaks, zombie workflows
 ```typescript
 // BAD - Could wait forever
 const result = await step.waitForEvent("wait", {
@@ -332,7 +332,7 @@ const result = await step.waitForEvent("wait", {
 ```
 
 ### ❌ No Type Safety
-**Impact:** Production bugs instead of compile-time errors
+**Common Impact:** Production bugs instead of compile-time errors
 ```typescript
 // BAD - Anything goes
 inngest.send({ name: "app/event", data: {} });
@@ -347,7 +347,7 @@ export const inngest = new Inngest({
 ```
 
 ### ❌ Not Idempotent Operations
-**Impact:** Duplicate charges, angry customers, refunds
+**Common Impact:** Duplicate charges, customer complaints, refunds
 ```typescript
 // BAD - Retries charge customer multiple times
 await step.run("charge", async () => {

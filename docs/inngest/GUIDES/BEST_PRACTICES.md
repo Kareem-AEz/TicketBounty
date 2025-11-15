@@ -7,9 +7,9 @@ A comprehensive guide to organizing event-driven workflows, messaging patterns, 
 ## 🚨 New to Inngest? Start Here First!
 
 Before diving into this comprehensive guide, **read [PITFALLS_AND_TIPS.md](./PITFALLS_AND_TIPS.md)** first. It covers:
-- 14 critical production pitfalls (with real cost estimates)
+- 14 critical production pitfalls based on common patterns
 - Do's and Don'ts quick reference
-- Battle-tested tips from real incidents
+- Battle-tested patterns from production experience
 
 **Why start there?** Learning what NOT to do saves you more time than learning best practices.
 
@@ -708,11 +708,11 @@ export const observableWorkflow = inngest.createFunction(
 
 ## Common Pitfalls
 
-> **📖 For a comprehensive guide to production pitfalls with real-world impact and costs, see [PITFALLS_AND_TIPS.md](./PITFALLS_AND_TIPS.md)**
+> **📖 For a comprehensive guide to production pitfalls with illustrative examples and typical impacts, see [PITFALLS_AND_TIPS.md](./PITFALLS_AND_TIPS.md)**
 
 ### ❌ **Pitfall 1: Not Using Steps**
 
-**Real impact:** $12K lost in one incident due to payment processing failures
+**Common impact:** Significant revenue loss due to payment processing failures
 
 ```typescript
 // ❌ BAD: No steps = no retries, no observability
@@ -740,7 +740,7 @@ export const goodWorkflow = inngest.createFunction(
 
 ### ❌ **Pitfall 2: Blocking API Responses**
 
-**Real impact:** Response time 5s → 180ms (96% improvement), conversion 94% → 99.8%
+**Common impact:** Response time improvements: 5s → 180ms (96%), conversion rate improvements: 94% → 99.8%
 
 ```typescript
 // ❌ BAD: Wait for email to complete
@@ -760,7 +760,7 @@ app.post("/signup", async (req, res) => {
 
 ### ❌ **Pitfall 3: Ignoring Timeouts**
 
-**Real impact:** Resource leaks, zombie processes, workflows running forever
+**Common impact:** Resource leaks, zombie processes, workflows running forever
 
 ```typescript
 // ❌ BAD: Infinite wait
@@ -778,7 +778,7 @@ const event = await step.waitForEvent("wait", {
 
 ### ❌ **Pitfall 4: Overloading Single Event**
 
-**Real impact:** Hard to maintain, debug, and enable/disable features independently
+**Common impact:** Hard to maintain, debug, and enable/disable features independently
 
 ```typescript
 // ❌ BAD: Too much responsibility
@@ -801,7 +801,7 @@ await inngest.send({
 
 ### ❌ **Pitfall 5: Not Defining Event Types**
 
-**Real impact:** Bugs discovered in production instead of compile time
+**Common impact:** Bugs discovered in production instead of compile time
 
 ```typescript
 // ❌ BAD: No type safety

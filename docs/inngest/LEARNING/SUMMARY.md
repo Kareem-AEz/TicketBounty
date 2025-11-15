@@ -281,7 +281,7 @@ src/
 
 ## 📖 Learning Path
 
-1. **⭐ Start Here**: Read **[PITFALLS_AND_TIPS.md](../GUIDES/PITFALLS_AND_TIPS.md)** - Learn from $12K+ in production mistakes
+1. **⭐ Start Here**: Read **[PITFALLS_AND_TIPS.md](../GUIDES/PITFALLS_AND_TIPS.md)** - Learn from common production patterns and mistakes
 2. **Quick Start**: Read **[SUMMARY.md](./SUMMARY.md)** - High-level overview (this document)
 3. **Practice**: Build your first workflow using **[CHEATSHEET.md](../QUICK_REFERENCE/CHEATSHEET.md)**
 4. **Deepen**: Read full **[BEST_PRACTICES.md](../GUIDES/BEST_PRACTICES.md)** for all patterns
