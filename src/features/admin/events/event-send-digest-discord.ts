@@ -1,11 +1,11 @@
 import { inngest } from "@/lib/inngest";
 import logger from "@/lib/logger";
 
-export const eventSendAdminDigestDiscord = inngest.createFunction(
+export const eventSendAdminDigestToDiscord = inngest.createFunction(
   {
-    id: "send-admin-digest-discord",
+    id: "send-admin-digest-to-discord",
   },
-  { event: "app/admin-digest.ready" }, // every day at midnight
+  { event: "app/admin.digest-ready" }, // every day at midnight
   async ({ event }) => {
     const { totalTickets, totalUsers, totalComments } = event.data;
     // TODO: Send digest to Discord

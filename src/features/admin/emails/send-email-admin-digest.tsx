@@ -1,6 +1,6 @@
 import AdminDigestEmail from "@/emails/digest/email-admin-digest";
 import { resend } from "@/lib/resend";
-import { AdminDigestReadyEventData } from "../events/prepare-admin-digest";
+import { AdminDigestReadyEventData } from "../events/event-prepare-digest";
 
 export const sendEmailAdminDigest = async ({
   totalTickets,

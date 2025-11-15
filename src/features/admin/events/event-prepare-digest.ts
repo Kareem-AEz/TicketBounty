@@ -76,8 +76,8 @@ export const eventPrepareAdminDigest = inngest.createFunction(
       totalCommentsPromise,
     ]);
 
-    await step.sendEvent("app/admin-digest.ready", {
-      name: "app/admin-digest.ready",
+    await step.sendEvent("emit-admin-digest-ready", {
+      name: "app/admin.digest-ready",
       data: {
         totalTickets,
         totalUsers,

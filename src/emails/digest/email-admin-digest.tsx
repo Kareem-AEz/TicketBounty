@@ -11,7 +11,7 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-import { AdminDigestReadyEventData } from "@/features/admin/events/prepare-admin-digest";
+import { AdminDigestReadyEventData } from "@/features/admin/events/event-prepare-digest";
 import { getBaseUrl } from "@/lib/url";
 
 const getColors = () => ({
