@@ -1,13 +1,13 @@
 import { EventSchemas, Inngest } from "inngest";
-import { AdminDigestReadyEventData } from "@/features/admin/events/prepare-admin-digest";
-import { SignUpWelcomeEmailFunctionData } from "@/features/auth/events/event-sign-up-welcome-email";
-import { PasswordResetFunctionData } from "@/features/password/events/event-password-reset";
+import { AdminDigestReadyEventData } from "@/features/admin/events/event-prepare-digest";
+import { UserSignedUpEventData } from "@/features/auth/events/event-signed-up-welcome-email";
+import { PasswordResetRequestedEventData } from "@/features/password/events/event-password-reset";
 import logger from "./logger";
 
 type Events = {
-  "app/password.password-reset-function": PasswordResetFunctionData;
-  "app/auth.sign-up-welcome-email-function": SignUpWelcomeEmailFunctionData;
-  "app/admin-digest.ready": AdminDigestReadyEventData;
+  "app/password.reset-requested": PasswordResetRequestedEventData;
+  "app/auth.signed-up": UserSignedUpEventData;
+  "app/admin.digest-ready": AdminDigestReadyEventData;
 };
 
 export const inngest = new Inngest({

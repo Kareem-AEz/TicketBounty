@@ -71,7 +71,7 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
 
     // send welcome email after 15 minutes
     await inngest.send({
-      name: "app/auth.sign-up-welcome-email-function",
+      name: "app/auth.signed-up",
       data: {
         userId: user.id,
       },
