@@ -9,7 +9,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Ticket, TicketStatus } from "@/generated/client";
+import type { Ticket, TicketStatus } from "@/generated/client";
 import { updateStatus } from "../actions/update-status";
 import { TICKET_STATUS_LABELS } from "../constants";
 
