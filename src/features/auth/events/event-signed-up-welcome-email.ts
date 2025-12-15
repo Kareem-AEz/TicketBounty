@@ -1,5 +1,5 @@
 import { inngest } from "@/lib/inngest";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { sendEmailSignUpWelcome } from "../emails/send-email-sign-up-welcome";
 
 export type UserSignedUpEventData = {

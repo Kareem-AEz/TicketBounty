@@ -11,7 +11,7 @@ import {
 import { hashToken } from "@/lib/generate-random-token";
 import { hashPassword } from "@/lib/hash-and-verify";
 import { lucia } from "@/lib/lucia";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
 
 const resetPasswordSchema = z

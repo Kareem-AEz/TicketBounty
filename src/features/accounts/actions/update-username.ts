@@ -8,7 +8,7 @@ import {
   toSuccessActionState,
 } from "@/components/form/utils/to-action-state";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 const updateUsernameSchema = z.object({
   id: z.string(),

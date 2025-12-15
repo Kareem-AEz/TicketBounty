@@ -7,6 +7,15 @@
   "explorer.confirmDragAndDrop": false,
 
   // ═══════════════════════════════════════════════════════════
+  // 🏷️ EDITOR LABELS (Next.js)
+  // ═══════════════════════════════════════════════════════════
+  "workbench.editor.customLabels.enabled": true,
+  "workbench.editor.customLabels.patterns": {
+    "**/app/**/{page,layout,template,loading,error,not-found,route}.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/index.{tsx,ts,jsx,js}": "${dirname} | index"
+  },
+
+  // ═══════════════════════════════════════════════════════════
   // ✨ CODE FORMATTING & QUALITY
   // ═══════════════════════════════════════════════════════════
 
@@ -170,6 +179,16 @@
     "!yml",
     "mdx"
   ],
+
+  // ═══════════════════════════════════════════════════════════
+  // 💻 TERMINAL
+  // ═══════════════════════════════════════════════════════════
+
+  // Auto-relaunch terminal when extensions need to modify environment
+  // "terminal.integrated.environmentChangesRelaunch": "on",
+
+  // Disable git terminal authentication if auto-relaunch doesn't work
+  // "git.terminalAuthentication": false,
 
   // ═══════════════════════════════════════════════════════════
   // 📦 VERSION CONTROL

@@ -11,7 +11,7 @@ import {
 import { Prisma } from "@/generated/client";
 import { inngest } from "@/lib/inngest";
 import { lucia } from "@/lib/lucia";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
 
 const signUpSchema = z

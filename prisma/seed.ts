@@ -1,7 +1,12 @@
 import argon2 from "@node-rs/argon2";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/client";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({
+    connectionString: process.env.DATABASE_URL,
+  }),
+});
 
 const users = [
   {

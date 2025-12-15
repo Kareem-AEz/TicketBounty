@@ -1,5 +1,5 @@
 import { generateRandomToken, hashToken } from "@/lib/generate-random-token";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { getBaseUrl } from "@/lib/url";
 import { passwordResetPath } from "@/paths";
 
