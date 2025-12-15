@@ -22,7 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { isOwner } from "@/features/auth/utils/is-owner";
-import { Prisma } from "@/generated/client";
+import type { Prisma } from "@/generated/client";
 import { copy } from "@/lib/copy";
 import { centToCurrency } from "@/lib/currency";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
@@ -95,7 +95,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
             {isEditing && (
               <motion.div
                 layoutId={`ticket-${ticket.id}-background${isDetail ? "-detail" : "normal"}`}
-                className="relative z-[2]"
+                className="relative z-2"
                 style={{
                   borderRadius: "calc(var(--radius) /* 0.25rem */ + 0.125rem",
                 }}
@@ -139,7 +139,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
 
           <AnimatePresence mode="popLayout" initial={false}>
             {!isEditing && (
-              <div className="group/card z-[1] flex w-full justify-center gap-x-1 self-center">
+              <div className="group/card z-1 flex w-full justify-center gap-x-1 self-center">
                 <>
                   <motion.div
                     layoutId={`ticket-${ticket.id}-background${isDetail ? "-detail" : "normal"}`}
