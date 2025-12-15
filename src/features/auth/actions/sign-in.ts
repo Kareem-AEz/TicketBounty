@@ -9,7 +9,7 @@ import {
   toErrorActionState,
 } from "@/components/form/utils/to-action-state";
 import { lucia } from "@/lib/lucia";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
 
 const signInSchema = z.object({

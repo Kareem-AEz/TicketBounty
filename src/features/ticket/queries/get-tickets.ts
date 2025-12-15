@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { TICKET_PAGE_SIZE } from "../constants";
 import { TicketParsedSearchParams } from "../utils/search-params";
 

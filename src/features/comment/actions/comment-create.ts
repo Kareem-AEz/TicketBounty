@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { ticketPath } from "@/paths";
 import { formSchema } from "../schema";
 

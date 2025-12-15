@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { TicketStatus } from "@/generated/client";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
 
 export const updateStatus = async (id: string, status: TicketStatus) => {

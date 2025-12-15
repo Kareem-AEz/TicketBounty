@@ -7,7 +7,7 @@ import {
   toSuccessActionState,
 } from "@/components/form/utils/to-action-state";
 import { inngest } from "@/lib/inngest";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 const forgotPasswordSchema = z.object({
   email: z.email({ message: "Invalid email address" }),

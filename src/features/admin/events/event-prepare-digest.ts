@@ -1,5 +1,5 @@
 import { inngest } from "@/lib/inngest";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export type AdminDigestReadyEventData = {
   data: {
