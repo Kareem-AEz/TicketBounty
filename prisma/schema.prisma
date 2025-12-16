@@ -19,25 +19,35 @@ datasource db {
 // ------------------------------
 
 model User {
-  id            String        @id @default(cuid())
-  createdAt     DateTime      @default(now()) @db.Timestamptz
-  updatedAt     DateTime      @updatedAt @db.Timestamptz
+  id                                String                                @id @default(cuid())
+  createdAt                         DateTime                              @default(now()) @db.Timestamptz
+  updatedAt                         DateTime                              @updatedAt @db.Timestamptz
 
-  email         String        @unique
-  username      String        @unique
-  passwordHash  String
-  passwordResetToken PasswordResetToken[]
-
-  sessions      Session[]
-  tickets       Ticket[]
-  comments      TicketComment[]
-
-  // Performance indexes for text search (temporarily disabled)
-  // @@index([username(ops: raw("gin_trgm_ops"))], type: Gin)
+  email                             String                                @unique
+  emailVerified                     DateTime?                             @db.Timestamptz
+  emailVerificationToken            EmailVerificationToken[]
+  passwordHash                      String
+  passwordResetTokens               PasswordResetToken[]
+  sessions                          Session[]
+  tickets                           Ticket[]  
+  comments                          TicketComment[]
+  username                          String                                @unique
 }
 
 model PasswordResetToken {
   tokenHash     String        @id
+  createdAt     DateTime      @default(now()) @db.Timestamptz
+  expiresAt     DateTime      @db.Timestamptz
+
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
+  tokenHash     String        @id
+  code          String
   createdAt     DateTime      @default(now()) @db.Timestamptz
   expiresAt     DateTime      @db.Timestamptz
 

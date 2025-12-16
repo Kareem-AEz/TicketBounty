@@ -13,30 +13,40 @@ Welcome! This is your entry point to comprehensive Inngest documentation for "Th
 ## ⏱️ Quick Navigation by Time
 
 ### I have 5 minutes
+
 → Read: [CHEATSHEET.md](./QUICK_REFERENCE/CHEATSHEET.md)
+
 - Copy-paste templates
 - Common patterns at a glance
 
 ### I have 15 minutes
+
 → Read: [SUMMARY.md](./LEARNING/SUMMARY.md)
+
 - Quick overview
 - Architecture concepts
 - Quick start example
 
 ### I have 30 minutes
+
 → Read: [FOR_YOUR_PROJECT.md](./LEARNING/FOR_YOUR_PROJECT.md)
+
 - What to build next
 - Integration points
 - Implementation roadmap
 
 ### I have 45 minutes
+
 → Read: [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)
+
 - Real-world production pitfalls
 - Do's and Don'ts
 - Battle-tested tips from production incidents
 
 ### I have 2 hours
+
 → Read these in order:
+
 1. [SUMMARY.md](./LEARNING/SUMMARY.md)
 2. [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)
 3. [BEST_PRACTICES.md](./GUIDES/BEST_PRACTICES.md)
@@ -48,6 +58,7 @@ Welcome! This is your entry point to comprehensive Inngest documentation for "Th
 ## 📂 Documentation Structure
 
 ### 🚀 [GUIDES/](./GUIDES/) - Deep Learning
+
 Complete guides covering patterns, best practices, and architecture:
 
 - **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - **⭐ START HERE!** Real-world production pitfalls & how to avoid them
@@ -56,12 +67,14 @@ Complete guides covering patterns, best practices, and architecture:
 - **[ROUTING_ARCHITECTURE.md](./GUIDES/ROUTING_ARCHITECTURE.md)** - How to organize & scale your route.ts
 
 ### 🔍 [QUICK_REFERENCE/](./QUICK_REFERENCE/) - Daily Lookup
+
 Quick references for when you need syntax or templates:
 
 - **[CHEATSHEET.md](./QUICK_REFERENCE/CHEATSHEET.md)** - One-pager (print this!)
 - **[QUICK_REFERENCE.md](./QUICK_REFERENCE/QUICK_REFERENCE.md)** - Syntax lookup & patterns
 
 ### 📚 [LEARNING/](./LEARNING/) - Onboarding
+
 Learning resources and project-specific guidance:
 
 - **[SUMMARY.md](./LEARNING/SUMMARY.md)** - High-level overview & concepts
@@ -73,26 +86,31 @@ Learning resources and project-specific guidance:
 ## 🎓 Use Cases
 
 ### "I'm new to Inngest"
+
 1. Read: [SUMMARY.md](./LEARNING/SUMMARY.md)
 2. Avoid mistakes: [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)
 3. Reference: [CHEATSHEET.md](./QUICK_REFERENCE/CHEATSHEET.md)
 4. Learn: [BEST_PRACTICES.md](./GUIDES/BEST_PRACTICES.md)
 
 ### "I need to add a new workflow"
+
 1. Copy: Template from [CHEATSHEET.md](./QUICK_REFERENCE/CHEATSHEET.md)
 2. Reference: [QUICK_REFERENCE.md](./QUICK_REFERENCE/QUICK_REFERENCE.md)
 3. Follow: [FOR_YOUR_PROJECT.md](./LEARNING/FOR_YOUR_PROJECT.md) integration points
 
 ### "I'm designing complex workflows"
+
 1. Avoid common mistakes: [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)
 2. Study: [MESSAGING_PATTERNS.md](./GUIDES/MESSAGING_PATTERNS.md)
 3. Reference: [BEST_PRACTICES.md](./GUIDES/BEST_PRACTICES.md)
 4. Lookup: [QUICK_REFERENCE.md](./QUICK_REFERENCE/QUICK_REFERENCE.md)
 
 ### "How do I organize my route.ts?"
+
 → Read: [ROUTING_ARCHITECTURE.md](./GUIDES/ROUTING_ARCHITECTURE.md)
 
 ### "I want to understand everything"
+
 → Follow learning path in [INDEX.md](./LEARNING/INDEX.md)
 
 ---
@@ -108,6 +126,7 @@ Learning resources and project-specific guidance:
 **Total:** 9 comprehensive guides covering everything from basics to advanced patterns
 
 ### ⭐ Must-Read Documents
+
 1. **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - Save hours by learning from production mistakes
 2. **[BEST_PRACTICES.md](./GUIDES/BEST_PRACTICES.md)** - Comprehensive patterns and organization
 3. **[CHEATSHEET.md](./QUICK_REFERENCE/CHEATSHEET.md)** - Your daily companion
@@ -129,14 +148,17 @@ Learning resources and project-specific guidance:
 ### 🚨 Production Pitfalls (NEW!)
 
 **The #1 mistake:** Not wrapping operations in `step.run()`
+
 - Results in: Lost payments, duplicate emails, inconsistent data
 - Common impact: Significant revenue loss from unreconciled transactions
 
 **The #2 mistake:** Blocking API responses
+
 - Results in: 5-second signups instead of 200ms
 - Impact: 99% → 94% conversion rate drop
 
 **The #3 mistake:** Missing timeouts on `waitForEvent()`
+
 - Results in: Workflows that never complete
 - Impact: Resource leaks, zombie processes
 
@@ -147,6 +169,7 @@ Learning resources and project-specific guidance:
 **Problem:** As you add more workflows, your `route.ts` becomes cluttered and hard to maintain.
 
 **Solution:** Three approaches depending on your app size:
+
 - **< 50 functions:** Manual organization by feature
 - **50-150 functions:** Centralized registry with auto-registration
 - **150+ functions:** Fully automated with glob imports
@@ -181,4 +204,3 @@ ls docs/inngest/LEARNING/
 ---
 
 Last updated: November 2025
-

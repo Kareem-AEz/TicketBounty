@@ -1,17 +1,21 @@
+import "dotenv/config";
 import argon2 from "@node-rs/argon2";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/client";
 
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
+
 const prisma = new PrismaClient({
-  adapter: new PrismaPg({
-    connectionString: process.env.DATABASE_URL,
-  }),
+  adapter,
 });
 
 const users = [
   {
     username: "admin",
     email: "admin@example.com",
+    emailVerified: new Date(),
   },
   {
     username: "Kareem Ahmed",
@@ -68,14 +72,15 @@ const seed = async () => {
   console.log("Seeding database...");
 
   const start = performance.now();
-  // Delete all users
-  await prisma.user.deleteMany();
-  await prisma.ticket.deleteMany();
-  await prisma.ticketComment.deleteMany();
 
   const passwordHash = await argon2.hash("password");
 
-  prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx) => {
+    // Delete all users
+    await tx.user.deleteMany();
+    await tx.ticket.deleteMany();
+    await tx.ticketComment.deleteMany();
+
     // Create users
     const createdUsers = await tx.user.createManyAndReturn({
       data: users.map((user) => ({
@@ -104,6 +109,16 @@ const seed = async () => {
 
   const end = performance.now();
   console.log(`Database seeded successfully in ${(end - start).toFixed(2)}ms`);
+
+  await prisma.$disconnect();
 };
 
-seed();
+seed()
+  .then(() => {
+    console.log("✅ Seed completed");
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error("❌ Seed failed:", error);
+    process.exit(1);
+  });
