@@ -46,8 +46,9 @@ model PasswordResetToken {
 }
 
 model EmailVerificationToken {
-  tokenHash     String        @id
+  id            String        @id @default(cuid())
   code          String
+  email         String
   createdAt     DateTime      @default(now()) @db.Timestamptz
   expiresAt     DateTime      @db.Timestamptz
 
