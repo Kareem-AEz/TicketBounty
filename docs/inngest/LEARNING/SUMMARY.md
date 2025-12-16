@@ -7,7 +7,9 @@ You now have a comprehensive Inngest documentation suite. Here's what's included
 ## 📚 Documentation Files
 
 ### 1. **INNGEST_BEST_PRACTICES.md** (Comprehensive)
+
 The main reference guide covering everything you need to know about Inngest:
+
 - **Architecture principles** (event-driven, decoupling)
 - **Project structure** (how to organize files by feature)
 - **Event naming conventions** (hierarchical, domain-based)
@@ -22,7 +24,9 @@ The main reference guide covering everything you need to know about Inngest:
 ---
 
 ### 2. **INNGEST_QUICK_REFERENCE.md** (Lookup)
+
 Fast lookup guide for common patterns:
+
 - Event naming quick table
 - Function structure template
 - Common triggers (event, cron, multiple)
@@ -38,7 +42,9 @@ Fast lookup guide for common patterns:
 ---
 
 ### 3. **INNGEST_MESSAGING_PATTERNS.md** (Advanced)
+
 Deep dive into event-driven messaging patterns:
+
 - **6 core patterns**: Command, Event, Saga, Fan-Out, Fan-In, Choreography
 - **Messaging styles**: Fire & Forget, Request-Reply, Batch Processing
 - **Event routing**: By type, conditional routing
@@ -304,6 +310,7 @@ src/
 ## 📞 When to Emit Events
 
 ✅ **DO emit events for:**
+
 - Sending emails/notifications
 - Integrating with external services
 - Long-running operations
@@ -312,6 +319,7 @@ src/
 - Scheduled jobs
 
 ❌ **DON'T emit events for:**
+
 - Critical path user data
 - Synchronous database writes
 - Real-time API responses
@@ -346,4 +354,3 @@ src/
 **Last Updated**: November 2025
 **Framework**: Next.js + TypeScript
 **Status**: Ready for production use ✓
-
