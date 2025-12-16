@@ -60,7 +60,7 @@
     "react-day-picker": "^9.11.1",
     "react-dom": "^19.2.3",
     "react-error-boundary": "^6.0.0",
-    "react-hook-form": "^7.66.0",
+    "react-hook-form": "^7.68.0",
     "react-use-measure": "^2.1.7",
     "resend": "^6.6.0",
     "schema-dts": "^1.1.5",
@@ -68,12 +68,12 @@
     "tailwind-merge": "^3.4.0",
     "use-debounce": "^10.0.6",
     "use-scramble": "^2.2.15",
-    "zod": "^4.2.0",
+    "zod": "^4.2.1",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@react-email/preview-server": "^5.0.7",
+    "@react-email/preview-server": "^5.0.8",
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query-devtools": "^5.91.1",
     "@types/big.js": "^6.2.2",
