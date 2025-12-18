@@ -50,12 +50,14 @@ model EmailVerificationToken {
   code          String
   email         String
   createdAt     DateTime      @default(now()) @db.Timestamptz
-  expiresAt     DateTime      @db.Timestamptz
+  expiresAt     DateTime      @db.Timestamptz 
 
   userId        String
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([email])
+  @@index([expiresAt])
 }
 
 model Session {

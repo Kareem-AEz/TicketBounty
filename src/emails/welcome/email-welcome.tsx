@@ -61,7 +61,7 @@ const WelcomeEmail = ({ toName }: { toName: string }) => {
                   letterSpacing: "-0.5px",
                 }}
               >
-                Welcome to TicketBounty
+                Your Journey Begins
               </Heading>
             </Section>
 
@@ -77,8 +77,9 @@ const WelcomeEmail = ({ toName }: { toName: string }) => {
                 className="m-0 mt-[16px] text-[16px] leading-[26px] font-normal"
                 style={{ color: colors.mutedForeground }}
               >
-                Your account is ready. Start managing your tickets with clarity
-                and ease.
+                Welcome to the digital wilderness of TicketBounty. Your account
+                has been woven into our universe, and your dashboard is ready to
+                transform your ideas into reality.
               </Text>
             </Section>
 

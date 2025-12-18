@@ -39,28 +39,45 @@ const StatCard = ({
   colors: ColorScheme;
 }) => (
   <Section
-    className="mb-[16px] p-[20px]"
-    style={{ backgroundColor: colors.statsBackground, borderRadius: "8px" }}
+    className="mb-[20px] p-[24px]"
+    style={{
+      backgroundColor: "#ffffff",
+      borderRadius: "12px",
+      border: `1px solid ${colors.border}`,
+    }}
   >
     <Text
-      className="m-0 mb-[8px] text-[13px] font-semibold"
+      className="m-0 mb-[8px] text-[12px] font-semibold tracking-[1px] uppercase"
       style={{
         color: colors.mutedForeground,
-        textTransform: "uppercase",
-        letterSpacing: "0.5px",
       }}
     >
       {label}
     </Text>
+    <Section className="flex items-baseline">
+      <Text
+        className="m-0 text-[36px] font-light"
+        style={{ color: colors.foreground, lineHeight: "1" }}
+      >
+        {total.toLocaleString()}
+      </Text>
+      {change !== 0 && (
+        <Text
+          className="m-0 ml-[12px] text-[14px] font-medium"
+          style={{
+            color: change > 0 ? "#10b981" : "#ef4444",
+          }}
+        >
+          {change > 0 ? "↑" : "↓"}
+          {Math.abs(change)}
+        </Text>
+      )}
+    </Section>
     <Text
-      className="m-0 mb-[4px] text-[32px] font-light"
-      style={{ color: colors.foreground, lineHeight: "1" }}
+      className="m-0 mt-[8px] text-[12px]"
+      style={{ color: colors.mutedForegroundLight }}
     >
-      {total.toLocaleString()}
-    </Text>
-    <Text className="m-0 text-[13px]" style={{ color: colors.mutedForeground }}>
-      {change > 0 ? "+" : ""}
-      {change} since yesterday
+      vs. previous period
     </Text>
   </Section>
 );
@@ -106,7 +123,7 @@ const AdminDigestEmail = ({
                   letterSpacing: "-0.5px",
                 }}
               >
-                Daily Digest
+                Pulse of the Universe
               </Heading>
             </Section>
 
@@ -116,26 +133,27 @@ const AdminDigestEmail = ({
                 className="m-0 text-[16px] leading-[26px] font-normal"
                 style={{ color: colors.mutedForeground }}
               >
-                Here&apos;s what&apos;s happening on TicketBounty today.
+                The digital ecosystem is thriving. Here is your daily overview
+                of TicketBounty&apos;s momentum.
               </Text>
             </Section>
 
             {/* Stats Section */}
             <Section className="mb-[48px]">
               <StatCard
-                label="Total Tickets"
+                label="Ticket Momentum"
                 total={totalTickets.total}
                 change={totalTickets.totalSince}
                 colors={colors}
               />
               <StatCard
-                label="Total Users"
+                label="Community Growth"
                 total={totalUsers.total}
                 change={totalUsers.totalSince}
                 colors={colors}
               />
               <StatCard
-                label="Total Comments"
+                label="Dialogue Activity"
                 total={totalComments.total}
                 change={totalComments.totalSince}
                 colors={colors}

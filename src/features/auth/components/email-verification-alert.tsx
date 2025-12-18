@@ -34,7 +34,7 @@ export default async function EmailVerificationAlert({
         </Button>
       }
     >
-      Please verify your email address to access all features.
+      Your email address is not verified. Please verify your email address.
     </Note>
   );
 }
