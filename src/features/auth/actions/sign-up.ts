@@ -13,6 +13,7 @@ import { inngest } from "@/lib/inngest";
 import { lucia } from "@/lib/lucia";
 import prisma from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
+import { generateEmailVerificationCode } from "../utils/generate-email-verification-code";
 
 const signUpSchema = z
   .object({
@@ -68,6 +69,9 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
       sessionCookie.value,
       sessionCookie.attributes,
     );
+
+    const code = await generateEmailVerificationCode(user.id, email);
+    console.log(code);
 
     // send welcome email after 15 minutes
     await inngest.send({

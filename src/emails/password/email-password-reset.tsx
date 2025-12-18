@@ -69,7 +69,7 @@ const PasswordResetEmail = ({
                   letterSpacing: "-0.5px",
                 }}
               >
-                Reset Your Password
+                Restore Your Access
               </Heading>
             </Section>
 
@@ -85,27 +85,29 @@ const PasswordResetEmail = ({
                 className="m-0 mt-[16px] text-[16px] leading-[26px] font-normal"
                 style={{ color: colors.mutedForeground }}
               >
-                We received a request to reset your password. Click the button
-                below to secure your account.
+                The digital bridges to your account have been temporarily
+                paused. Click below to weaving your way back into the
+                TicketBounty universe.
               </Text>
             </Section>
 
             {/* Security Notice - Minimal */}
             <Section
-              className="mb-[40px] p-[16px]"
+              className="mb-[40px] p-[20px]"
               style={{
-                backgroundColor: colors.warning,
-                borderRadius: "6px",
+                backgroundColor: colors.muted,
+                border: `1px solid ${colors.border}`,
+                borderRadius: "12px",
               }}
             >
               <Text
                 className="m-0 text-[14px] leading-[22px] font-normal"
                 style={{ color: colors.foreground }}
               >
-                This link expires in{" "}
+                This restoration link will vanish in{" "}
                 <strong>{EXPIRY_TIME_MINUTES} minutes</strong>. If you
-                didn&apos;t request this, ignore this email and your password
-                stays unchanged.
+                didn&apos;t request this, you can safely disregard this message.
+                Your account remains securely locked.
               </Text>
             </Section>
 
