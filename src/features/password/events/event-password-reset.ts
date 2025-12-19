@@ -3,17 +3,17 @@ import prisma from "@/lib/prisma";
 import { sendEmailPasswordReset } from "../emails/send-email-password-reset";
 import { generatePasswordResetLink } from "../utils/generate-password-reset-link";
 
-export type PasswordResetRequestedEventData = {
+export type PasswordResetEventData = {
   data: {
     userId: string;
   };
 };
 
-export const eventPasswordResetRequested = inngest.createFunction(
+export const eventPasswordReset = inngest.createFunction(
   {
-    id: "password-reset-requested",
+    id: "password-reset",
   },
-  { event: "app/password.reset-requested" },
+  { event: "app/password.password-reset-function" },
   async ({ event, step }) => {
     const { userId } = event.data;
 

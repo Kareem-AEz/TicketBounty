@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Note } from "@/components/ui/note";
 import prisma from "@/lib/prisma";
 import { cn } from "@/lib/utils";
+import { emailVerificationPath } from "@/paths";
 import { getAuth } from "../queries/get-auth";
 
 export default async function EmailVerificationAlert({
@@ -30,7 +31,7 @@ export default async function EmailVerificationAlert({
       label={false}
       action={
         <Button asChild size="sm" variant="outline">
-          <Link href="">Verify Email</Link>
+          <Link href={emailVerificationPath()}>Verify Email</Link>
         </Button>
       }
     >

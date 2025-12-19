@@ -13,7 +13,6 @@ import { inngest } from "@/lib/inngest";
 import { lucia } from "@/lib/lucia";
 import prisma from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
-import { generateEmailVerificationCode } from "../utils/generate-email-verification-code";
 
 const signUpSchema = z
   .object({
@@ -70,16 +69,20 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
       sessionCookie.attributes,
     );
 
-    const code = await generateEmailVerificationCode(user.id, email);
-    console.log(code);
-
-    // send welcome email after 15 minutes
-    await inngest.send({
-      name: "app/auth.signed-up",
-      data: {
-        userId: user.id,
-      },
-    });
+    Promise.all([
+      inngest.send({
+        name: "app/auth.signed-up-welcome-email-function",
+        data: {
+          userId: user.id,
+        },
+      }),
+      inngest.send({
+        name: "app/auth.send-email-verification-code-function",
+        data: {
+          userId: user.id,
+        },
+      }),
+    ]);
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {

@@ -1,3 +1,3 @@
-import { eventPasswordResetRequested } from "./event-password-reset";
+import { eventPasswordReset } from "./event-password-reset";
 
-export const PASSWORD_FUNCTIONS = [eventPasswordResetRequested];
+export const PASSWORD_FUNCTIONS = [eventPasswordReset];
