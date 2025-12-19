@@ -20,6 +20,7 @@ import PostHogAuthWrapper from "./_providers/posthog-auth-wrapper";
 import PostHogPageViewTracker from "./_providers/posthog-pageview-tracker";
 import { PostHogProvider } from "./_providers/posthog-provider";
 import ReactQueryProvider from "./_providers/react-query/react-query-provider";
+import { CookieBanner } from "@/components/privacy/cookie-banner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -109,6 +110,7 @@ export default function RootLayout({
                   </div>
                 </div>
                 <Toaster />
+                <CookieBanner />
               </ReactQueryProvider>
             </ThemeProvider>
           </PostHogAuthWrapper>
