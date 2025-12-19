@@ -47,6 +47,12 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       capture_pageview: false, // We handle this manually in the tracker
       capture_exceptions: true,
       debug: process.env.NODE_ENV === "development",
+      // GDPR Compliance:
+      // 1. We default to 'memory' persistence (cookieless) until consent.
+      // 2. We don't automatically capture until we confirm.
+      // However, to keep it simple with the banner, we usually rely on opt_in_capturing logic.
+      // If you want strict GDPR, use 'memory' persistence by default:
+      persistence: "memory", 
     });
   }, []);
 
@@ -90,7 +96,7 @@ export default function PostHogPageViewTracker() {
 }
 ```
 
-### D. Auto-Identify Wrapper (Optional but Recommended)
+### C. Auto-Identify Wrapper (Optional but Recommended)
 To automatically link your authenticated users to their PostHog sessions without manually calling `identify` everywhere.
 
 Create `src/app/_providers/posthog-auth-wrapper.tsx`:
@@ -137,7 +143,7 @@ export default function PostHogAuthWrapper({
 }
 ```
 
-### E. Add to Root Layout
+### D. Add to Root Layout
 Update `src/app/layout.tsx`:
 
 ```tsx
@@ -145,6 +151,7 @@ Update `src/app/layout.tsx`:
 import { PostHogProvider } from "./_providers/posthog-provider"
 import PostHogPageViewTracker from "./_providers/posthog-pageview-tracker"
 import PostHogAuthWrapper from "./_providers/posthog-auth-wrapper"
+import { CookieBanner } from "@/components/privacy/cookie-banner";
 import { Suspense } from "react"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -158,6 +165,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </Suspense>
           <PostHogAuthWrapper>
              {children}
+             <CookieBanner />
           </PostHogAuthWrapper>
         </body>
       </PostHogProvider>
@@ -172,7 +180,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 Ad-blockers often block PostHog. To fix this, use Next.js Rewrites to proxy events through your own domain.
 
-Update `next.config.ts`:
+Update `next.config.ts` (or `.js`):
 
 ```ts
 // next.config.ts
@@ -334,7 +342,42 @@ const handleSignOut = () => {
 
 ---
 
-## 7. Pro Tips & "Don't Do"s
+## 7. GDPR & Cookie Consent
+
+To be GDPR compliant, you must obtain user consent before setting non-essential cookies. We have implemented a setup that defaults to **cookieless** tracking (memory persistence) until the user consents.
+
+### A. Configuration
+In `src/app/_providers/posthog-provider.tsx`, we initialize PostHog with `persistence: 'memory'`. This means no cookies are stored by default, and user data is lost on page reload (safe for privacy).
+
+```tsx
+// src/app/_providers/posthog-provider.tsx
+posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+  // ... other config
+  persistence: 'memory', // Default to in-memory (cookieless)
+});
+```
+
+### B. Cookie Banner Component
+We created `src/components/privacy/cookie-banner.tsx` to handle consent.
+
+-   **Decline**: Keeps `persistence: 'memory'` (and calls `opt_out_capturing` to be sure).
+-   **Accept**: Switches to `persistence: 'localStorage+cookie'` and calls `opt_in_capturing`.
+
+```tsx
+// src/components/privacy/cookie-banner.tsx
+const handleAccept = () => {
+  posthog.opt_in_capturing();
+  posthog.set_config({ persistence: 'localStorage+cookie' }); // Enable cookies
+  setShowBanner(false);
+};
+```
+
+### C. Usage
+The banner is automatically included in your `RootLayout`, so it appears on every page for users who haven't made a choice yet.
+
+---
+
+## 8. Pro Tips & "Don't Do"s
 
 ### ✅ DO:
 1.  **Use Proxying:** Always set up the rewrite proxy. It dramatically increases data accuracy (20-40% more events captured).
