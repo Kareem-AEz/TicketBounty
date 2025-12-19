@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import NextTopLoader from "nextjs-toploader";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Suspense } from "react";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar/components/sidebar";
@@ -15,6 +16,9 @@ import {
   generateSoftwareApplicationStructuredData,
   generateWebsiteStructuredData,
 } from "@/lib/structured-data";
+import PostHogAuthWrapper from "./_providers/posthog-auth-wrapper";
+import PostHogPageViewTracker from "./_providers/posthog-pageview-tracker";
+import { PostHogProvider } from "./_providers/posthog-provider";
 import ReactQueryProvider from "./_providers/react-query/react-query-provider";
 
 const geistSans = Geist({
@@ -80,28 +84,35 @@ export default function RootLayout({
 
         <NextTopLoader color="var(--primary)" showSpinner={false} height={2} />
 
-        <ThemeProvider>
-          <ReactQueryProvider>
-            <ReactQueryDevtools />
+        <PostHogProvider>
+          <Suspense fallback={null}>
+            <PostHogPageViewTracker />
+          </Suspense>
+          <PostHogAuthWrapper>
+            <ThemeProvider>
+              <ReactQueryProvider>
+                <ReactQueryDevtools />
 
-            <Header />
+                <Header />
 
-            <div className="flex">
-              <Sidebar />
+                <div className="flex">
+                  <Sidebar />
 
-              <div className="flex flex-1 flex-col">
-                <main
-                  id="main"
-                  className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-clip px-8 py-24 pl-[7rem]"
-                >
-                  <NuqsAdapter>{children}</NuqsAdapter>
-                </main>
-                <Footer />
-              </div>
-            </div>
-            <Toaster />
-          </ReactQueryProvider>
-        </ThemeProvider>
+                  <div className="flex flex-1 flex-col">
+                    <main
+                      id="main"
+                      className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-clip px-8 py-24 pl-[7rem]"
+                    >
+                      <NuqsAdapter>{children}</NuqsAdapter>
+                    </main>
+                    <Footer />
+                  </div>
+                </div>
+                <Toaster />
+              </ReactQueryProvider>
+            </ThemeProvider>
+          </PostHogAuthWrapper>
+        </PostHogProvider>
       </body>
     </html>
   );

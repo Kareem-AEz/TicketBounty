@@ -3,6 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { signInPath } from "@/paths";
@@ -16,6 +17,8 @@ export default function SignOutButton() {
 
   // Event handlers
   const handleSignOut = () => {
+    // Reset PostHog session
+    posthog.reset();
     // Clear auth cache immediately to prevent stale data
     queryClient.setQueryData(["auth", "guard"], null);
     queryClient.removeQueries({ queryKey: ["auth", "guard"] });

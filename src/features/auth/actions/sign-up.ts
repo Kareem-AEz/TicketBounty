@@ -11,6 +11,7 @@ import {
 import { Prisma } from "@/generated/client";
 import { inngest } from "@/lib/inngest";
 import { lucia } from "@/lib/lucia";
+import PostHogClient from "@/lib/posthog";
 import prisma from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
 
@@ -68,6 +69,16 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
       sessionCookie.value,
       sessionCookie.attributes,
     );
+
+    const posthog = PostHogClient();
+    posthog.capture({
+      distinctId: user.id,
+      event: "user_signed_up",
+      properties: {
+        method: "email",
+      },
+    });
+    await posthog.shutdown();
 
     Promise.all([
       inngest.send({
