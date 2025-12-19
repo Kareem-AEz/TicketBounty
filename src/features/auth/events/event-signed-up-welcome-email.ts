@@ -25,10 +25,10 @@ export const eventSignedUpWelcomeEmail = inngest.createFunction(
         await prisma.user.findUniqueOrThrow({ where: { id: userId } }),
     );
 
-    const { username, email: userEmail } = user;
+    const { username, email: userEmail, emailVerified } = user;
 
     const result = await step.run("send-welcome-email", async () => {
-      return await sendEmailSignUpWelcome(username, userEmail);
+      return await sendEmailSignUpWelcome(username, userEmail, emailVerified);
     });
 
     return { event, data: result };
