@@ -12,7 +12,6 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-import * as React from "react";
 import { getBaseUrl } from "@/lib/url";
 
 const EmailVerification = ({
@@ -132,7 +131,7 @@ const EmailVerification = ({
                   className="m-0 text-[14px] leading-[22px]"
                   style={{ color: colors.mutedForeground }}
                 >
-                  • Enter the 6-digit code shown above
+                  • Enter the 8-digit code shown above
                 </Text>
                 <Text
                   className="m-0 text-[14px] leading-[22px]"

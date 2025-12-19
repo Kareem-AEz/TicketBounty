@@ -1,12 +1,14 @@
 import { EventSchemas, Inngest } from "inngest";
 import { AdminDigestReadyEventData } from "@/features/admin/events/event-prepare-digest";
-import { UserSignedUpEventData } from "@/features/auth/events/event-signed-up-welcome-email";
-import { PasswordResetRequestedEventData } from "@/features/password/events/event-password-reset";
+import { EmailConfirmationEventData } from "@/features/auth/events/email-confirmation.event";
+import { SignedUpWelcomeEmailEventData } from "@/features/auth/events/event-signed-up-welcome-email";
+import { PasswordResetEventData } from "@/features/password/events/event-password-reset";
 import logger from "./logger";
 
 type Events = {
-  "app/password.reset-requested": PasswordResetRequestedEventData;
-  "app/auth.signed-up": UserSignedUpEventData;
+  "app/password.password-reset-function": PasswordResetEventData;
+  "app/auth.signed-up-welcome-email-function": SignedUpWelcomeEmailEventData;
+  "app/auth.send-email-verification-code-function": EmailConfirmationEventData;
   "app/admin.digest-ready": AdminDigestReadyEventData;
 };
 
