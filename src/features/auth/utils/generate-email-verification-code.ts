@@ -19,7 +19,7 @@ export const generateEmailVerificationCode = async (
         code,
         email,
         userId,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+        expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
       },
     });
   });
