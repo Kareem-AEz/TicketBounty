@@ -9,6 +9,7 @@ import {
   toErrorActionState,
 } from "@/components/form/utils/to-action-state";
 import { lucia } from "@/lib/lucia";
+import PostHogClient from "@/lib/posthog";
 import prisma from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
 
@@ -49,6 +50,13 @@ export const signIn = async (_actionState: ActionState, formData: FormData) => {
       sessionCookie.value,
       sessionCookie.attributes,
     );
+
+    const posthog = PostHogClient();
+    posthog.capture({
+      distinctId: user.id,
+      event: "user_logged_in",
+    });
+    await posthog.shutdown();
   } catch (error) {
     return toErrorActionState(error, formData);
   }
