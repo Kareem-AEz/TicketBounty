@@ -39,7 +39,7 @@ export const forgotPassword = async (
     const { id } = userFound;
 
     await inngest.send({
-      name: "app/password.reset-requested",
+      name: "app/password.password-reset-function",
       data: {
         userId: id,
       },
