@@ -2,7 +2,7 @@
 
 import { LucideSkull, LucideUser } from "lucide-react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,7 +65,7 @@ export default function CommentItem({
               <motion.div
                 layoutId={`comment-${comment.id}`}
                 key={`comment-${comment.id}-editing`}
-                className="relative z-[2] w-full overflow-hidden will-change-auto"
+                className="relative z-2 w-full overflow-hidden will-change-auto"
                 style={{
                   borderRadius: "calc(var(--radius) /* 0.25rem */ + 0.125rem",
                 }}
@@ -154,11 +154,11 @@ export default function CommentItem({
                       }}
                     >
                       <CardHeader>
-                        <CardTitle className="text-muted-foreground flex items-center gap-x-2 text-sm font-bold">
+                        <CardTitle className="text-muted-foreground flex items-center gap-x-1 text-sm font-bold">
                           {isDeleted ? (
-                            <LucideSkull className="size-5" />
+                            <LucideSkull className="size-4" />
                           ) : (
-                            <LucideUser className="size-5" />
+                            <LucideUser className="size-4" />
                           )}
                           <span>
                             {isDeleted

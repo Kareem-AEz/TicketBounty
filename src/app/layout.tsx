@@ -101,7 +101,7 @@ export default function RootLayout({
                   <div className="flex flex-1 flex-col">
                     <main
                       id="main"
-                      className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-clip px-8 py-24 pl-[7rem]"
+                      className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-clip px-8 py-24 pl-28"
                     >
                       <NuqsAdapter>{children}</NuqsAdapter>
                     </main>
