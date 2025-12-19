@@ -78,9 +78,9 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
         method: "email",
       },
     });
-    await posthog.shutdown();
 
-    Promise.all([
+    await Promise.all([
+      posthog.shutdown(),
       inngest.send({
         name: "app/auth.signed-up-welcome-email-function",
         data: {

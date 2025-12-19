@@ -13,12 +13,14 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       capture_pageview: false, // We handle this manually in the tracker
       capture_exceptions: true,
       debug: process.env.NODE_ENV === "development",
+      disable_session_recording: true,
+
       // GDPR Compliance:
       // 1. We default to 'memory' persistence (cookieless) until consent.
       // 2. We don't automatically capture until we confirm.
       // However, to keep it simple with the banner, we usually rely on opt_in_capturing logic.
       // If you want strict GDPR, use 'memory' persistence by default:
-      persistence: "memory", 
+      // persistence: "memory",
     });
   }, []);
 
