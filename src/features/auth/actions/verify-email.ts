@@ -1,11 +1,14 @@
 "use server";
 
+import { cookies } from "next/headers";
 import z from "zod";
 import {
   ActionState,
   toErrorActionState,
   toSuccessActionState,
 } from "@/components/form/utils/to-action-state";
+import { lucia } from "@/lib/lucia";
+import PostHogClient from "@/lib/posthog";
 import prisma from "@/lib/prisma";
 import { getAuth } from "../queries/get-auth";
 
@@ -57,6 +60,25 @@ export const verifyEmail = async (
       where: { id: auth.user.id },
       data: { emailVerified: new Date() },
     });
+
+    const session = await lucia.createSession(auth.user.id, {});
+    const sessionCookie = lucia.createSessionCookie(session.id);
+
+    (await cookies()).set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
+
+    const posthog = PostHogClient();
+    posthog.capture({
+      distinctId: auth.user.id,
+      event: "user_email_verified",
+      properties: {
+        email: auth.user.email,
+      },
+    });
+    await posthog.shutdown();
 
     return toSuccessActionState({
       status: "SUCCESS",
