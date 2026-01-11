@@ -12,6 +12,9 @@
     "format:check": "prettier --check .",
     "type": "tsc --noEmit",
     "postinstall": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
     "email": "email dev --dir src/emails",
     "commit": "tsx scripts/ai-commit.ts"

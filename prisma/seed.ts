@@ -80,6 +80,15 @@ const seed = async () => {
     await tx.user.deleteMany();
     await tx.ticket.deleteMany();
     await tx.ticketComment.deleteMany();
+    await tx.organization.deleteMany();
+    await tx.membership.deleteMany();
+
+    // Create organization
+    const createdOrganization = await tx.organization.create({
+      data: {
+        name: "The Road to Next",
+      },
+    });
 
     // Create users
     const createdUsers = await tx.user.createManyAndReturn({
@@ -87,6 +96,14 @@ const seed = async () => {
         ...user,
         passwordHash,
       })),
+    });
+
+    // Create memberships
+    await tx.membership.createMany({
+      data: {
+        organizationId: createdOrganization.id,
+        userId: createdUsers[0].id,
+      },
     });
 
     // Create tickets

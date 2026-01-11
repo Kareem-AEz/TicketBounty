@@ -18,6 +18,29 @@ datasource db {
 // Users
 // ------------------------------
 
+model Organization {
+  id            String        @id @default(cuid())
+  createdAt     DateTime      @default(now()) @db.Timestamptz
+  updatedAt     DateTime      @updatedAt @db.Timestamptz
+
+  name        String
+  memberships Membership[]
+}
+
+model Membership {
+  joinedAt      DateTime      @default(now()) @db.Timestamptz
+
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@id([userId, organizationId])
+  @@index([userId])
+  @@index([organizationId])
+}
+
 model User {
   id                                String                                @id @default(cuid())
   createdAt                         DateTime                              @default(now()) @db.Timestamptz
@@ -32,6 +55,8 @@ model User {
   tickets                           Ticket[]  
   comments                          TicketComment[]
   username                          String                                @unique
+  
+  memberships                       Membership[]
 }
 
 model PasswordResetToken {
