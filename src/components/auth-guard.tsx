@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import {
+  getRedirectUrl,
   isRedirectError,
   useAuthQuery,
 } from "@/features/auth/queries/use-auth-query";
@@ -21,7 +22,13 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   // Handle redirect errors by navigating client-side
   useEffect(() => {
     if (error && isRedirectError(error)) {
-      router.push(signInPath());
+      const redirectUrl = getRedirectUrl(error);
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else {
+        // Fallback to sign-in if we can't extract the URL
+        router.push(signInPath());
+      }
     }
   }, [error, router]);
 

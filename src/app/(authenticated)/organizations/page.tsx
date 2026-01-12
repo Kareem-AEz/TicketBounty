@@ -1,9 +1,12 @@
+import { PlusIcon } from "lucide-react";
+import Link from "next/link";
 import { Suspense } from "react";
 import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
 import Heading from "@/components/heading";
 import Spinner from "@/components/spinner";
+import { Button } from "@/components/ui/button";
 import OrganizationsList from "@/features/organizations/components/organizations-list";
-import { homePath } from "@/paths";
+import { createOrganizationPath, homePath } from "@/paths";
 const breadcrumbs: Breadcrumb[] = [
   {
     label: "Home",
@@ -19,7 +22,15 @@ export default function OrganizationsPage() {
       <Heading
         title="Organizations"
         description="Manage your organizations"
-      ></Heading>
+        action={
+          <Button asChild>
+            <Link href={createOrganizationPath()}>
+              <PlusIcon className="h-4 w-4" />
+              Create Organization
+            </Link>
+          </Button>
+        }
+      />
       <Breadcrumbs breadcrumbs={breadcrumbs} />
 
       <Suspense

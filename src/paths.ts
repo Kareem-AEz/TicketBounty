@@ -14,3 +14,5 @@ export const accountProfilePath = () => "/account/profile" as const;
 export const accountPasswordPath = () => "/account/password" as const;
 
 export const organizationsPath = () => "/organizations" as const;
+export const createOrganizationPath = () => "/organizations/create" as const;
+export const onboardingPath = () => "/onboarding" as const;

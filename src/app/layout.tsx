@@ -10,6 +10,7 @@ import Header from "@/components/header";
 import Sidebar from "@/components/sidebar/components/sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import EmailVerificationAlert from "@/features/auth/components/email-verification-alert";
 import { getSEOTags } from "@/lib/seo-tags";
 import {
   generateOrganizationStructuredData,
@@ -103,6 +104,8 @@ export default function RootLayout({
                       id="main"
                       className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-clip px-8 py-24 pl-28"
                     >
+                      <EmailVerificationAlert className="mx-auto mb-4 w-full max-w-2xl" />
+
                       <NuqsAdapter>{children}</NuqsAdapter>
                     </main>
                     <Footer />
