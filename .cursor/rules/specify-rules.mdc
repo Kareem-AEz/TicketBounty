@@ -1,0 +1,29 @@
+# the-road-to-next Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2026-01-12
+
+## Active Technologies
+
+- TypeScript 5 (tsx runtime) + @ai-sdk/openai-compatible, ai (Vercel AI SDK 6.x), child_process, readline (001-ai-commit-optimization)
+
+## Project Structure
+
+```text
+src/
+tests/
+```
+
+## Commands
+
+npm test && npm run lint
+
+## Code Style
+
+TypeScript 5 (tsx runtime): Follow standard conventions
+
+## Recent Changes
+
+- 001-ai-commit-optimization: Added TypeScript 5 (tsx runtime) + @ai-sdk/openai-compatible, ai (Vercel AI SDK 6.x), child_process, readline
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->

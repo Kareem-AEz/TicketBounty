@@ -1,8 +1,14 @@
-import { LucideBook, LucideLibrary, LucideUser } from "lucide-react";
+import {
+  LucideBook,
+  LucideLibrary,
+  LucideUser,
+  LucideUsers,
+} from "lucide-react";
 import {
   accountPath,
   accountProfilePath,
   homePath,
+  organizationsPath,
   ticketsPath,
 } from "@/paths";
 import { SidebarItem } from "./types";
@@ -24,6 +30,11 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
     icon: <LucideUser />,
     separator: true,
     basePath: accountPath(), // Match any account sub-route
+  },
+  {
+    label: "Organizations",
+    href: organizationsPath(),
+    icon: <LucideUsers />,
   },
 ];
 

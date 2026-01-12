@@ -12,3 +12,5 @@ export const emailVerificationPath = () => "/email-verification" as const;
 export const accountPath = () => "/account" as const;
 export const accountProfilePath = () => "/account/profile" as const;
 export const accountPasswordPath = () => "/account/password" as const;
+
+export const organizationsPath = () => "/organizations" as const;
