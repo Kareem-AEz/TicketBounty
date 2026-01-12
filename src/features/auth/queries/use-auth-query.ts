@@ -22,3 +22,17 @@ export function isRedirectError(
     (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
   );
 }
+
+// Extract redirect URL from Next.js redirect error
+// Format: "NEXT_REDIRECT;replace;url" or "NEXT_REDIRECT;push;url"
+export function getRedirectUrl(error: unknown): string | null {
+  if (!isRedirectError(error)) return null;
+
+  const digest = error.digest;
+  // Next.js redirect digest format: "NEXT_REDIRECT;replace;url" or "NEXT_REDIRECT;push;url"
+  const parts = digest.split(";");
+  if (parts.length >= 3) {
+    return parts[2];
+  }
+  return null;
+}

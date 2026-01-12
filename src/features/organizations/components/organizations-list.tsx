@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { LucideUsers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,9 +37,19 @@ export default async function OrganizationsList() {
   }
 
   return (
-    <div>
+    <div className="animate-fade-from-bottom">
       {organizations.map((organization) => (
-        <div key={organization.id}>{organization.name}</div>
+        <div key={organization.id}>
+          <div>Name: {organization.name}</div>
+          <div>
+            Joined:{" "}
+            {format(
+              organization.membershipByUser.joinedAt,
+              "yyyy/MM/dd, hh:mm a",
+            )}
+          </div>
+          <div>Members: {organization._count.memberships}</div>
+        </div>
       ))}
     </div>
   );
