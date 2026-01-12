@@ -12,7 +12,18 @@
   "workbench.editor.customLabels.enabled": true,
   "workbench.editor.customLabels.patterns": {
     "**/app/**/{page,layout,template,loading,error,not-found,route}.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
-    "**/index.{tsx,ts,jsx,js}": "${dirname} | index"
+    "**/index.{tsx,ts,jsx,js}": "${dirname} | index",
+    "**/features/**/actions/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/features/**/components/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/features/**/queries/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/features/**/events/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/features/**/hooks/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/features/**/utils/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/features/**/emails/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/components/**/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/lib/hooks/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/emails/**/*.{tsx,ts,jsx,js}": "📧 ${dirname} | ${filename}",
+    "**/features/**/{schema,types,type,constants}.{tsx,ts,jsx,js}": "${dirname} | ${filename}"
   },
 
   // ═══════════════════════════════════════════════════════════
