@@ -11,7 +11,11 @@ import { Input } from "@/components/ui/input";
 import { ticketsPath } from "@/paths";
 import { createOrganization } from "../actions/create-organization";
 
-export default function CreateOrganizationForm() {
+export default function CreateOrganizationForm({
+  redirectTo,
+}: {
+  redirectTo?: string;
+}) {
   const [actionState, action] = useActionState(
     createOrganization,
     EMPTY_ACTION_STATE,
@@ -20,7 +24,7 @@ export default function CreateOrganizationForm() {
   useActionFeedback(actionState, {
     onSuccess: ({ actionState }) => {
       if (actionState.message) toast.success(actionState.message);
-      redirect(ticketsPath());
+      redirect(redirectTo ?? ticketsPath());
     },
     onError: ({ actionState }) => {
       if (actionState.message) toast.error(actionState.message);

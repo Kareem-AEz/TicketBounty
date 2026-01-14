@@ -1,5 +1,10 @@
 import { format } from "date-fns";
-import { LucideUsers } from "lucide-react";
+import {
+  LucideArrowRightLeft,
+  LucidePencil,
+  LucideTrash2,
+  LucideUsers,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -9,6 +14,15 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { getOrganizationsByUserId } from "../queries/get-organizations-by-user-id";
 
 export default async function OrganizationsList() {
@@ -37,20 +51,58 @@ export default async function OrganizationsList() {
   }
 
   return (
-    <div className="animate-fade-from-bottom">
-      {organizations.map((organization) => (
-        <div key={organization.id}>
-          <div>Name: {organization.name}</div>
-          <div>
-            Joined:{" "}
-            {format(
-              organization.membershipByUser.joinedAt,
-              "yyyy/MM/dd, hh:mm a",
-            )}
-          </div>
-          <div>Members: {organization._count.memberships}</div>
-        </div>
-      ))}
-    </div>
+    <Table containerClassName="overflow-visible px-4   " className="w-full">
+      <TableCaption>A list of your organizations.</TableCaption>
+      <TableHeader className="sticky top-14 z-10">
+        <TableRow>
+          <TableHead className="bg-background/95 backdrop-blur-sm">
+            ID
+          </TableHead>
+          <TableHead className="bg-background/95 backdrop-blur-sm">
+            Name
+          </TableHead>
+          <TableHead className="bg-background/95 backdrop-blur-sm">
+            Joined At
+          </TableHead>
+          <TableHead className="bg-background/95 backdrop-blur-sm">
+            Members
+          </TableHead>
+          <TableHead className="bg-background/95 text-center backdrop-blur-sm">
+            Actions
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {organizations.map((organization) => (
+          <TableRow key={organization.id}>
+            <TableCell>{organization.id}</TableCell>
+            <TableCell>{organization.name}</TableCell>
+            <TableCell>
+              {format(
+                organization.membershipByUser.joinedAt,
+                "yyyy/MM/dd, hh:mm a",
+              )}
+            </TableCell>
+            <TableCell>{organization._count.memberships}</TableCell>
+            <TableCell>
+              <div className="flex w-full justify-center gap-x-2">
+                <Button variant="outline" size="icon">
+                  <LucideArrowRightLeft />
+                </Button>
+                <Button variant="outline" size="icon">
+                  <LucideTrash2 />
+                </Button>
+                <Button variant="outline" size="icon">
+                  <LucidePencil />
+                </Button>
+                <Button variant="outline" size="icon">
+                  <LucideTrash2 />
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }
