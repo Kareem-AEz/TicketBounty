@@ -24,6 +24,9 @@ export const getOrganizationsByUserId = async () => {
         },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   // Example: Calculate average bounty across all tickets

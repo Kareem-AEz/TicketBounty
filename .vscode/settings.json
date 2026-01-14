@@ -207,7 +207,16 @@
 
   // Git and GitLens settings
   "git.openRepositoryInParentFolders": "never",
-  "gitlens.advanced.messages": {
-    "suppressCommitHasNoPreviousCommitWarning": true
-  }
+
+  // ═══════════════════════════════════════════════════════════
+  // 💅 TAILWIND CSS
+  // ═══════════════════════════════════════════════════════════
+  "tailwindCSS.classAttributes": [
+    "class",
+    "className",
+    "ngClass",
+    "classList",
+    ".*ClassName",
+    ".*Class"
+  ]
 }
