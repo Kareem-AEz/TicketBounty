@@ -36,7 +36,7 @@ model Membership {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  isActive        Boolean       
+  isActive        Boolean
 
   @@id([userId, organizationId])
   @@index([userId])

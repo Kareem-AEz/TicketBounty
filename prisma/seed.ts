@@ -103,6 +103,7 @@ const seed = async () => {
       data: {
         organizationId: createdOrganization.id,
         userId: createdUsers[0].id,
+        isActive: true,
       },
     });
 
