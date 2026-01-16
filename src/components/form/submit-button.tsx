@@ -53,11 +53,11 @@ function SubmitButton({
       type="submit"
       variant={variant}
       size={size}
-      className={cn("flex items-center", className)}
+      className={cn("", className)}
       disabled={props.disabled || isWorking}
       {...props}
     >
-      {isWorking && (
+      {isWorking ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -66,6 +66,8 @@ function SubmitButton({
         >
           <Spinner size="sm" />
         </motion.div>
+      ) : (
+        icon
       )}
 
       <motion.span
@@ -75,7 +77,6 @@ function SubmitButton({
           originY: "0px",
         }}
       >
-        {icon}
         {(isWorking && pendingLabel) || children}
       </motion.span>
     </Button>
