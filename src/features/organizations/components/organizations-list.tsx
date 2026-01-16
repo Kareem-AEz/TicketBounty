@@ -114,7 +114,7 @@ export default async function OrganizationsList() {
                       <motion.div
                         layoutId="active-left-arrow"
                         key="active-left-arrow"
-                        className="absolute top-1/2 left-0 z-10 flnpm run devtranslate-x-[150%] -translate-y-1/2 items-center justify-center"
+                        className="absolute top-1/2 left-0 z-10 flex -translate-x-[150%] -translate-y-1/2 items-center justify-center"
                       >
                         <LucideArrowRight className="text-primary size-5" />
                       </motion.div>
