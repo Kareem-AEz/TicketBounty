@@ -10,14 +10,14 @@ A fast lookup guide for common patterns and conventions in your codebase.
 app/[feature].[action]
 ```
 
-| Feature | Event Example | When to Use |
-|---------|---------------|-----------|
-| **auth** | `app/auth.sign-up-welcome-email-function` | Welcome email after signup |
-| **password** | `app/password.password-reset-function` | Password reset requested |
-| **admin** | `app/admin-digest.ready` | Daily digest data compiled |
-| **ticket** | `app/ticket.created` | New support ticket |
-| **payment** | `app/payment.succeeded` | Payment processed |
-| **comment** | `app/comment.posted` | New comment added |
+| Feature      | Event Example                             | When to Use                |
+| ------------ | ----------------------------------------- | -------------------------- |
+| **auth**     | `app/auth.sign-up-welcome-email-function` | Welcome email after signup |
+| **password** | `app/password.password-reset-function`    | Password reset requested   |
+| **admin**    | `app/admin-digest.ready`                  | Daily digest data compiled |
+| **ticket**   | `app/ticket.created`                      | New support ticket         |
+| **payment**  | `app/payment.succeeded`                   | Payment processed          |
+| **comment**  | `app/comment.posted`                      | New comment added          |
 
 ---
 
@@ -52,7 +52,7 @@ export const eventYourFeature = inngest.createFunction(
     });
 
     return result;
-  }
+  },
 );
 ```
 
@@ -62,13 +62,19 @@ export const eventYourFeature = inngest.createFunction(
 
 ```typescript
 // Event-triggered
-{ event: "app/auth.signup" }
+{
+  event: "app/auth.signup";
+}
 
 // Cron-scheduled
-{ cron: "0 0 * * *" } // Midnight daily
+{
+  cron: "0 0 * * *";
+} // Midnight daily
 
 // Multiple events
-{ event: ["app/order.created", "app/order.updated"] }
+{
+  event: ["app/order.created", "app/order.updated"];
+}
 ```
 
 ---
@@ -76,14 +82,16 @@ export const eventYourFeature = inngest.createFunction(
 ## Essential Patterns
 
 ### Send an Event (Fire & Forget)
+
 ```typescript
 await inngest.send({
   name: "app/auth.sign-up-welcome-email-function",
-  data: { userId, email, name }
+  data: { userId, email, name },
 });
 ```
 
 ### Wrap Operations in Steps
+
 ```typescript
 const data = await step.run("fetch-user", async () => {
   return await database.getUser(userId);
@@ -91,38 +99,44 @@ const data = await step.run("fetch-user", async () => {
 ```
 
 ### Wait for Another Event
+
 ```typescript
 const payment = await step.waitForEvent("wait-for-payment", {
   event: "app/payment.succeeded",
   timeout: "24h",
-  if: "async.data.userId == event.data.userId"
+  if: "async.data.userId == event.data.userId",
 });
 ```
 
 ### Sleep/Delay
+
 ```typescript
 await step.sleep("wait-24h", "24h");
 ```
 
 ### Run Multiple Steps in Parallel
+
 ```typescript
 const [user, orders, settings] = await Promise.all([
   step.run("fetch-user", async () => getUserData()),
   step.run("fetch-orders", async () => getOrders()),
-  step.run("fetch-settings", async () => getSettings())
+  step.run("fetch-settings", async () => getSettings()),
 ]);
 ```
 
 ### Chain Events (Event → Event)
+
 ```typescript
 // In first workflow
 await step.sendEvent("trigger-next", {
   name: "app/admin-digest.ready",
-  data: { totalTickets, totalUsers, totalComments }
+  data: { totalTickets, totalUsers, totalComments },
 });
 
 // Second workflow listens
-{ event: "app/admin-digest.ready" }
+{
+  event: "app/admin-digest.ready";
+}
 ```
 
 ---
@@ -151,6 +165,7 @@ concurrency: {
 ## Error Handling
 
 ### Automatic Retries (Built-in)
+
 ```typescript
 // Inngest automatically retries failed steps
 const result = await step.run("risky-operation", async () => {
@@ -159,6 +174,7 @@ const result = await step.run("risky-operation", async () => {
 ```
 
 ### Global Failure Handler
+
 ```typescript
 // Register in src/lib/inngest.ts
 export const handleAnyFunctionFailure = inngest.createFunction(
@@ -166,16 +182,20 @@ export const handleAnyFunctionFailure = inngest.createFunction(
   { event: "inngest/function.failed" },
   async ({ event, step }) => {
     await step.run("log-failure", async () => {
-      logger.error({
-        functionId: event.data.function_id,
-        error: event.data.error,
-      }, "Function failed");
+      logger.error(
+        {
+          functionId: event.data.function_id,
+          error: event.data.error,
+        },
+        "Function failed",
+      );
     });
-  }
+  },
 );
 ```
 
 ### Idempotent Operations
+
 ```typescript
 // Check if already done
 const existing = await prisma.charge.findUnique({ where: { paymentId } });
@@ -184,7 +204,7 @@ if (existing) return existing; // Safe to retry
 // Or use idempotency keys
 await stripe.charges.create({
   amount: 100,
-  idempotency_key: paymentId // Prevents duplicate charges
+  idempotency_key: paymentId, // Prevents duplicate charges
 });
 ```
 
@@ -199,10 +219,10 @@ All functions must be registered in the handler:
 export const { GET, POST, PUT } = serve({
   client: inngest,
   functions: [
-    handleAnyFunctionFailure,           // Always first
-    eventSignUpWelcomeEmail,            // Auth features
+    handleAnyFunctionFailure, // Always first
+    eventSignUpWelcomeEmail, // Auth features
     eventPasswordReset,
-    eventPrepareAdminDigest,            // Admin features
+    eventPrepareAdminDigest, // Admin features
     eventSendAdminDigestEmail,
     eventSendAdminDigestDiscord,
     // Add new functions as you create them
@@ -229,14 +249,14 @@ export const { GET, POST, PUT } = serve({
 
 ## Troubleshooting
 
-| Issue | Likely Cause | Solution |
-|-------|--------------|----------|
-| Function never runs | Not registered in route handler | Add to `serve({ functions: [...] })` |
-| No retries on failure | Operation not wrapped in `step.run()` | Use `step.run()` for all async operations |
-| Slow API response | Waiting for email/external call | Emit event, return immediately |
-| Duplicate operations | Missing idempotency key | Add idempotency check or use `idempotency_key` |
-| Function times out | No explicit timeout set | Add `timeout: "24h"` to `waitForEvent()` |
-| Can't find logs | Wrong feature folder | Check `src/features/[feature]/events/` |
+| Issue                 | Likely Cause                          | Solution                                       |
+| --------------------- | ------------------------------------- | ---------------------------------------------- |
+| Function never runs   | Not registered in route handler       | Add to `serve({ functions: [...] })`           |
+| No retries on failure | Operation not wrapped in `step.run()` | Use `step.run()` for all async operations      |
+| Slow API response     | Waiting for email/external call       | Emit event, return immediately                 |
+| Duplicate operations  | Missing idempotency key               | Add idempotency check or use `idempotency_key` |
+| Function times out    | No explicit timeout set               | Add `timeout: "24h"` to `waitForEvent()`       |
+| Can't find logs       | Wrong feature folder                  | Check `src/features/[feature]/events/`         |
 
 ---
 
@@ -264,4 +284,3 @@ src/
 - **Full Guide**: See `INNGEST_BEST_PRACTICES.md`
 - **Project Structure**: `PROJECT.md`
 - **Inngest Docs**: https://www.inngest.com/docs
-

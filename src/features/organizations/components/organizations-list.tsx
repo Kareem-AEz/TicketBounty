@@ -4,13 +4,13 @@ import {
   LucideArrowRight,
   LucideArrowRightLeft,
   LucideCheck,
+  LucideExternalLink,
   LucidePencil,
   LucideTrash2,
   LucideUsers,
 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
-import { Fragment } from "react/jsx-runtime";
 import SubmitButton from "@/components/form/submit-button";
 import { Button } from "@/components/ui/button";
 import {
@@ -134,7 +134,7 @@ export default async function OrganizationsList() {
                   <div className="flex w-full gap-x-2">
                     {switchButton}
                     <Button variant="outline" size="icon">
-                      <LucideTrash2 />
+                      <LucideExternalLink />
                     </Button>
                     <Button variant="outline" size="icon">
                       <LucidePencil />

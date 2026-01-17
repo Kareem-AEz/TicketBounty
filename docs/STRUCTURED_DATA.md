@@ -5,17 +5,20 @@ This project implements JSON-LD structured data following [Mike Bifulco's guide]
 ## What's Included
 
 ### Global Structured Data (in `layout.tsx`)
+
 - **Organization**: Company/app information
 - **Website**: Site-wide search functionality
 - **SoftwareApplication**: App-specific metadata
 
 ### Page-Specific Components
+
 - **BreadcrumbStructuredData**: For navigation breadcrumbs
 - **TicketStructuredData**: For individual ticket pages
 
 ## Usage Examples
 
 ### Adding Breadcrumbs to a Page
+
 ```tsx
 import { BreadcrumbStructuredData } from "@/components/structured-data/breadcrumb-structured-data";
 
@@ -36,6 +39,7 @@ export default function MyPage() {
 ```
 
 ### Adding Ticket-Specific Structured Data
+
 ```tsx
 import { TicketStructuredData } from "@/components/structured-data/ticket-structured-data";
 

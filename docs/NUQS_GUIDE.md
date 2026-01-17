@@ -28,7 +28,7 @@ npm install nuqs
 
 ```tsx
 // src/app/layout.tsx
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export default function RootLayout({ children }) {
   return (
@@ -37,7 +37,7 @@ export default function RootLayout({ children }) {
         <NuqsAdapter>{children}</NuqsAdapter>
       </body>
     </html>
-  )
+  );
 }
 ```
 
@@ -56,37 +56,39 @@ import {
   Options,
   parseAsString,
   parseAsStringLiteral,
-} from 'nuqs/server' // ⚠️ Import from 'nuqs/server' for server components
+} from "nuqs/server"; // ⚠️ Import from 'nuqs/server' for server components
 
 // Step 1: Define global options (DRY principle)
 export const searchOptions: Options = {
-  shallow: false,        // Critical: enables server re-renders
-  history: 'replace',    // Prevents history clutter
-  limitUrlUpdates: {     // Built-in debounce
-    method: 'debounce',
+  shallow: false, // Critical: enables server re-renders
+  history: "replace", // Prevents history clutter
+  limitUrlUpdates: {
+    // Built-in debounce
+    method: "debounce",
     timeMs: 350,
   },
-}
+};
 
 // Step 2: Define parsers with validation & defaults
 export const searchParsers = {
-  query: parseAsString.withDefault('').withOptions(searchOptions),
-  sort: parseAsStringLiteral(['newest', 'bounty'] as const)
-    .withDefault('newest')
+  query: parseAsString.withDefault("").withOptions(searchOptions),
+  sort: parseAsStringLiteral(["newest", "bounty"] as const)
+    .withDefault("newest")
     .withOptions(searchOptions),
   page: parseAsInteger.withDefault(1).withOptions(searchOptions),
-}
+};
 
 // Step 3: Create cache for server components
-export const searchParamsCache = createSearchParamsCache(searchParsers)
+export const searchParamsCache = createSearchParamsCache(searchParsers);
 
 // Step 4: Export derived types
 export type ParsedSearchParams = Awaited<
   ReturnType<typeof searchParamsCache.parse>
->
+>;
 ```
 
 **Why this pattern?**
+
 - ✅ Single source of truth
 - ✅ Automatic type inference
 - ✅ Consistent behavior across all params
@@ -100,35 +102,35 @@ export type ParsedSearchParams = Awaited<
 
 ```tsx
 // src/app/tickets/page.tsx
-import { searchParamsCache } from '@/lib/search-params'
-import { type SearchParams } from 'nuqs/server'
+import { searchParamsCache } from "@/lib/search-params";
+import { type SearchParams } from "nuqs/server";
 
 type PageProps = {
-  searchParams: Promise<SearchParams> // Next.js 15+
-}
+  searchParams: Promise<SearchParams>; // Next.js 15+
+};
 
 export default async function Page({ searchParams }: PageProps) {
   // ⚠️ CRITICAL: Call parse() to populate the cache
-  const params = await searchParamsCache.parse(searchParams)
-  
+  const params = await searchParamsCache.parse(searchParams);
+
   // Option 1: Use parsed values directly
-  const { query, sort } = params
-  
+  const { query, sort } = params;
+
   return (
     <>
       <h1>Search: {query}</h1>
       <NestedServerComponent />
     </>
-  )
+  );
 }
 
 // Access in deeply nested Server Components (no prop drilling!)
 function NestedServerComponent() {
-  const query = searchParamsCache.get('query')
-  const sort = searchParamsCache.get('sort')
+  const query = searchParamsCache.get("query");
+  const sort = searchParamsCache.get("sort");
   // or: const { query, sort } = searchParamsCache.all()
-  
-  return <div>...</div>
+
+  return <div>...</div>;
 }
 ```
 
@@ -138,70 +140,76 @@ function NestedServerComponent() {
 
 ```tsx
 // src/components/search-input.tsx
-'use client'
-import { useQueryState } from 'nuqs'
-import { searchParsers } from '@/lib/search-params'
+"use client";
+import { useQueryState } from "nuqs";
+import { searchParsers } from "@/lib/search-params";
 
 export default function SearchInput() {
-  const [query, setQuery] = useQueryState('query', searchParsers.query)
-  
+  const [query, setQuery] = useQueryState("query", searchParsers.query);
+
   return (
-    <input
-      value={query ?? ''}
-      onChange={(e) => setQuery(e.target.value)}
-    />
-  )
+    <input value={query ?? ""} onChange={(e) => setQuery(e.target.value)} />
+  );
 }
 ```
 
 #### Multiple Parameters
 
 ```tsx
-'use client'
-import { useQueryStates } from 'nuqs'
-import { searchParsers } from '@/lib/search-params'
+"use client";
+import { useQueryStates } from "nuqs";
+import { searchParsers } from "@/lib/search-params";
 
 export default function Filters() {
-  const [params, setParams] = useQueryStates(searchParsers)
-  
+  const [params, setParams] = useQueryStates(searchParsers);
+
   // Update single param
-  setParams({ query: 'bug' })
-  
+  setParams({ query: "bug" });
+
   // Update multiple params atomically
-  setParams({ query: 'bug', sort: 'bounty', page: 1 })
-  
-  return <div>...</div>
+  setParams({ query: "bug", sort: "bounty", page: 1 });
+
+  return <div>...</div>;
 }
 ```
 
 #### Type-Safe Select Components
 
 ```tsx
-'use client'
-import { useQueryState } from 'nuqs'
-import { searchParsers, type ParsedSearchParams } from '@/lib/search-params'
+"use client";
+import { useQueryState } from "nuqs";
+import { searchParsers, type ParsedSearchParams } from "@/lib/search-params";
 
 const OPTIONS = [
-  { label: 'Newest', value: 'newest' },
-  { label: 'Bounty', value: 'bounty' },
+  { label: "Newest", value: "newest" },
+  { label: "Bounty", value: "bounty" },
 ] as const satisfies Array<{
-  label: string
-  value: ParsedSearchParams['sort'] // ← Derives type automatically
-}>
+  label: string;
+  value: ParsedSearchParams["sort"]; // ← Derives type automatically
+}>;
 
 export default function SortSelect() {
-  const [sort, setSort] = useQueryState('sort', searchParsers.sort)
-  
+  const [sort, setSort] = useQueryState("sort", searchParsers.sort);
+
   // Type-safe handler
-  const handleChange = (value: ParsedSearchParams['sort']) => {
-    setSort(value)
-  }
-  
+  const handleChange = (value: ParsedSearchParams["sort"]) => {
+    setSort(value);
+  };
+
   return (
-    <select value={sort} onChange={(e) => handleChange(e.target.value as ParsedSearchParams['sort'])}>
-      {OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+    <select
+      value={sort}
+      onChange={(e) =>
+        handleChange(e.target.value as ParsedSearchParams["sort"])
+      }
+    >
+      {OPTIONS.map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
+      ))}
     </select>
-  )
+  );
 }
 ```
 
@@ -214,14 +222,14 @@ export default function SortSelect() {
 ```tsx
 // ❌ BAD: Parsers are inline, can't be reused
 export const searchParamsCache = createSearchParamsCache({
-  query: parseAsString.withDefault(''),
-})
+  query: parseAsString.withDefault(""),
+});
 
 // ✅ GOOD: Parsers exported, reusable in client components
 export const searchParsers = {
-  query: parseAsString.withDefault(''),
-}
-export const searchParamsCache = createSearchParamsCache(searchParsers)
+  query: parseAsString.withDefault(""),
+};
+export const searchParamsCache = createSearchParamsCache(searchParsers);
 ```
 
 ### 2. ✅ Use a Single Options Object
@@ -241,21 +249,21 @@ sort: parseAsStringLiteral(['newest']).withOptions(options),
 
 ```tsx
 // ❌ BAD: No default, value can be null
-query: parseAsString
+query: parseAsString;
 
 // ✅ GOOD: Always has a value
-query: parseAsString.withDefault('')
-sort: parseAsStringLiteral(['newest', 'bounty']).withDefault('newest')
+query: parseAsString.withDefault("");
+sort: parseAsStringLiteral(["newest", "bounty"]).withDefault("newest");
 ```
 
 ### 4. ✅ Import from Correct Package
 
 ```tsx
 // Server Components & Shared Code
-import { parseAsString, createSearchParamsCache } from 'nuqs/server'
+import { parseAsString, createSearchParamsCache } from "nuqs/server";
 
 // Client Components
-import { useQueryState, useQueryStates } from 'nuqs'
+import { useQueryState, useQueryStates } from "nuqs";
 ```
 
 ### 5. ✅ Derive Types, Don't Duplicate
@@ -263,12 +271,12 @@ import { useQueryState, useQueryStates } from 'nuqs'
 ```tsx
 // ❌ BAD: Manual type definition (can go out of sync)
 type SearchParams = {
-  query: string
-  sort: 'newest' | 'bounty'
-}
+  query: string;
+  sort: "newest" | "bounty";
+};
 
 // ✅ GOOD: Derived from cache (always in sync)
-type ParsedSearchParams = Awaited<ReturnType<typeof searchParamsCache.parse>>
+type ParsedSearchParams = Awaited<ReturnType<typeof searchParamsCache.parse>>;
 ```
 
 ---
@@ -281,14 +289,14 @@ type ParsedSearchParams = Awaited<ReturnType<typeof searchParamsCache.parse>>
 
 ```tsx
 // ❌ BAD: Default is shallow: true (client-only)
-const [query, setQuery] = useQueryState('query', parseAsString.withDefault(''))
+const [query, setQuery] = useQueryState("query", parseAsString.withDefault(""));
 // URL changes, but server components show stale data!
 
 // ✅ GOOD: Notify server to re-render
 const [query, setQuery] = useQueryState(
-  'query',
-  parseAsString.withDefault('').withOptions({ shallow: false })
-)
+  "query",
+  parseAsString.withDefault("").withOptions({ shallow: false }),
+);
 ```
 
 ### ❌ Pitfall #2: Forgetting to Call `.parse()`
@@ -298,13 +306,13 @@ const [query, setQuery] = useQueryState(
 ```tsx
 // ❌ BAD: Cache not populated
 export default async function Page({ searchParams }) {
-  return <NestedComponent /> // Can't access params here!
+  return <NestedComponent />; // Can't access params here!
 }
 
 // ✅ GOOD: Parse in page component
 export default async function Page({ searchParams }) {
-  await searchParamsCache.parse(searchParams) // ← Populates cache
-  return <NestedComponent /> // Now .get() works!
+  await searchParamsCache.parse(searchParams); // ← Populates cache
+  return <NestedComponent />; // Now .get() works!
 }
 ```
 
@@ -331,11 +339,15 @@ const handleSort = (value: ParsedSearchParams['sort']) => setSort(value)
 ```tsx
 // ❌ BAD: No adapter in layout
 export default function RootLayout({ children }) {
-  return <html><body>{children}</body></html>
+  return (
+    <html>
+      <body>{children}</body>
+    </html>
+  );
 }
 
 // ✅ GOOD: Wrap with NuqsAdapter
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 export default function RootLayout({ children }) {
   return (
     <html>
@@ -343,7 +355,7 @@ export default function RootLayout({ children }) {
         <NuqsAdapter>{children}</NuqsAdapter>
       </body>
     </html>
-  )
+  );
 }
 ```
 
@@ -354,7 +366,7 @@ export default function RootLayout({ children }) {
 ```tsx
 // ❌ BAD: Client component with nuqs hooks not in Suspense
 export default function Page() {
-  return <ClientWithSearchParams />
+  return <ClientWithSearchParams />;
 }
 
 // ✅ GOOD: Wrap in Suspense
@@ -363,7 +375,7 @@ export default function Page() {
     <Suspense fallback={<Loading />}>
       <ClientWithSearchParams />
     </Suspense>
-  )
+  );
 }
 ```
 
@@ -386,16 +398,19 @@ import {
   parseAsJson,
   parseAsIsoDateTime,
   parseAsTimestamp,
-} from 'nuqs/server'
+} from "nuqs/server";
 
 // Examples
-tags: parseAsArrayOf(parseAsString).withDefault([])
+tags: parseAsArrayOf(parseAsString).withDefault([]);
 // ?tags=react,nextjs,typescript → ['react', 'nextjs', 'typescript']
 
-filter: parseAsJson<{ min: number; max: number }>().withDefault({ min: 0, max: 100 })
+filter: parseAsJson<{ min: number; max: number }>().withDefault({
+  min: 0,
+  max: 100,
+});
 // ?filter={"min":0,"max":100}
 
-date: parseAsIsoDateTime.withDefault(new Date())
+date: parseAsIsoDateTime.withDefault(new Date());
 // ?date=2024-01-01T00:00:00.000Z
 ```
 
@@ -404,17 +419,19 @@ date: parseAsIsoDateTime.withDefault(new Date())
 Create your own validation:
 
 ```tsx
-import { createParser } from 'nuqs'
+import { createParser } from "nuqs";
 
 const parseAsTicketStatus = createParser({
   parse(value: string) {
-    const valid = ['open', 'in-progress', 'done'] as const
-    return valid.includes(value as any) ? value as typeof valid[number] : null
+    const valid = ["open", "in-progress", "done"] as const;
+    return valid.includes(value as any)
+      ? (value as (typeof valid)[number])
+      : null;
   },
   serialize(value) {
-    return value
+    return value;
   },
-}).withDefault('open')
+}).withDefault("open");
 ```
 
 ### 💡 Tip #3: URL Key Mapping
@@ -422,12 +439,12 @@ const parseAsTicketStatus = createParser({
 Map internal names to different URL params:
 
 ```tsx
-import { type UrlKeys } from 'nuqs/server'
+import { type UrlKeys } from "nuqs/server";
 
-const parsers = { videoId: parseAsString }
-const urlKeys: UrlKeys<typeof parsers> = { videoId: 'v' }
+const parsers = { videoId: parseAsString };
+const urlKeys: UrlKeys<typeof parsers> = { videoId: "v" };
 
-const cache = createSearchParamsCache(parsers, { urlKeys })
+const cache = createSearchParamsCache(parsers, { urlKeys });
 // URL: ?v=dQw4w9WgXcQ (not ?videoId=...)
 ```
 
@@ -456,38 +473,42 @@ serialize('/tickets?sort=bounty', { sort: null })
 ### 💡 Tip #5: Clearing Values
 
 ```tsx
-const [query, setQuery] = useQueryState('query', parseAsString.withDefault(''))
+const [query, setQuery] = useQueryState("query", parseAsString.withDefault(""));
 
 // Clear from URL
-setQuery(null) // ?query=hello → (removed)
+setQuery(null); // ?query=hello → (removed)
 
 // Reset to default (also removes if default)
-setQuery('') // ?query=hello → (removed because '' is the default)
+setQuery(""); // ?query=hello → (removed because '' is the default)
 ```
 
 ### 💡 Tip #6: History Management
 
 ```tsx
 // Don't create back button entries (good for filters)
-{ history: 'replace' }
+{
+  history: "replace";
+}
 
 // Create back button entries (good for navigation)
-{ history: 'push' } // default
+{
+  history: "push";
+} // default
 ```
 
 ### 💡 Tip #7: Transitions & Loading States
 
 ```tsx
-const [isPending, startTransition] = useTransition()
+const [isPending, startTransition] = useTransition();
 const [query, setQuery] = useQueryState(
-  'query',
+  "query",
   parseAsString.withOptions({
     shallow: false,
     startTransition, // ← Pass transition function
-  })
-)
+  }),
+);
 
-if (isPending) return <Spinner />
+if (isPending) return <Spinner />;
 ```
 
 ---
@@ -505,45 +526,47 @@ import {
   parseAsInteger,
   parseAsString,
   parseAsStringLiteral,
-} from 'nuqs/server'
+} from "nuqs/server";
 
 export const ticketSearchOptions: Options = {
   shallow: false,
-  history: 'replace',
+  history: "replace",
   limitUrlUpdates: {
-    method: 'debounce',
+    method: "debounce",
     timeMs: 350,
   },
-}
+};
 
 export const ticketSearchParsers = {
-  query: parseAsString.withDefault('').withOptions(ticketSearchOptions),
-  sort: parseAsStringLiteral(['newest', 'bounty', 'priority'] as const)
-    .withDefault('newest')
+  query: parseAsString.withDefault("").withOptions(ticketSearchOptions),
+  sort: parseAsStringLiteral(["newest", "bounty", "priority"] as const)
+    .withDefault("newest")
     .withOptions(ticketSearchOptions),
-  status: parseAsArrayOf(parseAsString).withDefault([]).withOptions(ticketSearchOptions),
+  status: parseAsArrayOf(parseAsString)
+    .withDefault([])
+    .withOptions(ticketSearchOptions),
   page: parseAsInteger.withDefault(1).withOptions(ticketSearchOptions),
-}
+};
 
-export const searchParamsCache = createSearchParamsCache(ticketSearchParsers)
+export const searchParamsCache = createSearchParamsCache(ticketSearchParsers);
 
 export type ParsedSearchParams = Awaited<
   ReturnType<typeof searchParamsCache.parse>
->
+>;
 ```
 
 ```tsx
 // src/app/tickets/page.tsx
-import { searchParamsCache } from '@/lib/search-params'
-import { type SearchParams } from 'nuqs/server'
+import { searchParamsCache } from "@/lib/search-params";
+import { type SearchParams } from "nuqs/server";
 
 export default async function TicketsPage({
   searchParams,
 }: {
-  searchParams: Promise<SearchParams>
+  searchParams: Promise<SearchParams>;
 }) {
-  const params = await searchParamsCache.parse(searchParams)
-  
+  const params = await searchParamsCache.parse(searchParams);
+
   return (
     <div>
       <Suspense fallback={<Spinner />}>
@@ -551,66 +574,72 @@ export default async function TicketsPage({
         <SortSelect />
         <StatusFilter />
       </Suspense>
-      
+
       <Suspense fallback={<Spinner />}>
         <TicketsList params={params} />
       </Suspense>
     </div>
-  )
+  );
 }
 ```
 
 ```tsx
 // src/components/search-input.tsx
-'use client'
-import { useQueryState } from 'nuqs'
-import { ticketSearchParsers } from '@/lib/search-params'
+"use client";
+import { useQueryState } from "nuqs";
+import { ticketSearchParsers } from "@/lib/search-params";
 
 export default function SearchInput() {
-  const [query, setQuery] = useQueryState('query', ticketSearchParsers.query)
-  
+  const [query, setQuery] = useQueryState("query", ticketSearchParsers.query);
+
   return (
     <input
       type="text"
-      value={query ?? ''}
+      value={query ?? ""}
       onChange={(e) => setQuery(e.target.value)}
       placeholder="Search tickets..."
     />
-  )
+  );
 }
 ```
 
 ```tsx
 // src/components/sort-select.tsx
-'use client'
-import { useQueryState } from 'nuqs'
-import { ticketSearchParsers, type ParsedSearchParams } from '@/lib/search-params'
+"use client";
+import { useQueryState } from "nuqs";
+import {
+  ticketSearchParsers,
+  type ParsedSearchParams,
+} from "@/lib/search-params";
 
 const SORT_OPTIONS = [
-  { label: 'Newest', value: 'newest' },
-  { label: 'Bounty', value: 'bounty' },
-  { label: 'Priority', value: 'priority' },
+  { label: "Newest", value: "newest" },
+  { label: "Bounty", value: "bounty" },
+  { label: "Priority", value: "priority" },
 ] as const satisfies Array<{
-  label: string
-  value: ParsedSearchParams['sort']
-}>
+  label: string;
+  value: ParsedSearchParams["sort"];
+}>;
 
 export default function SortSelect() {
-  const [sort, setSort] = useQueryState('sort', ticketSearchParsers.sort)
-  
-  const handleSort = (value: ParsedSearchParams['sort']) => {
-    setSort(value)
-  }
-  
+  const [sort, setSort] = useQueryState("sort", ticketSearchParsers.sort);
+
+  const handleSort = (value: ParsedSearchParams["sort"]) => {
+    setSort(value);
+  };
+
   return (
-    <select value={sort} onChange={(e) => handleSort(e.target.value as ParsedSearchParams['sort'])}>
+    <select
+      value={sort}
+      onChange={(e) => handleSort(e.target.value as ParsedSearchParams["sort"])}
+    >
       {SORT_OPTIONS.map((opt) => (
         <option key={opt.value} value={opt.value}>
           {opt.label}
         </option>
       ))}
     </select>
-  )
+  );
 }
 ```
 
@@ -658,16 +687,13 @@ import {
   type Options,
   type SearchParams,
   type UrlKeys,
-} from 'nuqs/server'
+} from "nuqs/server";
 
 // Client
-import {
-  useQueryState,
-  useQueryStates,
-} from 'nuqs'
+import { useQueryState, useQueryStates } from "nuqs";
 
 // Adapter
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 ```
 
 ---
@@ -681,4 +707,3 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 ---
 
 **Pro Tip**: Bookmark this guide and refer to it when implementing search params in your Next.js projects!
-

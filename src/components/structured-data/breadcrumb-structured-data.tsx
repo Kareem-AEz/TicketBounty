@@ -1,10 +1,12 @@
-import { generateBreadcrumbStructuredData } from '@/lib/structured-data';
+import { generateBreadcrumbStructuredData } from "@/lib/structured-data";
 
 interface BreadcrumbStructuredDataProps {
   items: Array<{ name: string; url: string }>;
 }
 
-export function BreadcrumbStructuredData({ items }: BreadcrumbStructuredDataProps) {
+export function BreadcrumbStructuredData({
+  items,
+}: BreadcrumbStructuredDataProps) {
   const structuredData = generateBreadcrumbStructuredData(items);
 
   return (

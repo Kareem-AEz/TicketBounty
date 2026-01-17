@@ -16,3 +16,5 @@ export const accountPasswordPath = () => "/account/password" as const;
 export const organizationsPath = () => "/organizations" as const;
 export const createOrganizationPath = () => "/organizations/create" as const;
 export const onboardingPath = () => "/onboarding" as const;
+export const selectActiveOrganizationPath = () =>
+  "onboarding/select-active-organization" as const;

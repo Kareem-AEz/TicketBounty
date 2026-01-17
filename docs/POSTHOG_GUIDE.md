@@ -52,7 +52,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       // 2. We don't automatically capture until we confirm.
       // However, to keep it simple with the banner, we usually rely on opt_in_capturing logic.
       // If you want strict GDPR, use 'memory' persistence by default:
-      persistence: "memory", 
+      persistence: "memory",
     });
   }, []);
 
@@ -61,6 +61,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 ```
 
 ### B. Handle Page Views (App Router)
+
 Since Next.js App Router doesn't trigger standard browser navigation events, we need a component to listen for path changes.
 
 Create `src/app/_providers/posthog-pageview-tracker.tsx`:
@@ -97,6 +98,7 @@ export default function PostHogPageViewTracker() {
 ```
 
 ### C. Auto-Identify Wrapper (Optional but Recommended)
+
 To automatically link your authenticated users to their PostHog sessions without manually calling `identify` everywhere.
 
 Create `src/app/_providers/posthog-auth-wrapper.tsx`:
@@ -144,17 +146,22 @@ export default function PostHogAuthWrapper({
 ```
 
 ### D. Add to Root Layout
+
 Update `src/app/layout.tsx`:
 
 ```tsx
 // src/app/layout.tsx
-import { PostHogProvider } from "./_providers/posthog-provider"
-import PostHogPageViewTracker from "./_providers/posthog-pageview-tracker"
-import PostHogAuthWrapper from "./_providers/posthog-auth-wrapper"
+import { PostHogProvider } from "./_providers/posthog-provider";
+import PostHogPageViewTracker from "./_providers/posthog-pageview-tracker";
+import PostHogAuthWrapper from "./_providers/posthog-auth-wrapper";
 import { CookieBanner } from "@/components/privacy/cookie-banner";
-import { Suspense } from "react"
+import { Suspense } from "react";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <PostHogProvider>
@@ -164,13 +171,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <PostHogPageViewTracker />
           </Suspense>
           <PostHogAuthWrapper>
-             {children}
-             <CookieBanner />
+            {children}
+            <CookieBanner />
           </PostHogAuthWrapper>
         </body>
       </PostHogProvider>
     </html>
-  )
+  );
 }
 ```
 
@@ -221,15 +228,15 @@ Create `src/lib/posthog.ts`:
 
 ```ts
 // src/lib/posthog.ts
-import { PostHog } from 'posthog-node'
+import { PostHog } from "posthog-node";
 
 export default function PostHogClient() {
   const posthogClient = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
     host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     flushAt: 1, // Flush immediately in serverless environments
-    flushInterval: 0
-  })
-  return posthogClient
+    flushInterval: 0,
+  });
+  return posthogClient;
 }
 ```
 
@@ -237,28 +244,28 @@ export default function PostHogClient() {
 
 ```ts
 // src/app/actions/example.ts
-'use server'
-import PostHogClient from "@/lib/posthog"
+"use server";
+import PostHogClient from "@/lib/posthog";
 
 export async function doSomething(userId: string) {
-  const posthog = PostHogClient()
-  
+  const posthog = PostHogClient();
+
   // 1. Capture Event
   posthog.capture({
     distinctId: userId,
-    event: 'server_action_triggered',
-    properties: { action_type: 'example' }
-  })
+    event: "server_action_triggered",
+    properties: { action_type: "example" },
+  });
 
   // 2. Check Feature Flag
-  const isEnabled = await posthog.isFeatureEnabled('new-feature-key', userId)
-  
+  const isEnabled = await posthog.isFeatureEnabled("new-feature-key", userId);
+
   if (isEnabled) {
     // execute new logic
   }
 
   // IMPORTANT: Flush events before the serverless function spins down
-  await posthog.shutdown() 
+  await posthog.shutdown();
 }
 ```
 
@@ -267,21 +274,23 @@ export async function doSomething(userId: string) {
 ## 5. Feature Flags (Best Practices)
 
 ### Client-Side (React Hooks)
+
 Use the `useFeatureFlagEnabled` hook.
 
 ```tsx
-'use client'
-import { useFeatureFlagEnabled } from 'posthog-js/react'
+"use client";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 
 export function MyComponent() {
-  const isNewFeature = useFeatureFlagEnabled('new-dashboard-ui')
+  const isNewFeature = useFeatureFlagEnabled("new-dashboard-ui");
 
-  if (isNewFeature) return <NewDashboard />
-  return <OldDashboard />
+  if (isNewFeature) return <NewDashboard />;
+  return <OldDashboard />;
 }
 ```
 
 ### Server-Side (Preventing Flicker)
+
 For critical UI changes, evaluate flags on the server and pass them to the client to avoid layout shifts.
 
 1. Fetch flag in Server Component/Page.
@@ -289,19 +298,23 @@ For critical UI changes, evaluate flags on the server and pass them to the clien
 
 ```tsx
 // app/page.tsx (Server Component)
-import PostHogClient from "@/lib/posthog"
-import { ClientComponent } from "./client-component"
-import { cookies } from "next/headers"
+import PostHogClient from "@/lib/posthog";
+import { ClientComponent } from "./client-component";
+import { cookies } from "next/headers";
 
 export default async function Page() {
-  const posthog = PostHogClient()
+  const posthog = PostHogClient();
   // Assuming you store a distinctId in cookies or auth session
-  const distinctId = (await cookies()).get('distinct_id')?.value || 'anonymous_id'
-  
-  const showNewFeature = await posthog.isFeatureEnabled('new-feature', distinctId)
-  await posthog.shutdown()
+  const distinctId =
+    (await cookies()).get("distinct_id")?.value || "anonymous_id";
 
-  return <ClientComponent showNewFeature={showNewFeature} />
+  const showNewFeature = await posthog.isFeatureEnabled(
+    "new-feature",
+    distinctId,
+  );
+  await posthog.shutdown();
+
+  return <ClientComponent showNewFeature={showNewFeature} />;
 }
 ```
 
@@ -312,9 +325,11 @@ export default async function Page() {
 This is **critical** for accurate tracking.
 
 ### A. Automatic Identification
+
 We use the `PostHogAuthWrapper` (see section 2D) to automatically identify users on the client side whenever the auth session is valid.
 
 ### B. Manual Identification (Sign Up / Login Actions)
+
 For immediate server-side events (like "User Signed Up"), handle it in your Server Action.
 
 ```ts
@@ -330,6 +345,7 @@ await posthog.shutdown();
 ```
 
 ### C. Reset on Sign Out
+
 Always reset to clear the session when the user logs out.
 
 ```tsx
@@ -347,32 +363,35 @@ const handleSignOut = () => {
 To be GDPR compliant, you must obtain user consent before setting non-essential cookies. We have implemented a setup that defaults to **cookieless** tracking (memory persistence) until the user consents.
 
 ### A. Configuration
+
 In `src/app/_providers/posthog-provider.tsx`, we initialize PostHog with `persistence: 'memory'`. This means no cookies are stored by default, and user data is lost on page reload (safe for privacy).
 
 ```tsx
 // src/app/_providers/posthog-provider.tsx
 posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
   // ... other config
-  persistence: 'memory', // Default to in-memory (cookieless)
+  persistence: "memory", // Default to in-memory (cookieless)
 });
 ```
 
 ### B. Cookie Banner Component
+
 We created `src/components/privacy/cookie-banner.tsx` to handle consent.
 
--   **Decline**: Keeps `persistence: 'memory'` (and calls `opt_out_capturing` to be sure).
--   **Accept**: Switches to `persistence: 'localStorage+cookie'` and calls `opt_in_capturing`.
+- **Decline**: Keeps `persistence: 'memory'` (and calls `opt_out_capturing` to be sure).
+- **Accept**: Switches to `persistence: 'localStorage+cookie'` and calls `opt_in_capturing`.
 
 ```tsx
 // src/components/privacy/cookie-banner.tsx
 const handleAccept = () => {
   posthog.opt_in_capturing();
-  posthog.set_config({ persistence: 'localStorage+cookie' }); // Enable cookies
+  posthog.set_config({ persistence: "localStorage+cookie" }); // Enable cookies
   setShowBanner(false);
 };
 ```
 
 ### C. Usage
+
 The banner is automatically included in your `RootLayout`, so it appears on every page for users who haven't made a choice yet.
 
 ---
@@ -380,19 +399,23 @@ The banner is automatically included in your `RootLayout`, so it appears on ever
 ## 8. Pro Tips & "Don't Do"s
 
 ### ✅ DO:
+
 1.  **Use Proxying:** Always set up the rewrite proxy. It dramatically increases data accuracy (20-40% more events captured).
 2.  **Wait for Shutdown (Server):** In Vercel/Serverless, always `await posthog.shutdown()` at the end of your server action/route handler. If you don't, events may be lost when the lambda freezes.
 3.  **Identify Early:** Identify the user as soon as you have their ID.
 4.  **Group Analytics:** If you are B2B, use `posthog.group('company', companyId)` to track usage at an organization level.
 
 ### ❌ DON'T:
+
 1.  **Don't** use `posthog-js` (the client library) inside Server Components. It is strictly for the browser. Use `posthog-node`.
 2.  **Don't** set `capture_pageview: true` in App Router. It will often miss soft navigations or capture duplicate views. Use the manual tracker component shown above.
 3.  **Don't** forget `use client` on components using `usePostHog` or `useFeatureFlagEnabled`.
 4.  **Don't** evaluate feature flags inside `useEffect` if they determine layout. It causes a "pop" effect. Evaluate server-side or use a loading skeleton while the flag loads.
 
 ### 💡 Pro Tip: Experiments
+
 Experiments are just Feature Flags with structured variants.
+
 1. Create Experiment in PostHog.
 2. Use `posthog.getFeatureFlag('experiment-key')` to get the variant (`control`, `test-a`, etc.).
 3. **Important**: Always capture the event that is your "Goal" in PostHog for the experiment to calculate significance.

@@ -68,25 +68,30 @@ ESLint and Prettier MUST pass before commits. Imports MUST be sorted (simple-imp
 All new code MUST use the established technology stack. Introducing new dependencies requires explicit justification.
 
 **Core Framework**:
+
 - Next.js 16 (App Router, Turbopack) — React framework
 - React 19.2 (React Compiler enabled) — UI library
 - TypeScript 5 — Type-safe JavaScript
 
 **Database & ORM**:
+
 - PostgreSQL — Primary database
 - Prisma ORM — Type-safe database client and migrations
 
 **Authentication**:
+
 - Lucia Auth — Session-based authentication
 - @node-rs/argon2 — Password hashing
 
 **State Management**:
+
 - React Query (TanStack Query) — Server state management
 - React Hook Form — Client-side form handling
 - nuqs — URL search params state
 - Zod — Schema validation
 
 **UI & Styling**:
+
 - Tailwind CSS 4 — Utility-first CSS
 - shadcn/ui — Component library (Radix primitives)
 - Motion — Animation library
@@ -95,14 +100,17 @@ All new code MUST use the established technology stack. Introducing new dependen
 - Lucide React — Icons
 
 **Background Jobs & Email**:
+
 - Inngest — Background job orchestration
 - Resend — Transactional email
 - React Email — Email templates
 
 **Analytics**:
+
 - PostHog — Product analytics (feature flags, experiments, events)
 
 **Development Tools**:
+
 - ESLint — Code linting
 - Prettier — Code formatting
 - Turbopack — Fast development builds
@@ -112,6 +120,7 @@ All new code MUST use the established technology stack. Introducing new dependen
 ### Code Quality Gates
 
 All code MUST pass these checks before merging:
+
 1. `npm run type` — TypeScript compilation with no errors
 2. `npm run lint` — ESLint with no errors or warnings
 3. `npm run format:check` — Prettier formatting verified
@@ -139,6 +148,7 @@ Feature flags MUST be used sparingly and defined in a centralized location. Even
 ## Governance
 
 This constitution supersedes all other practices. Amendments require:
+
 1. Documentation of the proposed change and rationale
 2. Review of impact on existing code and templates
 3. Update of affected documentation and guides
@@ -146,6 +156,7 @@ This constitution supersedes all other practices. Amendments require:
 All code reviews MUST verify compliance with these principles. Complexity beyond these patterns MUST be justified in PR descriptions.
 
 For runtime development guidance, consult:
+
 - `PROJECT.md` — Architecture and patterns
 - `REACT_QUERY_GUIDE.md` — Server state patterns
 - `docs/NUQS_GUIDE.md` — URL state management

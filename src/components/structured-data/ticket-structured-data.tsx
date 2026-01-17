@@ -1,4 +1,4 @@
-import { generateTicketStructuredData } from '@/lib/structured-data';
+import { generateTicketStructuredData } from "@/lib/structured-data";
 
 interface TicketStructuredDataProps {
   title: string;

@@ -7,9 +7,11 @@ Complete guide to all Inngest documentation files in your project.
 ## 📚 Documentation Suite
 
 ### 1. **INNGEST_SUMMARY.md** ⭐ **START HERE**
+
 Your entry point to understanding Inngest in your project.
 
 **Contains:**
+
 - Overview of all documentation
 - Quick start guide (4 steps to your first workflow)
 - Architecture diagram
@@ -25,9 +27,11 @@ Your entry point to understanding Inngest in your project.
 ---
 
 ### 2. **INNGEST_BEST_PRACTICES.md** 📖 **THE MAIN GUIDE**
+
 Comprehensive reference for everything about Inngest.
 
 **Contains:**
+
 - Architecture principles (event-driven, decoupling)
 - Project structure and organization
 - Event naming conventions
@@ -45,9 +49,11 @@ Comprehensive reference for everything about Inngest.
 ---
 
 ### 3. **INNGEST_QUICK_REFERENCE.md** 🔍 **DAILY LOOKUP**
+
 Fast lookup guide for syntax, patterns, and common operations.
 
 **Contains:**
+
 - Event naming quick table
 - Function structure template
 - Common triggers (event, cron, multiple)
@@ -65,9 +71,11 @@ Fast lookup guide for syntax, patterns, and common operations.
 ---
 
 ### 4. **INNGEST_MESSAGING_PATTERNS.md** 🎨 **ADVANCED PATTERNS**
+
 Deep dive into advanced event-driven messaging patterns.
 
 **Contains:**
+
 - 6 core messaging patterns:
   - Command pattern (imperative)
   - Event pattern (declarative)
@@ -90,9 +98,11 @@ Deep dive into advanced event-driven messaging patterns.
 ---
 
 ### 5. **INNGEST_FOR_YOUR_PROJECT.md** 🎯 **YOUR SPECIFIC CONTEXT**
+
 Tailored recommendations for your "Road to Next" application.
 
 **Contains:**
+
 - Current state analysis (what you're doing right)
 - Review of your current implementation
 - Suggested enhancements for your app:
@@ -119,27 +129,32 @@ Tailored recommendations for your "Road to Next" application.
 ### By Use Case
 
 #### "I'm new to Inngest"
+
 1. Start: `INNGEST_SUMMARY.md`
 2. Deep dive: `INNGEST_BEST_PRACTICES.md` (first 2 sections)
 3. Practice: Build your first workflow
 
 #### "I need to add a new workflow"
+
 1. Check: `INNGEST_QUICK_REFERENCE.md` (function template)
 2. Reference: `INNGEST_FOR_YOUR_PROJECT.md` (where to add it)
 3. Build: Use the template
 4. Verify: Use the checklist
 
 #### "I'm building something complex"
+
 1. Understand patterns: `INNGEST_MESSAGING_PATTERNS.md`
 2. Review: `INNGEST_BEST_PRACTICES.md` (error handling & performance)
 3. Check: `INNGEST_QUICK_REFERENCE.md` (troubleshooting)
 
 #### "I need to look up specific syntax"
+
 1. Quick lookup: `INNGEST_QUICK_REFERENCE.md`
 2. If not found: Search in `INNGEST_BEST_PRACTICES.md`
 3. For patterns: Check `INNGEST_MESSAGING_PATTERNS.md`
 
 #### "I'm implementing for our app"
+
 1. Context: `INNGEST_FOR_YOUR_PROJECT.md`
 2. Details: `INNGEST_BEST_PRACTICES.md`
 3. Reference: `INNGEST_QUICK_REFERENCE.md`
@@ -149,18 +164,21 @@ Tailored recommendations for your "Road to Next" application.
 ## 📋 What You'll Learn
 
 ### Basic Concepts
+
 - What Inngest does and why it matters
 - Event-driven architecture principles
 - Step-based execution model
 - Automatic retries and reliability
 
 ### Project Organization
+
 - How to structure workflows in your codebase
 - Where to put files
 - How to name events and functions
 - How to define event types
 
 ### Patterns & Practices
+
 - 4 core workflow patterns
 - 6 advanced messaging patterns
 - Error handling strategies
@@ -168,12 +186,14 @@ Tailored recommendations for your "Road to Next" application.
 - Testing approaches
 
 ### Implementation
+
 - Specific examples for your app
 - Integration points in your codebase
 - Concurrency and scaling considerations
 - Monitoring and observability
 
 ### Troubleshooting
+
 - Common issues and solutions
 - Quick reference for syntax
 - Checklist before shipping
@@ -184,12 +204,14 @@ Tailored recommendations for your "Road to Next" application.
 ## 🎯 Key Takeaways
 
 ### Architecture
+
 ```
 API Handler → inngest.send() → Inngest Queue → Workflow Functions
                  (fast)         (reliable)      (with retries)
 ```
 
 ### Core Pattern
+
 ```typescript
 // 1. Define event type
 type Events = { "app/feature.action": { data: {...} } };
@@ -220,6 +242,7 @@ await inngest.send({
 ```
 
 ### 10 Best Practices
+
 1. Decouple with events
 2. Use steps for everything
 3. Name clearly
@@ -258,36 +281,40 @@ src/
 
 ## ⏱️ Time Investment
 
-| Document | Time | Benefit |
-|----------|------|---------|
-| INNGEST_SUMMARY.md | 15 min | Understand overall picture |
-| INNGEST_BEST_PRACTICES.md | 45 min | Learn all patterns and best practices |
-| INNGEST_QUICK_REFERENCE.md | Ongoing | Quick lookups (2-5 min per use) |
-| INNGEST_MESSAGING_PATTERNS.md | 30 min | Understand advanced patterns |
-| INNGEST_FOR_YOUR_PROJECT.md | 20 min | Learn what to build for your app |
-| **Total Initial** | **2-3 hours** | **Full mastery** |
+| Document                      | Time          | Benefit                               |
+| ----------------------------- | ------------- | ------------------------------------- |
+| INNGEST_SUMMARY.md            | 15 min        | Understand overall picture            |
+| INNGEST_BEST_PRACTICES.md     | 45 min        | Learn all patterns and best practices |
+| INNGEST_QUICK_REFERENCE.md    | Ongoing       | Quick lookups (2-5 min per use)       |
+| INNGEST_MESSAGING_PATTERNS.md | 30 min        | Understand advanced patterns          |
+| INNGEST_FOR_YOUR_PROJECT.md   | 20 min        | Learn what to build for your app      |
+| **Total Initial**             | **2-3 hours** | **Full mastery**                      |
 
 ---
 
 ## 🚀 Your Action Items
 
 ### Immediately (Today)
+
 - [ ] Read `INNGEST_SUMMARY.md`
 - [ ] Skim `INNGEST_QUICK_REFERENCE.md`
 - [ ] Review current workflows in your codebase
 
 ### This Week
+
 - [ ] Read `INNGEST_BEST_PRACTICES.md` completely
 - [ ] Review `INNGEST_FOR_YOUR_PROJECT.md`
 - [ ] Identify where to add new workflows
 
 ### This Sprint
+
 - [ ] Implement ticket creation workflow
 - [ ] Add comment notification workflow
 - [ ] Add account update notifications
 - [ ] Add concurrency limits to existing workflows
 
 ### Ongoing
+
 - [ ] Use `INNGEST_QUICK_REFERENCE.md` as daily lookup
 - [ ] Bookmark `INNGEST_MESSAGING_PATTERNS.md` for complex features
 - [ ] Reference `INNGEST_BEST_PRACTICES.md` when unsure
@@ -297,22 +324,27 @@ src/
 ## 💡 Quick Examples
 
 ### Example 1: Send Email on Signup
+
 See: `INNGEST_BEST_PRACTICES.md` → Pattern 1: Simple Event-Triggered
 Or: `INNGEST_QUICK_REFERENCE.md` → Patterns → Send an Event
 
 ### Example 2: Multi-Step Order Processing
+
 See: `INNGEST_BEST_PRACTICES.md` → Pattern 2: Multi-Step Orchestration
 Or: `INNGEST_MESSAGING_PATTERNS.md` → Pattern: Saga
 
 ### Example 3: Wait for Payment
+
 See: `INNGEST_BEST_PRACTICES.md` → Pattern 4: Wait for External Events
 Or: `INNGEST_QUICK_REFERENCE.md` → Patterns → Wait for Another Event
 
 ### Example 4: Complex Workflows
+
 See: `INNGEST_MESSAGING_PATTERNS.md` → Messaging Patterns section
 Or: `INNGEST_BEST_PRACTICES.md` → Performance & Optimization
 
 ### Example 5: For Your App
+
 See: `INNGEST_FOR_YOUR_PROJECT.md` → Suggested Enhancements
 
 ---
@@ -346,4 +378,3 @@ You now have a complete Inngest knowledge base for your project. Use this index 
 ---
 
 Last updated: November 2025
-

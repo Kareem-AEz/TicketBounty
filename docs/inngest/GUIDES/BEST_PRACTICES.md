@@ -7,6 +7,7 @@ A comprehensive guide to organizing event-driven workflows, messaging patterns, 
 ## 🚨 New to Inngest? Start Here First!
 
 Before diving into this comprehensive guide, **read [PITFALLS_AND_TIPS.md](./PITFALLS_AND_TIPS.md)** first. It covers:
+
 - 14 critical production pitfalls based on common patterns
 - Do's and Don'ts quick reference
 - Battle-tested patterns from production experience
@@ -51,12 +52,12 @@ app.post("/api/signup", async (req, res) => {
 // ✅ FAST: Emit event, let Inngest handle email
 app.post("/api/signup", async (req, res) => {
   const user = await createUser(req.body);
-  
+
   await inngest.send({
     name: "app/auth.sign-up-welcome-email-function",
-    data: { userId: user.id, email: user.email }
+    data: { userId: user.id, email: user.email },
   });
-  
+
   res.json({ success: true }); // Returns immediately
 });
 ```
@@ -232,7 +233,7 @@ export const eventSignUpWelcomeEmail = inngest.createFunction(
       emailSent: true,
       messageId: result.messageId,
     };
-  }
+  },
 );
 ```
 
@@ -282,7 +283,7 @@ export const processTicketWorkflow = inngest.createFunction(
     });
 
     return { ticketId, assignedTo: assignment.assignedTo };
-  }
+  },
 );
 ```
 
@@ -334,7 +335,7 @@ export const eventPrepareAdminDigest = inngest.createFunction(
         totalComments,
       },
     });
-  }
+  },
 );
 ```
 
@@ -357,7 +358,7 @@ export const eventSendAdminDigestEmail = inngest.createFunction(
     });
 
     return { success: true };
-  }
+  },
 );
 
 // Send to Discord simultaneously
@@ -378,7 +379,7 @@ export const eventSendAdminDigestDiscord = inngest.createFunction(
     });
 
     return { success: true };
-  }
+  },
 );
 ```
 
@@ -419,7 +420,7 @@ export const onboardUserWorkflow = inngest.createFunction(
     });
 
     return { status: "completed" };
-  }
+  },
 );
 ```
 
@@ -450,13 +451,13 @@ export const reliableWorkflow = inngest.createFunction(
           paymentId: event.data.paymentId,
           error: error instanceof Error ? error.message : String(error),
         },
-        "Payment processing failed"
+        "Payment processing failed",
       );
 
       // Rethrow to trigger Inngest's built-in retry mechanism
       throw error;
     }
-  }
+  },
 );
 ```
 
@@ -478,13 +479,13 @@ export const handleAnyFunctionFailure = inngest.createFunction(
           error: event.data.error,
           eventData: event.data,
         },
-        "Inngest function failed"
+        "Inngest function failed",
       );
 
       // Optional: Send alert to Slack, PagerDuty, etc.
       // await notifyOncall(event.data);
     });
-  }
+  },
 );
 ```
 
@@ -515,7 +516,7 @@ export const safePaymentWorkflow = inngest.createFunction(
         idempotency_key: paymentId, // Prevents duplicate charges
       });
     });
-  }
+  },
 );
 ```
 
@@ -541,7 +542,7 @@ export const emailWorkflow = inngest.createFunction(
     return await step.run("send-email", async () => {
       return await sendEmail(event.data.email);
     });
-  }
+  },
 );
 ```
 
@@ -564,7 +565,7 @@ export const batchedDigestWorkflow = inngest.createFunction(
     await step.run("send-batch", async () => {
       return await sendBatchEmails(pending);
     });
-  }
+  },
 );
 ```
 
@@ -583,7 +584,9 @@ export const parallelWorkflow = inngest.createFunction(
         return await checkInventory(event.data.items);
       }),
       step.run("process-payment", async () => {
-        return await stripe.charges.create({ /* ... */ });
+        return await stripe.charges.create({
+          /* ... */
+        });
       }),
       step.run("book-shipping", async () => {
         return await bookShipping(event.data.address);
@@ -591,7 +594,7 @@ export const parallelWorkflow = inngest.createFunction(
     ]);
 
     return { inventory, payment, shipping };
-  }
+  },
 );
 ```
 
@@ -610,7 +613,7 @@ export const delayedNotificationWorkflow = inngest.createFunction(
     await step.run("send-reminder", async () => {
       return await sendReminder(event.data.userId);
     });
-  }
+  },
 );
 ```
 
@@ -631,7 +634,7 @@ export const eventSignUpWelcomeEmail = inngest.createFunction(
   { event: "app/auth.sign-up-welcome-email-function" },
   async ({ event, step }) => {
     // ...
-  }
+  },
 );
 ```
 
@@ -645,9 +648,12 @@ export const debuggableWorkflow = inngest.createFunction(
   { event: "app/order.created" },
   async ({ event, step }) => {
     // ✅ GOOD: Specific, actionable
-    const inventory = await step.run("check-inventory-availability", async () => {
-      return await checkInventory(event.data.items);
-    });
+    const inventory = await step.run(
+      "check-inventory-availability",
+      async () => {
+        return await checkInventory(event.data.items);
+      },
+    );
 
     // ❌ AVOID: Too generic
     // const result = await step.run("check", async () => { ... });
@@ -659,7 +665,7 @@ export const debuggableWorkflow = inngest.createFunction(
     const shipping = await step.run("book-shipping-label", async () => {
       return await bookShipping(event.data.address);
     });
-  }
+  },
 );
 ```
 
@@ -678,7 +684,7 @@ export const observableWorkflow = inngest.createFunction(
 
     logger.info(
       { userId, event: "workflow_started" },
-      "Starting onboarding workflow"
+      "Starting onboarding workflow",
     );
 
     try {
@@ -689,18 +695,21 @@ export const observableWorkflow = inngest.createFunction(
 
       logger.info(
         { userId, messageId: result.messageId },
-        "Welcome email sent successfully"
+        "Welcome email sent successfully",
       );
 
       return result;
     } catch (error) {
       logger.error(
-        { userId, error: error instanceof Error ? error.message : String(error) },
-        "Workflow failed"
+        {
+          userId,
+          error: error instanceof Error ? error.message : String(error),
+        },
+        "Workflow failed",
       );
       throw error;
     }
-  }
+  },
 );
 ```
 
@@ -722,7 +731,7 @@ export const badWorkflow = inngest.createFunction(
   async ({ event }) => {
     const data = await fetchData(); // Direct call, not wrapped
     return data;
-  }
+  },
 );
 
 // ✅ GOOD: Wrapped in steps
@@ -734,7 +743,7 @@ export const goodWorkflow = inngest.createFunction(
       return await fetchData();
     });
     return data;
-  }
+  },
 );
 ```
 
@@ -807,7 +816,9 @@ await inngest.send({
 // ❌ BAD: No type safety
 inngest.send({
   name: "app/payment.completed",
-  data: { /* anything goes */ },
+  data: {
+    /* anything goes */
+  },
 });
 
 // ✅ GOOD: Strongly typed
@@ -894,4 +905,3 @@ export const { GET, POST, PUT } = serve({
 - [Event-Driven Architecture Patterns](https://www.inngest.com/patterns)
 - [Workflow Orchestration Best Practices](https://www.inngest.com/blog)
 - **[PITFALLS_AND_TIPS.md](./PITFALLS_AND_TIPS.md)** - Battle-tested production tips
-

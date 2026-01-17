@@ -24,12 +24,14 @@ This specification addresses improvements to the existing `scripts/ai-commit.ts`
 ### Current State Analysis
 
 **Token Efficiency Issues Identified:**
+
 - `MAX_DIFF_LENGTH = 100,000` characters (~25,000+ tokens for large diffs)
 - System prompt contains ~2,000 tokens with verbose, redundant examples
 - User prompt repeats instructions and includes full uncompressed diff
 - No diff summarization or prioritization strategy
 
 **Algorithm/Mechanism Issues Identified:**
+
 - Linear single-pass generation with no intelligent retry
 - Basic scope detection using simple string matching on file paths
 - Naive temperature adjustment (+0.1 on regenerate)
@@ -39,7 +41,7 @@ This specification addresses improvements to the existing `scripts/ai-commit.ts`
 
 ---
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Reduced Token Usage for Large Changesets (Priority: P1)
 
@@ -115,11 +117,12 @@ As a maintainer of this tool, I want the prompt to be maintainable, well-structu
 
 ---
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
 **Diff Processing & Compression:**
+
 - **FR-001**: System MUST summarize large diffs using statistical + heuristic analysis: line counts per file, change types (add/modify/delete), and file category classification — without additional LLM calls
 - **FR-002**: System MUST prioritize changes by semantic importance using heuristics: logic changes (function/class modifications) over formatting, new code over boilerplate, source files over generated/config files
 - **FR-003**: System MUST activate diff summarization when raw diff exceeds 10,000 characters (~2,500 tokens); handle larger diffs by intelligent compression rather than truncation
@@ -127,25 +130,30 @@ As a maintainer of this tool, I want the prompt to be maintainable, well-structu
 - **FR-005**: System MUST represent binary files as metadata only (filename, size change, change type) without including binary content in the prompt
 
 **Change Classification:**
+
 - **FR-006**: System MUST pre-analyze changes to classify the primary change type (feat/fix/refactor/chore/docs) before prompting
 - **FR-007**: System MUST detect the primary scope from file paths with improved heuristics beyond simple string matching
 - **FR-008**: System MUST identify when changes span multiple scopes and determine the dominant one
 
 **Prompt Optimization:**
+
 - **FR-009**: System MUST use a condensed prompt format that reduces token usage by at least 40%
 - **FR-010**: System MUST use structured output guidance to improve format consistency
 - **FR-011**: System MUST separate "analysis" instructions from "output format" instructions for clarity
 
 **Intelligent Retry:**
+
 - **FR-012**: System MUST track specific validation failures and include targeted correction guidance on retry
 - **FR-013**: System MUST use validation feedback to construct focused refinement prompts rather than regenerating from scratch
 - **FR-014**: System MUST limit retry attempts and provide clear guidance when multiple retries fail
 
 **Quality & Validation:**
+
 - **FR-015**: System MUST validate output format before presenting to user (conventional commit structure)
 - **FR-016**: System MUST warn users about potential issues (very short diff, binary files, sensitive content patterns)
 
 **Security:**
+
 - **FR-017**: System MUST scan diffs for sensitive data patterns (API keys, passwords, tokens, private keys) before sending to LLM
 - **FR-018**: When sensitive data is detected, system MUST display a warning and require explicit user confirmation ("y") to proceed
 
@@ -158,7 +166,7 @@ As a maintainer of this tool, I want the prompt to be maintainable, well-structu
 
 ---
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
