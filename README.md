@@ -30,6 +30,7 @@ This is a complete ticket management system that actually works and doesn't look
 ## The Tech Stack
 
 ### Main Technologies
+
 ```
 Next.js 16 (beta)  ━━━  The React framework everyone's using (App Router)
 React 19.2         ━━━  Latest React with React Compiler enabled
@@ -38,6 +39,7 @@ Tailwind CSS 4     ━━━  CSS utility classes (no more writing CSS files)
 ```
 
 ### Data & State
+
 ```
 Prisma ORM         ━━━  Makes database queries type-safe and easy
 PostgreSQL         ━━━  The database that stores everything
@@ -48,12 +50,14 @@ Zod                ━━━  Schema validation that actually makes sense
 ```
 
 ### Authentication & Security
+
 ```
 Lucia Auth         ━━━  Handles user sessions securely
 @node-rs/argon2    ━━━  Password hashing (the fast, secure kind)
 ```
 
 ### UI & Interactions
+
 ```
 shadcn/ui          ━━━  Pre-built components that look good
 Motion             ━━━  Makes things move smoothly (spring physics)
@@ -62,19 +66,20 @@ Sonner             ━━━  Toast notifications that don't get in the way
 Lucide React       ━━━  Icons that are actually nice
 ```
 
-
 ### Developer Experience
+
 ```
 ESLint             ━━━  Catches mistakes before you deploy
 Prettier           ━━━  Formats code consistently (no more style debates)
 Turbopack          ━━━  Fast builds and hot reload
- ```
+```
 
 ---
 
 ## How It's Organized
 
 ### File Structure (The Important Parts)
+
 ```
 src/
 ├── features/              # Everything organized by what it does
@@ -101,7 +106,9 @@ src/
 ```
 
 ### Database Setup
+
 Uses PostgreSQL with four main tables:
+
 - **Users** — Stores user accounts (username, email, hashed passwords)
 - **Sessions** — Keeps track of who's logged in
 - **Tickets** — All your ticket data (title, content, status, bounty, deadline)
@@ -112,6 +119,7 @@ Uses PostgreSQL with four main tables:
 ## The Nice Details
 
 ### Animations That Don't Annoy You
+
 - Buttons appear in sequence with a 68ms delay (fast enough to feel snappy, slow enough to notice)
 - Uses spring physics for smooth movement (not the jarring kind)
 - Everything works with keyboard navigation
@@ -119,29 +127,32 @@ Uses PostgreSQL with four main tables:
 - Dark mode transitions smoothly without flashing
 
 ### Language That Makes Sense
+
 - Uses friendly words: "Inspect" instead of "View", "Refine" instead of "Edit"
 - Loading messages that aren't boring: "Summoning your tickets..."
 - Error messages that actually help: "The universe hiccupped" (with instructions on what to do)
 - Button labels that tell you what they do
 
 ### Works for Everyone
+
 - Proper HTML structure for screen readers
 - Everything has labels for accessibility tools
 - You can navigate the entire app with just your keyboard
 - High contrast colors so text is actually readable
 - Focus indicators that are visible but not obnoxious
 
-
 ---
 
 ## Getting It Running
 
 ### What You Need
+
 - Node.js 18 or newer (check with `node --version`)
 - PostgreSQL database (local or hosted, something like Neon works great)
 - npm or yarn (whatever you prefer)
 
 ### Setup Steps
+
 ```bash
 # Install everything
 npm install
@@ -160,6 +171,7 @@ npm run dev           # Opens on http://localhost:3000
 ```
 
 ### Useful Commands
+
 ```bash
 npm run dev          # Start development with Turbopack (fast hot reload)
 npm run build        # Build for production
@@ -176,6 +188,7 @@ npm run seed         # Add sample data to database
 ## What's Working and What's Not
 
 ### ✅ Working Right Now
+
 - [x] User authentication (sign up, sign in, sessions)
 - [x] Full ticket management (create, edit, delete, view)
 - [x] Ticket bounties and deadlines (manage priorities)
@@ -195,12 +208,14 @@ npm run seed         # Add sample data to database
 - [ ] Mobile responsive (mostly works, could be better)
 
 ### 🔄 Recently Added
+
 - [x] React Compiler (automatic memoization, faster renders)
 - [x] Documentation suite (1,400+ lines of guides)
 - [x] Sidebar navigation (easier to get around)
 - [x] Toast notifications (feedback that doesn't block you)
 
 ### 📋 Maybe Someday Features
+
 - [ ] Team collaboration (share tickets with others)
 - [ ] File attachments (add images, documents to tickets)
 - [ ] Email notifications (get notified about updates)
@@ -231,6 +246,7 @@ This project tries to prove that apps can work well AND feel good to use. Every 
 This project follows **[The Road to Next](https://www.road-to-next.com)** by Robin Wieruch — a really good course about building modern web apps with Next.js.
 
 **What You'll Learn from This Code:**
+
 - Server Components and Server Actions (the new React way)
 - Authentication with Lucia (secure user sessions without the complexity)
 - Database stuff with Prisma (type-safe queries that prevent bugs)
@@ -256,12 +272,14 @@ Feel free to suggest improvements or report bugs. Just keep the code clean, main
 ## Documentation
 
 ### React Patterns
+
 - **[React Query Guide](REACT_QUERY_GUIDE.md)** — Server state management patterns
 - **[nuqs Guide](docs/NUQS_GUIDE.md)** — Type-safe URL search params
 
 ### Project Documentation
+
 - **[Project Overview](PROJECT.md)** — Architecture, patterns, and learning journey
 
 ---
 
-*Built with care for the details. Every interaction is intentional, even at 2am.*
+_Built with care for the details. Every interaction is intentional, even at 2am._

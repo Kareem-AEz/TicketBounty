@@ -23,6 +23,7 @@ A battle-tested guide to avoiding common mistakes and building reliable event-dr
 ### ❌ Pitfall #1: Not Wrapping Operations in `step.run()`
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: No automatic retries or observability
 export const badFunction = inngest.createFunction(
@@ -33,17 +34,19 @@ export const badFunction = inngest.createFunction(
     await db.payments.create({ chargeId: charge.id });
     await sendReceipt(event.data.email);
     return { success: true };
-  }
+  },
 );
 ```
 
 **Why It's Bad:**
+
 - If Stripe call fails, the entire function restarts from scratch
 - No visibility into which step failed
 - Database might end up in inconsistent state
 - Email might be sent multiple times
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Each step is isolated and retryable
 export const goodFunction = inngest.createFunction(
@@ -63,15 +66,17 @@ export const goodFunction = inngest.createFunction(
     });
 
     return { success: true, paymentId: payment.id };
-  }
+  },
 );
 ```
 
 **Real-World Impact:**
 Based on common production patterns, scenarios like this occur:
+
 > Example: "We lost $12K in payments because Stripe charges went through but our database writes failed. We had no way to recover because nothing was wrapped in steps."
 
 This pattern commonly leads to:
+
 - Payment processing inconsistencies
 - Revenue loss from unreconciled transactions
 - No recovery path when operations fail mid-process
@@ -81,38 +86,41 @@ This pattern commonly leads to:
 ### ❌ Pitfall #2: Blocking API Responses
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: User waits 2-5 seconds for email to send
 export async function POST(request: Request) {
   const user = await createUser(data);
-  
+
   // Blocks the response!
   await sendWelcomeEmail(user.email);
   await sendSlackNotification(user);
   await trackAnalytics(user.id);
-  
+
   return Response.json({ success: true }); // Finally returns after 5 seconds
 }
 ```
 
 **Why It's Bad:**
+
 - Slow API responses (2-5 seconds instead of <200ms)
 - Poor user experience
 - Increased serverless costs (longer execution time)
 - If email service is down, signup fails
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Return immediately, handle notifications in background
 export async function POST(request: Request) {
   const user = await createUser(data);
-  
+
   // Fire and forget - returns immediately
   await inngest.send({
     name: "app/user.created",
-    data: { userId: user.id, email: user.email }
+    data: { userId: user.id, email: user.email },
   });
-  
+
   return Response.json({ success: true }); // Returns in <200ms
 }
 
@@ -126,12 +134,13 @@ export const onUserCreated = inngest.createFunction(
       step.run("slack", async () => sendSlackNotification(event.data)),
       step.run("analytics", async () => trackAnalytics(event.data.userId)),
     ]);
-  }
+  },
 );
 ```
 
 **Common Impact Metrics:**
 Based on typical implementations:
+
 - API response time: 5s → 180ms (96% improvement)
 - User signup success rate: 94% → 99.8%
 
@@ -140,6 +149,7 @@ Based on typical implementations:
 ### ❌ Pitfall #3: Missing Timeout on `waitForEvent()`
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: Could wait forever, resources never released
 export const orderWorkflow = inngest.createFunction(
@@ -153,23 +163,25 @@ export const orderWorkflow = inngest.createFunction(
     // Waits indefinitely!
     const payment = await step.waitForEvent("wait-payment", {
       event: "app/payment.received",
-      if: "async.data.orderId == event.data.orderId"
+      if: "async.data.orderId == event.data.orderId",
     });
 
     await step.run("ship-order", async () => {
       return await shipOrder(event.data.orderId);
     });
-  }
+  },
 );
 ```
 
 **Why It's Bad:**
+
 - Workflows never complete if payment never comes
 - Resources leak (database connections, memory)
 - No way to handle abandoned carts
 - Dashboard shows "running" workflows forever
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Explicit timeout with fallback handling
 export const orderWorkflow = inngest.createFunction(
@@ -184,7 +196,7 @@ export const orderWorkflow = inngest.createFunction(
     const payment = await step.waitForEvent("wait-payment", {
       event: "app/payment.received",
       timeout: "7d",
-      if: "async.data.orderId == event.data.orderId"
+      if: "async.data.orderId == event.data.orderId",
     });
 
     if (!payment) {
@@ -192,24 +204,25 @@ export const orderWorkflow = inngest.createFunction(
       await step.run("cancel-order", async () => {
         return await cancelOrder(event.data.orderId);
       });
-      
+
       await step.run("notify-timeout", async () => {
         return await sendAbandonedCartEmail(event.data.customerId);
       });
-      
+
       return { status: "cancelled" };
     }
 
     await step.run("ship-order", async () => {
       return await shipOrder(event.data.orderId);
     });
-    
+
     return { status: "completed" };
-  }
+  },
 );
 ```
 
 **Best Practice:** Always set timeouts. Typical values based on use case:
+
 - Payment: `24h` - `7d`
 - User actions: `1h` - `24h`
 - External webhooks: `5m` - `1h`
@@ -219,6 +232,7 @@ export const orderWorkflow = inngest.createFunction(
 ### ❌ Pitfall #4: Ignoring Idempotency
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: Retries can charge customer multiple times
 export const chargeCustomer = inngest.createFunction(
@@ -229,23 +243,25 @@ export const chargeCustomer = inngest.createFunction(
       // No idempotency key!
       return await stripe.charges.create({
         amount: event.data.amount,
-        customer: event.data.customerId
+        customer: event.data.customerId,
       });
     });
-    
+
     await step.run("save", async () => {
       return await db.charges.create({ chargeId: charge.id });
     });
-  }
+  },
 );
 ```
 
 **Why It's Bad:**
+
 - If function retries, customer gets charged multiple times
 - No way to detect duplicate operations
 - Angry customers and refund requests
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Idempotent with database checks and Stripe idempotency keys
 export const chargeCustomer = inngest.createFunction(
@@ -253,37 +269,37 @@ export const chargeCustomer = inngest.createFunction(
   { event: "app/order.confirmed" },
   async ({ event, step }) => {
     const orderId = event.data.orderId;
-    
+
     // Check if already processed
     const existing = await step.run("check-existing", async () => {
       return await db.charges.findUnique({
-        where: { orderId }
+        where: { orderId },
       });
     });
-    
+
     if (existing) {
       return { alreadyProcessed: true, chargeId: existing.chargeId };
     }
-    
+
     const charge = await step.run("charge", async () => {
       // Idempotency key prevents duplicate charges
       return await stripe.charges.create({
         amount: event.data.amount,
         customer: event.data.customerId,
-        idempotency_key: orderId // Critical!
+        idempotency_key: orderId, // Critical!
       });
     });
-    
+
     const saved = await step.run("save", async () => {
       return await db.charges.create({
         orderId,
         chargeId: charge.id,
-        amount: event.data.amount
+        amount: event.data.amount,
       });
     });
-    
+
     return { success: true, chargeId: saved.chargeId };
-  }
+  },
 );
 ```
 
@@ -296,6 +312,7 @@ export const chargeCustomer = inngest.createFunction(
 ### ❌ Pitfall #5: No Concurrency Limits
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: Can overwhelm your email service
 export const sendNotification = inngest.createFunction(
@@ -305,7 +322,7 @@ export const sendNotification = inngest.createFunction(
     await step.run("send-email", async () => {
       return await sendgrid.send(event.data);
     });
-  }
+  },
 );
 
 // If 10,000 events come in, 10,000 emails try to send simultaneously
@@ -313,12 +330,14 @@ await inngest.send([...Array(10000).map(/* notification events */)]);
 ```
 
 **Why It's Bad:**
+
 - Email service rate limits hit (SendGrid, Postmark, etc.)
 - API returns 429 errors
 - Database connections exhausted
 - Costs spike from retries
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Controlled concurrency
 export const sendNotification = inngest.createFunction(
@@ -326,19 +345,20 @@ export const sendNotification = inngest.createFunction(
     id: "send-notification",
     concurrency: {
       key: "event.data.userId",
-      limit: 5 // Max 5 emails per user at once
-    }
+      limit: 5, // Max 5 emails per user at once
+    },
   },
   { event: "app/notification.send" },
   async ({ event, step }) => {
     await step.run("send-email", async () => {
       return await sendgrid.send(event.data);
     });
-  }
+  },
 );
 ```
 
 **Better: Account-level concurrency**
+
 ```typescript
 // ✅ BEST: Global concurrency for shared resources
 export const sendNotification = inngest.createFunction(
@@ -346,23 +366,25 @@ export const sendNotification = inngest.createFunction(
     id: "send-notification",
     concurrency: {
       key: "'global-email-queue'", // Single queue for all emails
-      limit: 100 // Max 100 emails across all users
-    }
+      limit: 100, // Max 100 emails across all users
+    },
   },
   { event: "app/notification.send" },
   async ({ event, step }) => {
     await step.run("send-email", async () => {
       return await sendgrid.send(event.data);
     });
-  }
+  },
 );
 ```
 
 **Real-World Example:**
 Based on common production incidents with email service providers:
+
 > Example scenario: "We sent 50,000 welcome emails in 2 minutes when a batch import succeeded. SendGrid blocked us for 24 hours."
 
 This pattern commonly leads to:
+
 - Email service rate limit violations
 - Temporary or permanent API blocks
 - Customer communication failures
@@ -372,6 +394,7 @@ This pattern commonly leads to:
 ### ❌ Pitfall #6: Sequential Steps That Could Be Parallel
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: Takes 15 seconds (5s + 5s + 5s)
 export const processOrder = inngest.createFunction(
@@ -381,26 +404,28 @@ export const processOrder = inngest.createFunction(
     const inventory = await step.run("check-inventory", async () => {
       return await checkInventory(event.data.items); // 5 seconds
     });
-    
+
     const shipping = await step.run("calculate-shipping", async () => {
       return await calculateShipping(event.data.address); // 5 seconds
     });
-    
+
     const tax = await step.run("calculate-tax", async () => {
       return await calculateTax(event.data.amount); // 5 seconds
     });
-    
+
     return { inventory, shipping, tax };
-  }
+  },
 );
 ```
 
 **Why It's Bad:**
+
 - Unnecessarily slow (15 seconds instead of 5)
 - Higher costs (3x execution time)
 - Poor customer experience
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Takes 5 seconds (parallel execution)
 export const processOrder = inngest.createFunction(
@@ -417,11 +442,11 @@ export const processOrder = inngest.createFunction(
       }),
       step.run("calculate-tax", async () => {
         return await calculateTax(event.data.amount);
-      })
+      }),
     ]);
-    
+
     return { inventory, shipping, tax };
-  }
+  },
 );
 ```
 
@@ -432,6 +457,7 @@ export const processOrder = inngest.createFunction(
 ### ❌ Pitfall #7: Processing Items One-by-One Instead of Batching
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: Processes 10,000 notifications individually
 export const sendDailyDigest = inngest.createFunction(
@@ -441,23 +467,25 @@ export const sendDailyDigest = inngest.createFunction(
     const users = await step.run("fetch-users", async () => {
       return await db.users.findMany(); // 10,000 users
     });
-    
+
     // Creates 10,000 separate events!
     for (const user of users) {
       await step.run(`send-to-${user.id}`, async () => {
         return await sendEmail(user.email);
       });
     }
-  }
+  },
 );
 ```
 
 **Why It's Bad:**
+
 - 10,000 step executions = expensive
 - Slow (sequential processing)
 - Poor observability (10,000 steps in dashboard)
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Batch processing
 export const sendDailyDigest = inngest.createFunction(
@@ -467,24 +495,25 @@ export const sendDailyDigest = inngest.createFunction(
     const users = await step.run("fetch-users", async () => {
       return await db.users.findMany();
     });
-    
+
     // Process in batches of 100
     const batches = chunk(users, 100);
-    
+
     for (let i = 0; i < batches.length; i++) {
       await step.run(`send-batch-${i}`, async () => {
         return await Promise.all(
-          batches[i].map(user => sendEmail(user.email))
+          batches[i].map((user) => sendEmail(user.email)),
         );
       });
     }
-    
+
     return { totalSent: users.length };
-  }
+  },
 );
 ```
 
 **Better: Fan-out pattern**
+
 ```typescript
 // ✅ BEST: Emit events for separate processing
 export const prepareDigest = inngest.createFunction(
@@ -494,31 +523,31 @@ export const prepareDigest = inngest.createFunction(
     const users = await step.run("fetch-users", async () => {
       return await db.users.findMany();
     });
-    
+
     // Emit individual events (fan-out)
     await step.run("emit-events", async () => {
       return await inngest.send(
-        users.map(user => ({
+        users.map((user) => ({
           name: "app/digest.send",
-          data: { userId: user.id, email: user.email }
-        }))
+          data: { userId: user.id, email: user.email },
+        })),
       );
     });
-  }
+  },
 );
 
 // Separate function with concurrency control
 export const sendDigest = inngest.createFunction(
   {
     id: "send-digest",
-    concurrency: { limit: 50 } // Max 50 at once
+    concurrency: { limit: 50 }, // Max 50 at once
   },
   { event: "app/digest.send" },
   async ({ event, step }) => {
     await step.run("send", async () => {
       return await sendEmail(event.data.email);
     });
-  }
+  },
 );
 ```
 
@@ -529,6 +558,7 @@ export const sendDigest = inngest.createFunction(
 ### ❌ Pitfall #8: Overloading a Single Event
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: One event does too much
 export const onUserCreated = inngest.createFunction(
@@ -536,25 +566,43 @@ export const onUserCreated = inngest.createFunction(
   { event: "app/user.created" },
   async ({ event, step }) => {
     // Too many responsibilities in one function!
-    await step.run("send-welcome-email", async () => {/*...*/});
-    await step.run("send-slack-notification", async () => {/*...*/});
-    await step.run("create-stripe-customer", async () => {/*...*/});
-    await step.run("add-to-crm", async () => {/*...*/});
-    await step.run("send-to-analytics", async () => {/*...*/});
-    await step.run("provision-trial", async () => {/*...*/});
-    await step.run("send-sms", async () => {/*...*/});
-    await step.run("update-data-warehouse", async () => {/*...*/});
-  }
+    await step.run("send-welcome-email", async () => {
+      /*...*/
+    });
+    await step.run("send-slack-notification", async () => {
+      /*...*/
+    });
+    await step.run("create-stripe-customer", async () => {
+      /*...*/
+    });
+    await step.run("add-to-crm", async () => {
+      /*...*/
+    });
+    await step.run("send-to-analytics", async () => {
+      /*...*/
+    });
+    await step.run("provision-trial", async () => {
+      /*...*/
+    });
+    await step.run("send-sms", async () => {
+      /*...*/
+    });
+    await step.run("update-data-warehouse", async () => {
+      /*...*/
+    });
+  },
 );
 ```
 
 **Why It's Bad:**
+
 - Hard to maintain (8 different concerns)
 - If one step fails, everything retries
 - Can't enable/disable individual features
 - Debugging nightmare
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Separate functions for separate concerns
 export const sendWelcomeEmail = inngest.createFunction(
@@ -564,7 +612,7 @@ export const sendWelcomeEmail = inngest.createFunction(
     await step.run("send-email", async () => {
       return await sendEmail(event.data);
     });
-  }
+  },
 );
 
 export const notifyTeam = inngest.createFunction(
@@ -574,7 +622,7 @@ export const notifyTeam = inngest.createFunction(
     await step.run("send-slack", async () => {
       return await slack.notify(event.data);
     });
-  }
+  },
 );
 
 export const createStripeCustomer = inngest.createFunction(
@@ -584,13 +632,14 @@ export const createStripeCustomer = inngest.createFunction(
     await step.run("create-customer", async () => {
       return await stripe.customers.create(event.data);
     });
-  }
+  },
 );
 
 // ... separate functions for each concern
 ```
 
 **Benefits:**
+
 - Easy to disable individual features
 - Clear observability (see which step failed)
 - Independent retry policies
@@ -601,6 +650,7 @@ export const createStripeCustomer = inngest.createFunction(
 ### ❌ Pitfall #9: Not Using Event Schemas
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: No type safety
 export const inngest = new Inngest({ id: "my-app" });
@@ -612,17 +662,19 @@ await inngest.send({
     userID: "123", // Should be userId (typo)
     emial: "test@example.com", // Should be email (typo)
     // Missing required fields
-  }
+  },
 });
 ```
 
 **Why It's Bad:**
+
 - No compile-time errors
 - Bugs discovered in production
 - Inconsistent event shapes
 - Poor developer experience
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Strongly typed events
 import { EventSchemas } from "inngest";
@@ -648,7 +700,7 @@ type Events = {
 
 export const inngest = new Inngest({
   id: "my-app",
-  schemas: new EventSchemas().fromRecord<Events>()
+  schemas: new EventSchemas().fromRecord<Events>(),
 });
 
 // Now you get type checking!
@@ -658,9 +710,9 @@ await inngest.send({
     userId: "123", // ✓ Correct
     email: "test@example.com", // ✓ Correct
     name: "John",
-    createdAt: new Date()
+    createdAt: new Date(),
     // TypeScript error if fields are missing!
-  }
+  },
 });
 ```
 
@@ -669,33 +721,37 @@ await inngest.send({
 ### ❌ Pitfall #10: Poor Event Naming
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: Inconsistent, unclear names
-"sendEmail"
-"user_signup"
-"processPayment"
-"onOrderCreated"
-"notification-sent"
-"stripe.webhook.received"
+"sendEmail";
+"user_signup";
+"processPayment";
+"onOrderCreated";
+"notification-sent";
+"stripe.webhook.received";
 ```
 
 **Why It's Bad:**
+
 - Hard to understand what happened vs. what should happen
 - No clear hierarchy or organization
 - Mixing conventions (camelCase, snake_case, kebab-case)
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Consistent, hierarchical naming
-"app/email.send-requested"       // Clear: action requested
-"app/user.signed-up"             // Clear: past tense event
-"app/payment.process-requested"  // Clear: command
-"app/order.created"              // Clear: domain event
-"app/notification.sent"          // Clear: completed action
-"app/stripe.webhook-received"    // Clear: external event
+"app/email.send-requested"; // Clear: action requested
+"app/user.signed-up"; // Clear: past tense event
+"app/payment.process-requested"; // Clear: command
+"app/order.created"; // Clear: domain event
+"app/notification.sent"; // Clear: completed action
+"app/stripe.webhook-received"; // Clear: external event
 ```
 
 **Naming Convention:**
+
 ```
 app/[domain].[event-or-action]
 
@@ -711,6 +767,7 @@ Action: imperative (send, process, notify)
 ### ❌ Pitfall #11: Sensitive Data in Event Payloads
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: Sending sensitive data through events
 await inngest.send({
@@ -720,18 +777,20 @@ await inngest.send({
     email: "user@example.com",
     password: "plaintextPassword123", // Never do this!
     creditCard: "4242-4242-4242-4242", // Never do this!
-    ssn: "123-45-6789" // Never do this!
-  }
+    ssn: "123-45-6789", // Never do this!
+  },
 });
 ```
 
 **Why It's Bad:**
+
 - Events are logged and stored
 - Could be exposed in dashboards
 - Violates PCI-DSS, GDPR, etc.
 - Security audit nightmare
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Only send IDs and public data
 await inngest.send({
@@ -740,7 +799,7 @@ await inngest.send({
     userId: "123",
     email: "user@example.com", // OK if needed
     // Fetch sensitive data inside the function when needed
-  }
+  },
 });
 
 export const onUserCreated = inngest.createFunction(
@@ -755,14 +814,15 @@ export const onUserCreated = inngest.createFunction(
           id: true,
           email: true,
           // Get what you need here
-        }
+        },
       });
     });
-  }
+  },
 );
 ```
 
 **Golden Rules:**
+
 - ✅ Send: IDs, timestamps, public metadata
 - ❌ Never send: passwords, tokens, credit cards, SSNs, API keys
 
@@ -771,6 +831,7 @@ export const onUserCreated = inngest.createFunction(
 ### ❌ Pitfall #12: No Error Monitoring
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: Silent failures
 export const processPayment = inngest.createFunction(
@@ -785,17 +846,19 @@ export const processPayment = inngest.createFunction(
       // Error swallowed - no one knows this failed!
       console.log("Payment failed");
     }
-  }
+  },
 );
 ```
 
 **Why It's Bad:**
+
 - Failures go unnoticed
 - Customers don't get charged
 - No alerts to on-call team
 - Revenue loss
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Structured logging and alerting
 import logger from "@/lib/logger";
@@ -808,12 +871,12 @@ export const processPayment = inngest.createFunction(
       const charge = await step.run("charge", async () => {
         return await stripe.charges.create(event.data);
       });
-      
+
       logger.info(
         { chargeId: charge.id, amount: event.data.amount },
-        "Payment processed successfully"
+        "Payment processed successfully",
       );
-      
+
       return charge;
     } catch (error) {
       // Structured error logging
@@ -822,15 +885,15 @@ export const processPayment = inngest.createFunction(
           orderId: event.data.orderId,
           amount: event.data.amount,
           error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined
+          stack: error instanceof Error ? error.stack : undefined,
         },
-        "Payment processing failed"
+        "Payment processing failed",
       );
-      
+
       // Rethrow so Inngest retries
       throw error;
     }
-  }
+  },
 );
 
 // Global failure handler
@@ -843,10 +906,10 @@ export const handleFailure = inngest.createFunction(
       return await slack.notify({
         channel: "#alerts",
         text: `🚨 Function failed: ${event.data.function_id}`,
-        error: event.data.error
+        error: event.data.error,
       });
     });
-  }
+  },
 );
 ```
 
@@ -857,17 +920,20 @@ export const handleFailure = inngest.createFunction(
 ### ❌ Pitfall #13: Testing Only in Production
 
 **The Mistake:**
+
 ```typescript
 // Push code → Deploy → Hope it works 🤞
 // (No local testing)
 ```
 
 **Why It's Bad:**
+
 - Bugs caught by users, not developers
 - Expensive to fix in production
 - Poor development cycle
 
 **The Fix:**
+
 ```bash
 # ✅ GOOD: Local development workflow
 
@@ -882,6 +948,7 @@ npm run dev
 ```
 
 **Local Testing Pattern:**
+
 ```typescript
 // Create test endpoint for local development
 // app/api/test/trigger-event/route.ts
@@ -891,10 +958,10 @@ export async function GET() {
     data: {
       userId: "test-123",
       email: "test@example.com",
-      name: "Test User"
-    }
+      name: "Test User",
+    },
   });
-  
+
   return Response.json({ triggered: true });
 }
 
@@ -907,47 +974,63 @@ export async function GET() {
 ### ❌ Pitfall #14: Not Using Step Names Effectively
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: Generic step names
 export const processOrder = inngest.createFunction(
   { id: "process-order" },
   { event: "app/order.created" },
   async ({ event, step }) => {
-    const a = await step.run("step1", async () => {/*...*/});
-    const b = await step.run("step2", async () => {/*...*/});
-    const c = await step.run("step3", async () => {/*...*/});
-  }
+    const a = await step.run("step1", async () => {
+      /*...*/
+    });
+    const b = await step.run("step2", async () => {
+      /*...*/
+    });
+    const c = await step.run("step3", async () => {
+      /*...*/
+    });
+  },
 );
 ```
 
 **Why It's Bad:**
+
 - Dashboard shows "step1 failed" - which operation was that?
 - Hard to debug in production
 - Poor observability
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Descriptive, actionable step names
 export const processOrder = inngest.createFunction(
   { id: "process-order" },
   { event: "app/order.created" },
   async ({ event, step }) => {
-    const inventory = await step.run("check-inventory-availability", async () => {
-      return await inventory.check(event.data.items);
-    });
-    
-    const payment = await step.run("charge-customer-payment-method", async () => {
-      return await stripe.charges.create(event.data.payment);
-    });
-    
+    const inventory = await step.run(
+      "check-inventory-availability",
+      async () => {
+        return await inventory.check(event.data.items);
+      },
+    );
+
+    const payment = await step.run(
+      "charge-customer-payment-method",
+      async () => {
+        return await stripe.charges.create(event.data.payment);
+      },
+    );
+
     const shipping = await step.run("create-shipping-label", async () => {
       return await fedex.createLabel(event.data.address);
     });
-  }
+  },
 );
 ```
 
 **Best Practices for Step Names:**
+
 - Use verb-noun format: "send-welcome-email", "charge-payment-method"
 - Be specific: "validate-credit-card" not "validate"
 - Avoid abbreviations: "calculate-shipping-cost" not "calc-ship"
@@ -959,6 +1042,7 @@ export const processOrder = inngest.createFunction(
 ### ✅ Do's
 
 #### Event Design
+
 - ✅ **Do** use past tense for events: `user.created`, `payment.processed`
 - ✅ **Do** use imperative for commands: `email.send`, `payment.process`
 - ✅ **Do** namespace events: `app/[domain].[action]`
@@ -966,6 +1050,7 @@ export const processOrder = inngest.createFunction(
 - ✅ **Do** send only IDs and minimal public data in events
 
 #### Function Design
+
 - ✅ **Do** wrap all operations in `step.run()`
 - ✅ **Do** use descriptive step names
 - ✅ **Do** make functions idempotent
@@ -973,18 +1058,21 @@ export const processOrder = inngest.createFunction(
 - ✅ **Do** handle timeout scenarios gracefully
 
 #### Performance
+
 - ✅ **Do** set concurrency limits for shared resources
 - ✅ **Do** run independent steps in parallel with `Promise.all()`
 - ✅ **Do** batch process large datasets
 - ✅ **Do** use fan-out pattern for high-volume processing
 
 #### Error Handling
+
 - ✅ **Do** use structured logging with context
 - ✅ **Do** set up global failure handler
 - ✅ **Do** rethrow errors to trigger automatic retries
 - ✅ **Do** alert team on critical failures
 
 #### Testing
+
 - ✅ **Do** test locally with `inngest dev`
 - ✅ **Do** create test endpoints for development
 - ✅ **Do** monitor metrics in production
@@ -995,30 +1083,35 @@ export const processOrder = inngest.createFunction(
 ### ❌ Don'ts
 
 #### Event Design
+
 - ❌ **Don't** send sensitive data in event payloads
 - ❌ **Don't** use inconsistent naming conventions
 - ❌ **Don't** create overly broad events that do too much
 - ❌ **Don't** skip type definitions
 
 #### Function Design
+
 - ❌ **Don't** skip wrapping operations in steps
 - ❌ **Don't** make functions that aren't idempotent
 - ❌ **Don't** use generic step names like "step1", "process"
 - ❌ **Don't** forget timeouts on `waitForEvent()`
 
 #### Performance
+
 - ❌ **Don't** process large datasets without batching
 - ❌ **Don't** run independent operations sequentially
 - ❌ **Don't** ignore concurrency limits
 - ❌ **Don't** create infinite retry loops
 
 #### Architecture
+
 - ❌ **Don't** block API responses waiting for workflows
 - ❌ **Don't** put 8+ responsibilities in one function
 - ❌ **Don't** skip organizing functions by feature
 - ❌ **Don't** ignore scaling considerations
 
 #### Production
+
 - ❌ **Don't** deploy without testing locally first
 - ❌ **Don't** ignore errors silently
 - ❌ **Don't** skip monitoring and alerting
@@ -1132,4 +1225,3 @@ Do I need to enable/disable features independently?
 
 **Last Updated:** November 2025  
 **Status:** Battle-tested in production ✓
-

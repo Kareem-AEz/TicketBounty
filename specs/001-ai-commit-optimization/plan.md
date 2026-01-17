@@ -8,6 +8,7 @@
 Optimize the existing `scripts/ai-commit.ts` CLI tool to reduce token usage by 50% through intelligent diff summarization using statistical + heuristic analysis (no additional LLM calls), improve commit message quality with pre-analysis change classification, and implement intelligent retry mechanisms with targeted correction guidance.
 
 **Key Technical Decisions (from Clarifications):**
+
 - Diff summarization: Statistical + heuristic analysis (deterministic, no LLM)
 - Compression threshold: 10,000 characters (~2,500 tokens)
 - Quality tradeoff: Maintain quality for <100 files; graceful degradation for edge cases
@@ -28,17 +29,17 @@ Optimize the existing `scripts/ai-commit.ts` CLI tool to reduce token usage by 5
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-| Principle | Applies | Status | Notes |
-|-----------|---------|--------|-------|
-| I. Feature-Based Architecture | ❌ N/A | — | Standalone CLI script in `scripts/` |
-| II. Server-First Rendering | ❌ N/A | — | Not a web application |
-| III. Type Safety Everywhere | ✅ Yes | ✅ Pass | TypeScript with proper interfaces |
-| IV. React Query for Server State | ❌ N/A | — | No React/web involved |
-| V. URL State for Shareability | ❌ N/A | — | CLI tool |
-| VI. Accessibility as Foundation | ❌ N/A | — | CLI tool (terminal output) |
-| VII. Clean Code Standards | ✅ Yes | ✅ Pass | ESLint + Prettier compatible |
+| Principle                        | Applies | Status  | Notes                               |
+| -------------------------------- | ------- | ------- | ----------------------------------- |
+| I. Feature-Based Architecture    | ❌ N/A  | —       | Standalone CLI script in `scripts/` |
+| II. Server-First Rendering       | ❌ N/A  | —       | Not a web application               |
+| III. Type Safety Everywhere      | ✅ Yes  | ✅ Pass | TypeScript with proper interfaces   |
+| IV. React Query for Server State | ❌ N/A  | —       | No React/web involved               |
+| V. URL State for Shareability    | ❌ N/A  | —       | CLI tool                            |
+| VI. Accessibility as Foundation  | ❌ N/A  | —       | CLI tool (terminal output)          |
+| VII. Clean Code Standards        | ✅ Yes  | ✅ Pass | ESLint + Prettier compatible        |
 
 **Gate Status**: ✅ PASSED — No constitution violations
 
@@ -117,22 +118,23 @@ interface DiffSummary {
   files: FileSummary[];
   totalAdditions: number;
   totalDeletions: number;
-  primaryCategory: 'feature' | 'fix' | 'refactor' | 'chore' | 'docs' | 'style';
-  compressedDiff: string;  // Used when raw diff > 10,000 chars
+  primaryCategory: "feature" | "fix" | "refactor" | "chore" | "docs" | "style";
+  compressedDiff: string; // Used when raw diff > 10,000 chars
 }
 
 interface FileSummary {
   path: string;
-  changeType: 'add' | 'modify' | 'delete';
+  changeType: "add" | "modify" | "delete";
   additions: number;
   deletions: number;
   category: FileCategory;
   isBinary: boolean;
-  keyChanges: string[];  // Top 3-5 significant changes
+  keyChanges: string[]; // Top 3-5 significant changes
 }
 ```
 
 **Heuristics for semantic importance (FR-002):**
+
 1. Source files (.ts, .tsx, .js, .jsx, .py, etc.) > Config files
 2. Logic changes (function/class mods) > Formatting changes
 3. New code > Removed code > Modified code
@@ -145,22 +147,31 @@ interface FileSummary {
 
 ```typescript
 interface ChangeClassification {
-  type: 'feat' | 'fix' | 'refactor' | 'chore' | 'docs' | 'style' | 'test' | 'perf';
+  type:
+    | "feat"
+    | "fix"
+    | "refactor"
+    | "chore"
+    | "docs"
+    | "style"
+    | "test"
+    | "perf";
   scope: string;
-  confidence: 'high' | 'medium' | 'low';
+  confidence: "high" | "medium" | "low";
   secondaryScopes: string[];
-  reasoning: string;  // For debugging
+  reasoning: string; // For debugging
 }
 ```
 
 **Classification heuristics:**
+
 - `feat`: New files added, new exports, new functions with public signatures
 - `fix`: Changes to existing logic, error handling modifications
 - `refactor`: Renames, restructuring without behavior change
 - `chore`: Config files, dependencies, scripts, build tools
 - `docs`: .md files, JSDoc comments, README changes
 - `style`: Formatting only (detected via whitespace-only changes)
-- `test`: Test files (.test.ts, .spec.ts, __tests__/)
+- `test`: Test files (.test.ts, .spec.ts, **tests**/)
 - `perf`: Performance-related keywords in diff (cache, optimize, memoize)
 
 ### 3. Condensed Prompt (FR-009 through FR-011)
@@ -168,6 +179,7 @@ interface ChangeClassification {
 **Target**: 40% reduction in system prompt tokens (~800 tokens instead of ~2,000)
 
 **Strategy:**
+
 - Remove verbose examples (keep 1 good, 1 bad)
 - Convert bullet lists to concise format
 - Remove redundant "CRITICAL" markers
@@ -183,18 +195,19 @@ interface ValidationResult {
   isValid: boolean;
   errors: string[];
   warnings: string[];
-  suggestedCorrections: CorrectionHint[];  // NEW
+  suggestedCorrections: CorrectionHint[]; // NEW
 }
 
 interface CorrectionHint {
-  issue: 'subject_too_long' | 'missing_bullets' | 'wrong_format' | 'wrong_type';
+  issue: "subject_too_long" | "missing_bullets" | "wrong_format" | "wrong_type";
   suggestion: string;
-  priority: 'must_fix' | 'should_fix';
+  priority: "must_fix" | "should_fix";
 }
 ```
 
 **Refinement prompt (for retry):**
 Instead of regenerating from scratch, include specific correction guidance:
+
 - "Previous subject was 67 chars. Shorten to under 50 while preserving meaning."
 - "Missing bullet points. Add 2-3 bullets explaining the key changes."
 - "Format invalid. Ensure format: type(scope): subject"
@@ -215,6 +228,7 @@ const SENSITIVE_PATTERNS = [
 ```
 
 **User flow when detected:**
+
 ```
 ⚠️  Potential sensitive data detected in diff:
    - Line 45: Possible API key pattern

@@ -9,6 +9,7 @@ One-page reference for the most common tasks and patterns.
 ## 🔧 Basic Setup
 
 ### Define Event Types
+
 ```typescript
 // src/lib/inngest.ts
 import { EventSchemas, Inngest } from "inngest";
@@ -29,6 +30,7 @@ export const inngest = new Inngest({
 ```
 
 ### Create a Function
+
 ```typescript
 // src/features/feature/events/event-action.ts
 export const eventAction = inngest.createFunction(
@@ -39,11 +41,12 @@ export const eventAction = inngest.createFunction(
       return await someService.do(event.data);
     });
     return result;
-  }
+  },
 );
 ```
 
 ### Register Functions
+
 ```typescript
 // src/app/api/inngest/route.ts
 export const { GET, POST, PUT } = serve({
@@ -61,15 +64,17 @@ export const { GET, POST, PUT } = serve({
 ## 📤 Triggering Events
 
 ### Send Event (Fire & Forget)
+
 ```typescript
 await inngest.send({
   name: "app/feature.action",
-  data: { userId: "123", email: "user@example.com" }
+  data: { userId: "123", email: "user@example.com" },
 });
 // Returns immediately - no wait for processing
 ```
 
 ### Send Multiple Events
+
 ```typescript
 await inngest.send([
   { name: "app/event.one", data: {...} },
@@ -78,10 +83,11 @@ await inngest.send([
 ```
 
 ### Send Event from Workflow
+
 ```typescript
 await step.sendEvent("trigger-next", {
   name: "app/next-step",
-  data: { userId: event.data.userId }
+  data: { userId: event.data.userId },
 });
 ```
 
@@ -90,6 +96,7 @@ await step.sendEvent("trigger-next", {
 ## ⚙️ Step Operations
 
 ### Run Code with Retries
+
 ```typescript
 const result = await step.run("operation-name", async () => {
   return await someAsyncFunction();
@@ -98,18 +105,20 @@ const result = await step.run("operation-name", async () => {
 ```
 
 ### Sleep/Delay
+
 ```typescript
-await step.sleep("wait-period", "24h");  // 24 hours
-await step.sleep("wait-period", "5m");   // 5 minutes
-await step.sleep("wait-period", "30s");  // 30 seconds
+await step.sleep("wait-period", "24h"); // 24 hours
+await step.sleep("wait-period", "5m"); // 5 minutes
+await step.sleep("wait-period", "30s"); // 30 seconds
 ```
 
 ### Wait for Event
+
 ```typescript
 const event = await step.waitForEvent("wait-name", {
   event: "app/payment.succeeded",
   timeout: "24h",
-  if: "async.data.orderId == event.data.orderId"
+  if: "async.data.orderId == event.data.orderId",
 });
 
 if (!event) {
@@ -118,6 +127,7 @@ if (!event) {
 ```
 
 ### Run in Parallel
+
 ```typescript
 const [user, orders, settings] = await Promise.all([
   step.run("get-user", async () => getUser()),
@@ -131,20 +141,33 @@ const [user, orders, settings] = await Promise.all([
 ## 🎯 Triggers
 
 ### Event-Triggered
+
 ```typescript
-{ event: "app/feature.action" }
+{
+  event: "app/feature.action";
+}
 ```
 
 ### Scheduled (Cron)
+
 ```typescript
-{ cron: "0 0 * * *" }     // Midnight daily
-{ cron: "0 9 * * MON" }   // Monday 9am
-{ cron: "0 * * * *" }     // Every hour
+{
+  cron: "0 0 * * *";
+} // Midnight daily
+{
+  cron: "0 9 * * MON";
+} // Monday 9am
+{
+  cron: "0 * * * *";
+} // Every hour
 ```
 
 ### Multiple Events
+
 ```typescript
-{ event: ["app/one", "app/two", "app/three"] }
+{
+  event: ["app/one", "app/two", "app/three"];
+}
 ```
 
 ---
@@ -152,22 +175,27 @@ const [user, orders, settings] = await Promise.all([
 ## 🛡️ Error Handling
 
 ### Global Failure Handler
+
 ```typescript
 export const handleAnyFunctionFailure = inngest.createFunction(
   { id: "handle-any-fn-failure" },
   { event: "inngest/function.failed" },
   async ({ event, step }) => {
     await step.run("log-failure", async () => {
-      logger.error({
-        functionId: event.data.function_id,
-        error: event.data.error,
-      }, "Function failed");
+      logger.error(
+        {
+          functionId: event.data.function_id,
+          error: event.data.error,
+        },
+        "Function failed",
+      );
     });
-  }
+  },
 );
 ```
 
 ### Try-Catch in Function
+
 ```typescript
 try {
   const result = await step.run("risky-op", async () => {
@@ -181,9 +209,10 @@ try {
 ```
 
 ### Idempotent Check
+
 ```typescript
 const existing = await db.processed.findUnique({
-  where: { idempotencyKey }
+  where: { idempotencyKey },
 });
 if (existing) return existing; // Safe to retry
 
@@ -196,6 +225,7 @@ await db.processed.create({ data: { idempotencyKey, result } });
 ## ⚡ Performance
 
 ### Concurrency Control
+
 ```typescript
 {
   id: "send-email",
@@ -207,13 +237,16 @@ await db.processed.create({ data: { idempotencyKey, result } });
 ```
 
 ### Batch Processing
+
 ```typescript
-{ cron: "0 * * * *" }  // Run hourly
+{
+  cron: "0 * * * *";
+} // Run hourly
 
 const pending = await step.run("fetch", async () => {
   return await db.notifications.findMany({
     where: { sent: false },
-    take: 1000  // Process in batches
+    take: 1000, // Process in batches
   });
 });
 ```
@@ -249,25 +282,27 @@ src/
 app/[feature].[action]
 ```
 
-| Example | Use Case |
-|---------|----------|
+| Example                                   | Use Case           |
+| ----------------------------------------- | ------------------ |
 | `app/auth.sign-up-welcome-email-function` | Send welcome email |
-| `app/ticket.created` | New ticket created |
-| `app/comment.posted` | New comment posted |
-| `app/payment.succeeded` | Payment processed |
-| `app/admin-digest.ready` | Digest compiled |
+| `app/ticket.created`                      | New ticket created |
+| `app/comment.posted`                      | New comment posted |
+| `app/payment.succeeded`                   | Payment processed  |
+| `app/admin-digest.ready`                  | Digest compiled    |
 
 ---
 
 ## ✅ Before Shipping
 
 **Critical (prevents common production issues):**
+
 - [ ] All operations wrapped in `step.run()` (prevents revenue loss)
 - [ ] Timeouts set on `waitForEvent()` (prevents zombie workflows)
 - [ ] Idempotency keys for side effects (prevents duplicate charges)
 - [ ] No blocking of API responses (prevents conversion drops)
 
 **Important:**
+
 - [ ] Event defined in `src/lib/inngest.ts` with types
 - [ ] Function in `src/features/[feature]/events/`
 - [ ] Function registered in `route.ts`
@@ -276,6 +311,7 @@ app/[feature].[action]
 - [ ] Tested locally with `inngest dev`
 
 **Nice to have:**
+
 - [ ] Descriptive step names
 - [ ] Structured logging added
 - [ ] Documentation updated
@@ -287,7 +323,9 @@ app/[feature].[action]
 > **💡 Common Production Patterns:** These mistakes represent typical issues teams face. See [PITFALLS_AND_TIPS.md](../GUIDES/PITFALLS_AND_TIPS.md) for 14 pitfalls with detailed examples and fixes.
 
 ### ❌ Not Wrapping in Steps
+
 **Common Impact:** Lost payments, duplicate emails, data inconsistencies
+
 ```typescript
 // BAD - No retries
 const data = await fetchData();
@@ -299,12 +337,14 @@ const data = await step.run("fetch", async () => {
 ```
 
 ### ❌ Blocking API Responses
+
 **Common Impact:** 5s response times, conversion rate drops
+
 ```typescript
 // BAD - Slow
 app.post("/signup", async (req, res) => {
   const user = await createUser();
-  await sendEmail(user);  // Blocks!
+  await sendEmail(user); // Blocks!
   res.json(user);
 });
 
@@ -317,37 +357,43 @@ app.post("/signup", async (req, res) => {
 ```
 
 ### ❌ Missing Timeout
+
 **Common Impact:** Resource leaks, zombie workflows
+
 ```typescript
 // BAD - Could wait forever
 const result = await step.waitForEvent("wait", {
-  event: "app/payment.succeeded"
+  event: "app/payment.succeeded",
 });
 
 // GOOD - Explicit timeout
 const result = await step.waitForEvent("wait", {
   event: "app/payment.succeeded",
-  timeout: "24h"
+  timeout: "24h",
 });
 ```
 
 ### ❌ No Type Safety
+
 **Common Impact:** Production bugs instead of compile-time errors
+
 ```typescript
 // BAD - Anything goes
 inngest.send({ name: "app/event", data: {} });
 
 // GOOD - Type safe
 type Events = {
-  "app/event": { data: { userId: string } }
+  "app/event": { data: { userId: string } };
 };
 export const inngest = new Inngest({
-  schemas: new EventSchemas().fromRecord<Events>()
+  schemas: new EventSchemas().fromRecord<Events>(),
 });
 ```
 
 ### ❌ Not Idempotent Operations
+
 **Common Impact:** Duplicate charges, customer complaints, refunds
+
 ```typescript
 // BAD - Retries charge customer multiple times
 await step.run("charge", async () => {
@@ -358,7 +404,7 @@ await step.run("charge", async () => {
 await step.run("charge", async () => {
   return await stripe.charges.create({
     amount,
-    idempotency_key: orderId // Critical!
+    idempotency_key: orderId, // Critical!
   });
 });
 ```
@@ -368,6 +414,7 @@ await step.run("charge", async () => {
 ## 🎯 Pattern Templates
 
 ### Simple Workflow
+
 ```typescript
 export const simpleWorkflow = inngest.createFunction(
   { id: "simple" },
@@ -376,11 +423,12 @@ export const simpleWorkflow = inngest.createFunction(
     await step.run("do-it", async () => {
       return await doSomething(event.data);
     });
-  }
+  },
 );
 ```
 
 ### Multi-Step Workflow
+
 ```typescript
 export const multiStep = inngest.createFunction(
   { id: "multi-step" },
@@ -388,19 +436,20 @@ export const multiStep = inngest.createFunction(
   async ({ event, step }) => {
     // Step 1
     const a = await step.run("step-1", async () => await doA());
-    
+
     // Step 2
     const b = await step.run("step-2", async () => await doB(a));
-    
+
     // Step 3
     const c = await step.run("step-3", async () => await doC(b));
-    
+
     return { a, b, c };
-  }
+  },
 );
 ```
 
 ### Conditional Workflow
+
 ```typescript
 export const conditional = inngest.createFunction(
   { id: "conditional" },
@@ -409,19 +458,20 @@ export const conditional = inngest.createFunction(
     if (event.data.amount > 1000) {
       await step.sendEvent("high-value", {
         name: "app/order.high-value",
-        data: event.data
+        data: event.data,
       });
     } else {
       await step.sendEvent("standard", {
         name: "app/order.standard",
-        data: event.data
+        data: event.data,
       });
     }
-  }
+  },
 );
 ```
 
 ### Wait-Based Workflow
+
 ```typescript
 export const waitBased = inngest.createFunction(
   { id: "wait-based" },
@@ -436,7 +486,7 @@ export const waitBased = inngest.createFunction(
     const payment = await step.waitForEvent("wait-payment", {
       event: "app/payment.succeeded",
       timeout: "24h",
-      if: "async.data.orderId == event.data.orderId"
+      if: "async.data.orderId == event.data.orderId",
     });
 
     if (payment) {
@@ -448,7 +498,7 @@ export const waitBased = inngest.createFunction(
         return await cancelOrder(event.data.orderId);
       });
     }
-  }
+  },
 );
 ```
 
@@ -468,14 +518,14 @@ export const waitBased = inngest.createFunction(
 ## 🔗 Time Conversions
 
 ```typescript
-"1s"    // 1 second
-"30s"   // 30 seconds
-"1m"    // 1 minute
-"5m"    // 5 minutes
-"1h"    // 1 hour
-"24h"   // 24 hours (1 day)
-"7d"    // 7 days
-"1w"    // 1 week
+"1s"; // 1 second
+"30s"; // 30 seconds
+"1m"; // 1 minute
+"5m"; // 5 minutes
+"1h"; // 1 hour
+"24h"; // 24 hours (1 day)
+"7d"; // 7 days
+"1w"; // 1 week
 ```
 
 ---
@@ -492,4 +542,3 @@ export const waitBased = inngest.createFunction(
 ---
 
 **Print this page and keep it handy!** 🚀
-

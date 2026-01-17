@@ -122,7 +122,7 @@ export const eventTicketCreated = inngest.createFunction(
         priority: event.data.priority,
       });
     });
-  }
+  },
 );
 
 export const eventUrgentTicket = inngest.createFunction(
@@ -134,11 +134,12 @@ export const eventUrgentTicket = inngest.createFunction(
         message: `🚨 Urgent ticket created: ${event.data.ticketId}`,
       });
     });
-  }
+  },
 );
 ```
 
 **Add to schema**:
+
 ```typescript
 "app/ticket.created": {
   data: {
@@ -203,7 +204,7 @@ export const eventCommentPosted = inngest.createFunction(
       ...new Set(
         ticket.comments
           .map((c) => c.authorId)
-          .filter((id) => id !== event.data.authorId)
+          .filter((id) => id !== event.data.authorId),
       ),
     ];
 
@@ -214,11 +215,11 @@ export const eventCommentPosted = inngest.createFunction(
             userId,
             subject: `New comment on ticket: ${ticket.title}`,
             content: event.data.content,
-          })
-        )
+          }),
+        ),
       );
     });
-  }
+  },
 );
 ```
 
@@ -250,7 +251,7 @@ export const eventPasswordChanged = inngest.createFunction(
         },
       });
     });
-  }
+  },
 );
 ```
 
@@ -262,30 +263,58 @@ export const eventPasswordChanged = inngest.createFunction(
 // src/lib/inngest.ts
 type Events = {
   // Auth events
-  "app/auth.sign-up-welcome-email-function": { /* ... */ };
-  "app/auth.email-verified": { /* ... */ };
-  
+  "app/auth.sign-up-welcome-email-function": {
+    /* ... */
+  };
+  "app/auth.email-verified": {
+    /* ... */
+  };
+
   // Password events
-  "app/password.password-reset-function": { /* ... */ };
-  "app/password.password-changed": { /* ... */ };
-  
+  "app/password.password-reset-function": {
+    /* ... */
+  };
+  "app/password.password-changed": {
+    /* ... */
+  };
+
   // Account events
-  "app/account.profile-updated": { /* ... */ };
-  "app/account.settings-changed": { /* ... */ };
-  
+  "app/account.profile-updated": {
+    /* ... */
+  };
+  "app/account.settings-changed": {
+    /* ... */
+  };
+
   // Ticket events
-  "app/ticket.created": { /* ... */ };
-  "app/ticket.updated": { /* ... */ };
-  "app/ticket.assigned": { /* ... */ };
-  "app/admin.urgent-ticket-created": { /* ... */ };
-  
+  "app/ticket.created": {
+    /* ... */
+  };
+  "app/ticket.updated": {
+    /* ... */
+  };
+  "app/ticket.assigned": {
+    /* ... */
+  };
+  "app/admin.urgent-ticket-created": {
+    /* ... */
+  };
+
   // Comment events
-  "app/comment.posted": { /* ... */ };
-  "app/comment.updated": { /* ... */ };
-  
+  "app/comment.posted": {
+    /* ... */
+  };
+  "app/comment.updated": {
+    /* ... */
+  };
+
   // Admin events
-  "app/admin-digest.ready": { /* ... */ };
-  "app/admin.daily-metrics": { /* ... */ };
+  "app/admin-digest.ready": {
+    /* ... */
+  };
+  "app/admin.daily-metrics": {
+    /* ... */
+  };
 };
 ```
 
@@ -294,6 +323,7 @@ type Events = {
 ## 📂 Folder Structure Refactor
 
 **Current structure** (good):
+
 ```
 src/features/
 ├── admin/
@@ -311,6 +341,7 @@ src/features/
 ```
 
 **Proposed additions**:
+
 ```
 src/features/
 ├── ticket/
@@ -467,11 +498,11 @@ export const batchDigestNotifications = inngest.createFunction(
     await step.run("send-digests", async () => {
       return await Promise.all(
         Object.entries(grouped).map(([userId, notifications]) =>
-          sendDigestEmail(userId, notifications)
-        )
+          sendDigestEmail(userId, notifications),
+        ),
       );
     });
-  }
+  },
 );
 ```
 
@@ -516,6 +547,7 @@ export async function testWorkflow() {
 ### 1. Dashboard Metrics
 
 Track in Inngest Cloud dashboard:
+
 - Function success/failure rates
 - Average execution time
 - Event throughput
@@ -532,7 +564,7 @@ export const eventTicketCreated = inngest.createFunction(
   async ({ event, step }) => {
     logger.info(
       { ticketId: event.data.ticketId, userId: event.data.userId },
-      "Processing ticket creation"
+      "Processing ticket creation",
     );
 
     try {
@@ -543,11 +575,11 @@ export const eventTicketCreated = inngest.createFunction(
     } catch (error) {
       logger.error(
         { ticketId: event.data.ticketId, error: String(error) },
-        "Failed to process ticket creation"
+        "Failed to process ticket creation",
       );
       throw error;
     }
-  }
+  },
 );
 ```
 
@@ -556,17 +588,20 @@ export const eventTicketCreated = inngest.createFunction(
 ## 🚀 Implementation Roadmap
 
 ### Phase 1: Current (Already Done ✓)
+
 - ✓ Auth events (signup, password reset)
 - ✓ Admin digest (daily reports)
 - ✓ Global error handler
 
 ### Phase 2: Next (Recommended)
+
 - [ ] Ticket creation events
 - [ ] Comment notification workflow
 - [ ] Account update notifications
 - [ ] Add concurrency limits
 
 ### Phase 3: Enhanced (Future)
+
 - [ ] Ticket assignment notifications
 - [ ] Batch digest emails
 - [ ] Analytics tracking for all events
@@ -574,6 +609,7 @@ export const eventTicketCreated = inngest.createFunction(
 - [ ] Dead letter queue for failed events
 
 ### Phase 4: Advanced (Later)
+
 - [ ] Workflow chains (multi-step processes)
 - [ ] Event replay for debugging
 - [ ] Custom dashboards
@@ -600,6 +636,7 @@ export const eventTicketCreated = inngest.createFunction(
 ## 🎯 Success Metrics
 
 After implementing these recommendations:
+
 - ✓ Reduced API response times (fire & forget pattern)
 - ✓ Reliable email/notification delivery (automatic retries)
 - ✓ Better observability (structured logging)
@@ -627,4 +664,3 @@ After implementing these recommendations:
 5. Monitor metrics in Inngest Cloud
 
 Good luck with your implementation! 🚀
-

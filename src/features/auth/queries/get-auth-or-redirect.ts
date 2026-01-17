@@ -1,9 +1,19 @@
 import { redirect } from "next/navigation";
 import { getOrganizationsByUserId } from "@/features/organizations/queries/get-organizations-by-user-id";
-import { onboardingPath, signInPath } from "@/paths";
+import {
+  onboardingPath,
+  selectActiveOrganizationPath,
+  signInPath,
+} from "@/paths";
 import { getAuth } from "./get-auth";
 
-export const getAuthOrRedirect = async () => {
+interface GetAuthOrRedirectOptions {
+  checkActiveOrganization?: boolean;
+}
+
+export const getAuthOrRedirect = async ({
+  checkActiveOrganization = true,
+}: GetAuthOrRedirectOptions = {}) => {
   const { user } = await getAuth();
   if (!user) {
     redirect(signInPath());
@@ -13,5 +23,15 @@ export const getAuthOrRedirect = async () => {
   if (organizations.length === 0) {
     redirect(onboardingPath());
   }
+
+  if (checkActiveOrganization) {
+    const hasActiveOrganization = organizations.some(
+      (organization) => organization.membershipByUser?.isActive,
+    );
+    if (!hasActiveOrganization) {
+      redirect(selectActiveOrganizationPath());
+    }
+  }
+
   return user;
 };

@@ -46,11 +46,13 @@ npm run commit
 ```
 
 **Expected behavior**:
+
 - No compression (diff < 10,000 chars)
 - Quick generation (<5 seconds)
 - Accurate type/scope detection
 
 **Metrics to capture**:
+
 - [ ] Token count (from output)
 - [ ] Generation time
 - [ ] First-attempt acceptance (y/n/r/e)
@@ -70,12 +72,14 @@ git add src/features/ticket/*.ts
 ```
 
 **Expected behavior**:
+
 - Compression activates automatically
 - Summary shown instead of raw diff
 - Token count significantly lower than raw diff
 - Quality maintained for commit message
 
 **Metrics to capture**:
+
 - [ ] Original diff size (chars)
 - [ ] Compressed size
 - [ ] Token reduction percentage
@@ -94,11 +98,13 @@ git add src/lib/prisma.ts
 ```
 
 **Expected behavior**:
+
 - Primary scope detected (highest impact area)
 - Secondary scopes mentioned in bullets
 - Type accurately reflects dominant change
 
 **Verification**:
+
 - [ ] Primary scope makes sense
 - [ ] All areas mentioned in commit body
 - [ ] No important changes omitted
@@ -116,11 +122,13 @@ echo 'const API_KEY = "sk-test1234567890abcdef1234567890abcdef123456"' > /tmp/te
 ```
 
 **Expected behavior**:
+
 - Warning displayed before generation
 - Pattern type identified (OpenAI Key, API Key, etc.)
 - Requires explicit "y" confirmation to proceed
 
 **Verification**:
+
 - [ ] Warning appears with correct pattern type
 - [ ] User can cancel (N) or proceed (y)
 - [ ] Proceeding works normally after confirmation
@@ -132,16 +140,19 @@ echo 'const API_KEY = "sk-test1234567890abcdef1234567890abcdef123456"' > /tmp/te
 **Setup**: Any staged changes
 
 **Process**:
+
 1. Run `npm run commit`
 2. If first attempt has validation warnings, press `r` to regenerate
 3. Observe refinement behavior
 
 **Expected behavior**:
+
 - Second attempt includes specific correction guidance
 - Temperature slightly increased for variation
 - Issues from first attempt should be addressed
 
 **Verification**:
+
 - [ ] Refinement prompt visible in debug output (if enabled)
 - [ ] Second attempt improves on first
 - [ ] Maximum 3 retries before manual edit suggestion
@@ -153,16 +164,19 @@ echo 'const API_KEY = "sk-test1234567890abcdef1234567890abcdef123456"' > /tmp/te
 **Setup**: Any staged changes
 
 **Process**:
+
 1. Run `npm run commit`
 2. Press `e` to enter edit mode
 3. Provide feedback: "Make the subject shorter" or "Add more detail to bullets"
 
 **Expected behavior**:
+
 - Feedback incorporated into refinement prompt
 - Previous output preserved where valid
 - Only requested changes applied
 
 **Verification**:
+
 - [ ] Feedback accurately applied
 - [ ] Unchanged parts preserved
 - [ ] Result addresses user's request
@@ -180,11 +194,13 @@ git add public/image.png
 ```
 
 **Expected behavior**:
+
 - Binary file shown as metadata only
 - No binary content in prompt
 - Commit message mentions asset change
 
 **Verification**:
+
 - [ ] "Binary: public/image.png (modified)" in output
 - [ ] Commit message acknowledges the change
 - [ ] No error or garbage in output
@@ -201,6 +217,7 @@ git add package-lock.json
 ```
 
 **Expected behavior**:
+
 - Either: Generate message acknowledging dependency update
 - Or: Warn that only excluded files are staged
 
@@ -214,23 +231,25 @@ Use this template to track optimization results:
 ## Test Run: [DATE]
 
 ### Environment
+
 - Model: [model name]
 - API: [local/external]
 
 ### Results
 
-| Scenario | Original Tokens | Optimized Tokens | Reduction | Quality (1-5) | First Accept |
-|----------|-----------------|------------------|-----------|---------------|--------------|
-| Small diff | | | | | |
-| Large diff | | | | | |
-| Multi-scope | | | | | |
-| Sensitive data | N/A | N/A | N/A | | |
-| Regeneration | | | | | |
-| Edit mode | | | | | |
-| Binary files | | | | | |
+| Scenario       | Original Tokens | Optimized Tokens | Reduction | Quality (1-5) | First Accept |
+| -------------- | --------------- | ---------------- | --------- | ------------- | ------------ |
+| Small diff     |                 |                  |           |               |              |
+| Large diff     |                 |                  |           |               |              |
+| Multi-scope    |                 |                  |           |               |              |
+| Sensitive data | N/A             | N/A              | N/A       |               |              |
+| Regeneration   |                 |                  |           |               |              |
+| Edit mode      |                 |                  |           |               |              |
+| Binary files   |                 |                  |           |               |              |
 
 ### Notes
-- 
+
+-
 ```
 
 ## Success Criteria Validation

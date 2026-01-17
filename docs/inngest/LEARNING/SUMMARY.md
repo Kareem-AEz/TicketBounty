@@ -88,7 +88,7 @@ export const eventAction = inngest.createFunction(
       return await doSomething(event.data);
     });
     return result;
-  }
+  },
 );
 ```
 
@@ -166,7 +166,7 @@ export const eventSignUpWelcome = inngest.createFunction(
     await step.run("send-email", async () => {
       return await mailer.sendWelcome(event.data);
     });
-  }
+  },
 );
 ```
 
@@ -184,7 +184,7 @@ export const dailyDigest = inngest.createFunction(
     await step.run("send-digest", async () => {
       return await sendDigestEmail(data);
     });
-  }
+  },
 );
 ```
 
@@ -207,7 +207,7 @@ export const multiEventWorkflow = inngest.createFunction(
         return await shipOrder(event.data.orderId);
       });
     }
-  }
+  },
 );
 ```
 

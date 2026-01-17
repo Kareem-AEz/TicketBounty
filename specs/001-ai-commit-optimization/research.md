@@ -12,6 +12,7 @@
 **Decision**: Statistical + heuristic analysis (no additional LLM calls)
 
 **Rationale**:
+
 - LLM-based summarization adds latency and cost (defeats the purpose)
 - AST parsing requires language-specific tooling (complexity)
 - Statistical analysis is fast, deterministic, and sufficient for commit context
@@ -24,6 +25,7 @@
 | Truncation | Simple | Loses important context | Already proven problematic |
 
 **Implementation Approach**:
+
 1. Parse unified diff format to extract file-level statistics
 2. Count additions/deletions per file
 3. Detect file categories (source, config, generated, test, docs)
@@ -87,6 +89,7 @@ perf (performance):
 ```
 
 **Scope Detection**:
+
 1. Check `src/features/{scope}/` pattern first (highest confidence)
 2. Fall back to file path analysis (components → ui, prisma → db, etc.)
 3. Use existing `getScopeHints()` logic as baseline
@@ -139,6 +142,7 @@ Output ONLY the commit message. No explanations.
 **Decision**: Conservative regex patterns with confirmation flow
 
 **Research findings**:
+
 - Trufflehog/GitLeaks patterns are battle-tested but complex
 - Simple patterns catch 90% of cases with few false positives
 - User confirmation prevents blocking legitimate changes
@@ -147,13 +151,27 @@ Output ONLY the commit message. No explanations.
 
 ```typescript
 const SENSITIVE_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
-  { pattern: /['"]?(?:api[_-]?key|apikey)['"]?\s*[:=]\s*['"][A-Za-z0-9_\-]{20,}['"]/gi, label: 'API Key' },
-  { pattern: /['"]?(?:password|passwd|pwd)['"]?\s*[:=]\s*['"][^'"]{8,}['"]/gi, label: 'Password' },
-  { pattern: /['"]?(?:secret|token)['"]?\s*[:=]\s*['"][A-Za-z0-9_\-]{20,}['"]/gi, label: 'Secret/Token' },
-  { pattern: /-----BEGIN (?:RSA |DSA |EC |OPENSSH )?PRIVATE KEY-----/, label: 'Private Key' },
-  { pattern: /ghp_[A-Za-z0-9]{36}/, label: 'GitHub PAT' },
-  { pattern: /sk-[A-Za-z0-9]{48}/, label: 'OpenAI Key' },
-  { pattern: /AKIA[0-9A-Z]{16}/, label: 'AWS Access Key' },
+  {
+    pattern:
+      /['"]?(?:api[_-]?key|apikey)['"]?\s*[:=]\s*['"][A-Za-z0-9_\-]{20,}['"]/gi,
+    label: "API Key",
+  },
+  {
+    pattern: /['"]?(?:password|passwd|pwd)['"]?\s*[:=]\s*['"][^'"]{8,}['"]/gi,
+    label: "Password",
+  },
+  {
+    pattern:
+      /['"]?(?:secret|token)['"]?\s*[:=]\s*['"][A-Za-z0-9_\-]{20,}['"]/gi,
+    label: "Secret/Token",
+  },
+  {
+    pattern: /-----BEGIN (?:RSA |DSA |EC |OPENSSH )?PRIVATE KEY-----/,
+    label: "Private Key",
+  },
+  { pattern: /ghp_[A-Za-z0-9]{36}/, label: "GitHub PAT" },
+  { pattern: /sk-[A-Za-z0-9]{48}/, label: "OpenAI Key" },
+  { pattern: /AKIA[0-9A-Z]{16}/, label: "AWS Access Key" },
 ];
 ```
 
@@ -168,24 +186,27 @@ const SENSITIVE_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
 **Retry strategy**:
 
 1. **First retry (soft guidance)**: Include previous output + specific issue
+
    ```
-   Previous output had [ISSUE]. 
+   Previous output had [ISSUE].
    Fix: [SPECIFIC_INSTRUCTION]
    Keep other parts unchanged if valid.
    ```
 
 2. **Second retry (stronger guidance)**: More prescriptive
+
    ```
    REQUIRED FIXES:
    1. Subject must be under 50 chars (was 67)
    2. Add at least 2 bullet points
-   
+
    Generate corrected version:
    ```
 
 3. **Third retry (abort)**: Present last attempt, ask user to edit manually
 
 **Temperature progression**:
+
 - Retry 1: 0.2 (same as initial)
 - Retry 2: 0.3 (slight increase)
 - Retry 3: 0.4 (more variation)
@@ -199,6 +220,7 @@ const SENSITIVE_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
 **Detection**: Git diff outputs `Binary files a/path and b/path differ` for binary changes.
 
 **Summary format**:
+
 ```typescript
 {
   path: "public/logo.png",
@@ -209,6 +231,7 @@ const SENSITIVE_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
 ```
 
 **Included in prompt as**:
+
 ```
 Binary: public/logo.png (modified)
 Binary: public/favicon.ico (added)
@@ -218,14 +241,14 @@ Binary: public/favicon.ico (added)
 
 All technical uncertainties from spec have been resolved:
 
-| Item | Resolution |
-|------|------------|
-| Diff compression approach | Statistical heuristics |
-| Compression threshold | 10,000 characters |
+| Item                      | Resolution                        |
+| ------------------------- | --------------------------------- |
+| Diff compression approach | Statistical heuristics            |
+| Compression threshold     | 10,000 characters                 |
 | Quality vs token tradeoff | Quality first, degrade >100 files |
-| Sensitive data handling | Warn + confirm |
-| Binary file handling | Metadata only |
-| Retry mechanism | Validation-guided refinement |
+| Sensitive data handling   | Warn + confirm                    |
+| Binary file handling      | Metadata only                     |
+| Retry mechanism           | Validation-guided refinement      |
 
 ## Next Steps
 

@@ -117,11 +117,11 @@ Learning resources and project-specific guidance:
 
 ## 📊 Documentation Overview
 
-| Folder | Files | Purpose |
-|--------|-------|---------|
-| **GUIDES/** | 4 files | Deep dives into patterns, best practices, pitfalls, and architecture |
-| **QUICK_REFERENCE/** | 2 files | Quick syntax lookups and templates |
-| **LEARNING/** | 3 files | Onboarding, navigation, and project specifics |
+| Folder               | Files   | Purpose                                                              |
+| -------------------- | ------- | -------------------------------------------------------------------- |
+| **GUIDES/**          | 4 files | Deep dives into patterns, best practices, pitfalls, and architecture |
+| **QUICK_REFERENCE/** | 2 files | Quick syntax lookups and templates                                   |
+| **LEARNING/**        | 3 files | Onboarding, navigation, and project specifics                        |
 
 **Total:** 9 comprehensive guides covering everything from basics to advanced patterns
 

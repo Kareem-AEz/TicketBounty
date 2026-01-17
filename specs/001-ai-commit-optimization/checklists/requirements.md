@@ -46,6 +46,7 @@
 5. **Binary file handling** → Metadata only (filename, size, change type)
 
 ### Sections Updated:
+
 - Clarifications (new section)
 - Functional Requirements (FR-001 through FR-005 updated, FR-017/FR-018 added)
 - Edge Cases (2 decisions documented)

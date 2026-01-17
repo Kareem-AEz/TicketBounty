@@ -5,12 +5,14 @@
 This project is part of **"The Road to Next"** - a comprehensive full-stack development course by **Robin Wieruch**. The course guides developers through mastering modern web development using Next.js, React, and the latest ecosystem tools.
 
 ### About the Course
+
 - **Instructor**: Robin Wieruch - Freelance full-stack product engineer specializing in React.js, Next.js, JavaScript, and TypeScript
 - **Focus**: Building real-world SaaS applications with modern tools and best practices
 - **Approach**: Hands-on learning with practical application development
 - **Website**: [road-to-next.com](https://www.road-to-next.com)
 
 ### Learning Objectives
+
 - Master full-stack web development with Next.js 16
 - Build scalable, high-performance applications
 - Learn React Server Components and Server Actions
@@ -22,28 +24,33 @@ This project is part of **"The Road to Next"** - a comprehensive full-stack deve
 ## 🛠️ Technology Stack
 
 ### Core Framework
+
 - **Next.js 16 (beta)** - React framework with App Router and Turbopack
 - **React 19.2** - Latest React with Server Components and React Compiler
 - **TypeScript 5** - Type-safe development
 
 ### Database & ORM
+
 - **PostgreSQL** - Production-grade relational database
 - **Prisma ORM** - Type-safe database client and migrations
 - **@prisma/client** - Auto-generated database client
 
 ### Authentication
+
 - **Lucia Auth** - Secure session-based authentication
 - **@lucia-auth/adapter-prisma** - Prisma adapter for Lucia
 - **@node-rs/argon2** - Fast, secure password hashing
 - **oslo** - Auth utilities and helpers
 
 ### State Management
+
 - **React Query (TanStack Query)** - Server state management
 - **React Hook Form** - Client-side form management
 - **nuqs** - Type-safe URL search params
 - **Zod** - Schema validation
 
 ### UI & Styling
+
 - **Tailwind CSS 4** - Utility-first CSS framework
 - **shadcn/ui** - Beautiful, accessible components built on Radix primitives
 - **Motion** - Animation library with spring physics
@@ -54,9 +61,11 @@ This project is part of **"The Road to Next"** - a comprehensive full-stack deve
 - **clsx & tailwind-merge** - Conditional styling utilities
 
 ### Analytics
+
 - **Umami Analytics** - Privacy-friendly, cookieless analytics
 
 ### Development Tools
+
 - **ESLint** - Code linting with custom rules
 - **Prettier** - Code formatting with Tailwind plugin
 - **TypeScript** - Static type checking
@@ -69,6 +78,7 @@ This project is part of **"The Road to Next"** - a comprehensive full-stack deve
 ## 🏗️ Project Architecture
 
 ### Feature-Based Structure
+
 ```
 src/
 ├── app/                          # Next.js App Router
@@ -142,6 +152,7 @@ src/
 ```
 
 ### Design Patterns Implemented
+
 - **Feature-based organization** - Modular code structure by domain
 - **Server Actions pattern** - Form submissions and mutations
 - **React Query integration** - Server state caching and synchronization
@@ -158,6 +169,7 @@ src/
 ## 🎫 Current Features
 
 ### Authentication System
+
 - ✅ **User registration** - Sign up with username, email, password
 - ✅ **Secure login** - Session-based authentication with Lucia
 - ✅ **Password hashing** - Argon2 for secure credential storage
@@ -166,11 +178,13 @@ src/
 - ✅ **Sign out** - Secure session termination
 
 ### Account Management
+
 - ✅ **Profile updates** - Change username
 - ✅ **Password changes** - Update password securely
 - ✅ **User settings** - Tabbed interface for account management
 
 ### Ticket Management System
+
 - ✅ **CRUD operations** - Create, read, update, delete tickets
 - ✅ **Status workflow** - OPEN → IN_PROGRESS → DONE
 - ✅ **Bounty system** - Assign monetary value to tickets
@@ -182,6 +196,7 @@ src/
 - ✅ **Rich metadata** - Track creation date, owner, status
 
 ### Comment System
+
 - ✅ **Threaded comments** - Discuss tickets with team
 - ✅ **CRUD operations** - Create, edit, delete comments
 - ✅ **Real-time updates** - Optimistic UI with React Query
@@ -189,6 +204,7 @@ src/
 - ✅ **User attribution** - Comments linked to users
 
 ### UI Components
+
 - ✅ **TicketItem** - Card-based ticket display with status
 - ✅ **TicketUpsertForm** - Create/edit ticket form with validation
 - ✅ **CommentForm** - Comment creation/editing
@@ -201,6 +217,7 @@ src/
 - ✅ **SelectInput** - Dropdown filters
 
 ### Advanced Features
+
 - ✅ **Staggered animations** - Custom timing for button reveals (68ms)
 - ✅ **Spring physics** - Natural motion with Motion library
 - ✅ **Focus management** - Keyboard navigation support
@@ -213,6 +230,7 @@ src/
 - ✅ **Privacy-friendly analytics** - Track 11 events with rich metadata
 
 ### Analytics Tracking
+
 - ✅ **User identification** - Cross-session tracking
 - ✅ **Navigation events** - Track route changes
 - ✅ **Form submissions** - Track sign-up, sign-in, ticket creation, comments
@@ -226,6 +244,7 @@ src/
 ## 🎨 Design System
 
 ### Animation Philosophy
+
 - **Staggered reveals** - Sequential button animations (68ms delays)
 - **Spring easing** - Natural motion with custom linear() functions
 - **Focus-within states** - Keyboard accessibility
@@ -233,6 +252,7 @@ src/
 - **Theme transitions** - Smooth dark/light mode switching
 
 ### Copy Strategy
+
 - **Emotional resonance** - Human, warm language
 - **Sophisticated tone** - Professional yet approachable
 - **Whimsical touches** - "Summoning your tickets...", "The universe hiccupped"
@@ -240,6 +260,7 @@ src/
 - **Consistency** - Organized copy structure in `lib/copy.ts`
 
 ### Color Scheme
+
 - **Theme support** - Dark and light themes with next-themes
 - **Semantic colors** - Status-based color coding (OPEN, IN_PROGRESS, DONE)
 - **High contrast** - Accessibility compliant (WCAG AA)
@@ -275,18 +296,21 @@ npm run seed         # Seed database with sample data
 ## 📝 Code Quality Standards
 
 ### ESLint Configuration
+
 - **Import sorting** - Automatic import organization
 - **Unused imports** - Detection and removal
 - **Next.js rules** - Framework-specific best practices
 - **React Compiler** - Compatible linting rules
 
 ### TypeScript Standards
+
 - **Strict mode** - Maximum type safety
 - **No implicit any** - Explicit typing required
 - **Path aliases** - `@/` for clean imports
 - **Generated types** - Prisma client types
 
 ### Component Patterns
+
 - **Props interfaces** - Clear component contracts
 - **Default exports** - Consistent module exports
 - **Client/Server split** - `"use client"` directives where needed
@@ -294,6 +318,7 @@ npm run seed         # Seed database with sample data
 - **Server Components** - SSR-optimized rendering by default
 
 ### Data Fetching Patterns
+
 - **React Query** - All GET requests cached with TanStack Query
 - **Server Actions** - All mutations (POST, PUT, DELETE)
 - **Optimistic updates** - Instant UI feedback
@@ -304,8 +329,9 @@ npm run seed         # Seed database with sample data
 ## 🎯 Learning Progress
 
 ### ✅ Completed Concepts (Course + Custom Enhancements)
+
 - ✅ Next.js App Router setup
-- ✅ TypeScript configuration  
+- ✅ TypeScript configuration
 - ✅ Tailwind CSS integration
 - ✅ **Component architecture** (Server + Client Components)
 - ✅ **Feature-based organization** (domain-driven structure)
@@ -324,6 +350,7 @@ npm run seed         # Seed database with sample data
 - ✅ **Performance optimization** (React Compiler, optimistic updates)
 
 ### 🚀 Beyond the Course
+
 - ✅ **React 19.2 + React Compiler** - Automatic memoization
 - ✅ **Comprehensive analytics** - 1,400+ lines of documentation
 - ✅ **Reusable analytics layer** - Works with any auth system
@@ -336,6 +363,7 @@ npm run seed         # Seed database with sample data
 ## 🏆 Key Achievements
 
 ### Course Foundation + Personal Innovation
+
 1. **Production-Ready Architecture** - Complete full-stack application with auth, database, and state management
 2. **Custom Animation System** - 68ms staggered delays with spring easing (personal enhancement)
 3. **Accessibility Excellence** - Focus management, keyboard nav, screen reader support (beyond course scope)
@@ -346,8 +374,9 @@ npm run seed         # Seed database with sample data
 8. **Reusable Patterns** - Analytics layer designed for plug-and-play reuse
 
 ### Personal Design Philosophy
+
 - **Elegance over simplicity** - Sophisticated but clear language
-- **Animation as personality** - Motion that feels alive and intentional  
+- **Animation as personality** - Motion that feels alive and intentional
 - **Accessibility as foundation** - Not an afterthought, but core design principle
 - **Emotional resonance** - Technology that feels human and welcoming
 - **Privacy as default** - Analytics that inform without surveillance
@@ -358,11 +387,13 @@ npm run seed         # Seed database with sample data
 ## 📚 Related Resources
 
 ### Course Materials
+
 - **[The Road to Next](https://www.road-to-next.com)** - Main course website
 - **Robin Wieruch's Blog** - Advanced React and Next.js tutorials
 - **The Road to React** - Foundational React learning resource
 
 ### Documentation
+
 - **[Next.js Documentation](https://nextjs.org/docs)** - Official framework documentation
 - **[React Documentation](https://react.dev)** - React 19 with Server Components
 - **[Prisma Docs](https://www.prisma.io/docs)** - Database ORM guide
@@ -370,10 +401,11 @@ npm run seed         # Seed database with sample data
 - **[TanStack Query Docs](https://tanstack.com/query)** - React Query patterns
 
 ### Project Documentation
+
 - **[Analytics Guide](docs/UMAMI_README.md)** - Complete analytics documentation
 - **[React Query Guide](REACT_QUERY_GUIDE.md)** - Server state patterns
 - **[nuqs Guide](docs/NUQS_GUIDE.md)** - URL state management
 
 ---
 
-*This project represents hands-on learning through building real-world applications with modern web development tools and best practices—then taking it further with personal enhancements and production-ready patterns.*
+_This project represents hands-on learning through building real-world applications with modern web development tools and best practices—then taking it further with personal enhancements and production-ready patterns._

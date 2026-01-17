@@ -31,6 +31,7 @@ export const { GET, POST, PUT } = serve({
 ```
 
 **Issues:**
+
 - ❌ Hard to find specific functions
 - ❌ Difficult to add/remove functions
 - ❌ No organization by feature
@@ -113,6 +114,7 @@ export const { GET, POST, PUT } = serve({
 ```
 
 **Benefits:**
+
 - ✅ Clean route handler
 - ✅ Easy to find functions by feature
 - ✅ Easy to add/remove entire feature modules
@@ -214,6 +216,7 @@ export const { GET, POST, PUT } = serve({
 ```
 
 **Benefits:**
+
 - ✅ Very clean route handler
 - ✅ Functions auto-register when imported
 - ✅ Easy to add new features (just import)
@@ -229,6 +232,7 @@ For very large apps, use dynamic imports:
 ### Step 1: Standardize File Naming
 
 All workflow functions must follow this pattern:
+
 ```
 src/features/[feature]/events/event-*.ts
 ```
@@ -264,11 +268,7 @@ export async function loadAllFunctions() {
 
 // Method 2: Explicit path import (works with Next.js)
 export function loadAllFunctionsSync() {
-  const modules = require.context(
-    "@/features",
-    true,
-    /events\/event-.*\.ts$/
-  );
+  const modules = require.context("@/features", true, /events\/event-.*\.ts$/);
 
   const functions = [];
   modules.keys().forEach((key) => {
@@ -298,6 +298,7 @@ export const { GET, POST, PUT } = serve({
 ```
 
 **Benefits:**
+
 - ✅ Completely automated
 - ✅ Add new workflows with zero changes to route.ts
 - ✅ No manual registration needed
@@ -305,6 +306,7 @@ export const { GET, POST, PUT } = serve({
 - ✅ No merge conflicts ever
 
 **Drawbacks:**
+
 - ⚠️ Harder to debug which functions are loaded
 - ⚠️ Less explicit about what's registered
 - ⚠️ May have performance impact on startup
@@ -313,12 +315,12 @@ export const { GET, POST, PUT } = serve({
 
 ## Recommendation by App Size
 
-| App Size | Functions | Solution | Complexity |
-|----------|-----------|----------|-----------|
-| Small | < 10 | Keep in route.ts | Low |
-| Growing | 10-50 | **Solution 1** (Recommended) | Low |
-| Medium | 50-150 | **Solution 2** | Medium |
-| Large | 150+ | **Solution 3** | High |
+| App Size | Functions | Solution                     | Complexity |
+| -------- | --------- | ---------------------------- | ---------- |
+| Small    | < 10      | Keep in route.ts             | Low        |
+| Growing  | 10-50     | **Solution 1** (Recommended) | Low        |
+| Medium   | 50-150    | **Solution 2**               | Medium     |
+| Large    | 150+      | **Solution 3**               | High       |
 
 ---
 
@@ -373,6 +375,7 @@ export const { GET, POST, PUT } = serve({
 ### Template: Adding Booking Feature
 
 1. Create feature folder:
+
 ```
 src/features/booking/events/
   ├── event-booking-created.ts
@@ -381,15 +384,14 @@ src/features/booking/events/
 ```
 
 2. Export functions:
+
 ```typescript
 // src/features/booking/events/index.ts
-export const BOOKING_FUNCTIONS = [
-  eventBookingCreated,
-  eventBookingConfirmed,
-];
+export const BOOKING_FUNCTIONS = [eventBookingCreated, eventBookingConfirmed];
 ```
 
 3. Update route.ts:
+
 ```typescript
 // src/app/api/inngest/route.ts
 import { BOOKING_FUNCTIONS } from "@/features/booking/events"; // Add this line
@@ -400,7 +402,7 @@ const ALL_FUNCTIONS = [
   ...ADMIN_FUNCTIONS,
   ...TICKET_FUNCTIONS,
   ...COMMENT_FUNCTIONS,
-  ...BOOKING_FUNCTIONS,  // Add this line
+  ...BOOKING_FUNCTIONS, // Add this line
 ];
 ```
 
@@ -445,6 +447,7 @@ export const { GET, POST, PUT } = serve({
 ## Your Implementation Path
 
 ### Now (Current State: 6 functions)
+
 Keep Solution 1 (Manual Organization)
 
 ```typescript
@@ -461,21 +464,23 @@ const ALL_FUNCTIONS = [
 ```
 
 ### Later (50+ functions)
+
 Upgrade to Solution 2 (Registry) if needed
 
 ### At Scale (150+ functions)
+
 Upgrade to Solution 3 (Auto-discovery)
 
 ---
 
 ## Summary
 
-| Aspect | Manual | Registry | Auto-Discovery |
-|--------|--------|----------|-----------------|
-| Clarity | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
-| Scalability | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Maintenance | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Best For | < 50 functions | 50-150 | 150+ |
+| Aspect      | Manual         | Registry | Auto-Discovery |
+| ----------- | -------------- | -------- | -------------- |
+| Clarity     | ⭐⭐⭐⭐⭐     | ⭐⭐⭐⭐ | ⭐⭐⭐         |
+| Scalability | ⭐⭐⭐         | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐     |
+| Maintenance | ⭐⭐⭐⭐       | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐     |
+| Best For    | < 50 functions | 50-150   | 150+           |
 
 **Recommendation:** Start with **Solution 1** (Manual) now. Upgrade to **Solution 2** (Registry) when you hit ~40-50 functions.
 
@@ -486,6 +491,7 @@ Upgrade to Solution 3 (Auto-discovery)
 ### ❌ Pitfall #1: Forgetting to Register New Functions
 
 **The Mistake:**
+
 ```typescript
 // You create a new function file
 // src/features/booking/events/event-booking-created.ts
@@ -496,16 +502,18 @@ export const eventBookingCreated = inngest.createFunction(/* ... */);
 ```
 
 **The Fix:**
+
 - ✅ Keep a checklist: Create function → Export → Register → Test
 - ✅ Add a comment in route.ts as a reminder
 - ✅ Use TypeScript to enforce registration (advanced)
 
 ```typescript
 // Create a type-safe registry
-type RegisteredFunctions = typeof AUTH_FUNCTIONS[number] | 
-                           typeof TICKET_FUNCTIONS[number] | 
-                           // ... more types
-                           typeof eventBookingCreated; // TypeScript error if missing!
+type RegisteredFunctions =
+  | (typeof AUTH_FUNCTIONS)[number]
+  | (typeof TICKET_FUNCTIONS)[number]
+  // ... more types
+  | typeof eventBookingCreated; // TypeScript error if missing!
 ```
 
 ---
@@ -513,6 +521,7 @@ type RegisteredFunctions = typeof AUTH_FUNCTIONS[number] |
 ### ❌ Pitfall #2: Import Order Breaking Functions
 
 **The Mistake:**
+
 ```typescript
 // ❌ BAD: Global failure handler not first
 const ALL_FUNCTIONS = [
@@ -525,6 +534,7 @@ const ALL_FUNCTIONS = [
 **Why It Matters:** Failure handler should catch errors from ALL functions.
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Failure handler always first
 const ALL_FUNCTIONS = [
@@ -539,6 +549,7 @@ const ALL_FUNCTIONS = [
 ### ❌ Pitfall #3: Circular Dependencies
 
 **The Mistake:**
+
 ```typescript
 // src/features/auth/events/index.ts
 import { TICKET_FUNCTIONS } from "@/features/ticket/events";
@@ -550,6 +561,7 @@ import { AUTH_FUNCTIONS } from "@/features/auth/events";
 ```
 
 **The Fix:**
+
 - ✅ Never import between feature registries
 - ✅ Only import in route.ts
 - ✅ Keep features independent
@@ -559,6 +571,7 @@ import { AUTH_FUNCTIONS } from "@/features/auth/events";
 ### ❌ Pitfall #4: Auto-Discovery Loading Wrong Files
 
 **The Mistake:**
+
 ```typescript
 // Auto-discovery pattern matches test files!
 const files = glob("src/features/**/events/**/*.ts");
@@ -566,10 +579,11 @@ const files = glob("src/features/**/events/**/*.ts");
 ```
 
 **The Fix:**
+
 ```typescript
 // ✅ GOOD: Explicit pattern
 const files = glob("src/features/**/events/event-*.ts", {
-  ignore: ["**/*.test.ts", "**/*.spec.ts"]
+  ignore: ["**/*.test.ts", "**/*.spec.ts"],
 });
 ```
 
@@ -578,17 +592,18 @@ const files = glob("src/features/**/events/event-*.ts", {
 ### 💡 Pro Tips
 
 #### Tip #1: Use Comments to Track Function Count
+
 ```typescript
 // src/app/api/inngest/route.ts
 const ALL_FUNCTIONS = [
-  handleAnyFunctionFailure,    // 1
-  
+  handleAnyFunctionFailure, // 1
+
   // Auth (3 functions)
-  ...AUTH_FUNCTIONS,           // 2-4
-  
+  ...AUTH_FUNCTIONS, // 2-4
+
   // Tickets (7 functions)
-  ...TICKET_FUNCTIONS,         // 5-11
-  
+  ...TICKET_FUNCTIONS, // 5-11
+
   // Total: 11 functions
 ];
 
@@ -597,38 +612,41 @@ console.log(`Registered ${ALL_FUNCTIONS.length} functions`);
 ```
 
 #### Tip #2: Create a Debug Endpoint
+
 ```typescript
 // src/app/api/inngest/debug/route.ts (only in development)
 export async function GET() {
   if (process.env.NODE_ENV !== "development") {
     return Response.json({ error: "Not available" }, { status: 404 });
   }
-  
+
   return Response.json({
     totalFunctions: ALL_FUNCTIONS.length,
-    functions: ALL_FUNCTIONS.map(fn => ({
+    functions: ALL_FUNCTIONS.map((fn) => ({
       id: fn.id,
-      triggers: fn.triggers
-    }))
+      triggers: fn.triggers,
+    })),
   });
 }
 ```
 
 #### Tip #3: Alphabetize for Easy Scanning
+
 ```typescript
 // ✅ GOOD: Easy to scan
 const ALL_FUNCTIONS = [
   handleAnyFunctionFailure,
-  ...ADMIN_FUNCTIONS,      // A
-  ...AUTH_FUNCTIONS,       // A
-  ...BOOKING_FUNCTIONS,    // B
-  ...COMMENT_FUNCTIONS,    // C
-  ...PAYMENT_FUNCTIONS,    // P
-  ...TICKET_FUNCTIONS,     // T
+  ...ADMIN_FUNCTIONS, // A
+  ...AUTH_FUNCTIONS, // A
+  ...BOOKING_FUNCTIONS, // B
+  ...COMMENT_FUNCTIONS, // C
+  ...PAYMENT_FUNCTIONS, // P
+  ...TICKET_FUNCTIONS, // T
 ];
 ```
 
 #### Tip #4: Group by Criticality
+
 ```typescript
 // ✅ BEST: Critical functions are obvious
 const ALL_FUNCTIONS = [
@@ -636,11 +654,11 @@ const ALL_FUNCTIONS = [
   handleAnyFunctionFailure,
   ...PAYMENT_FUNCTIONS,
   ...AUTH_FUNCTIONS,
-  
+
   // === IMPORTANT FUNCTIONS ===
   ...TICKET_FUNCTIONS,
   ...BOOKING_FUNCTIONS,
-  
+
   // === NICE-TO-HAVE FUNCTIONS ===
   ...ANALYTICS_FUNCTIONS,
   ...NOTIFICATION_FUNCTIONS,
@@ -654,6 +672,7 @@ const ALL_FUNCTIONS = [
 ### From Unorganized to Solution 1
 
 **Step 1:** Create feature index files
+
 ```bash
 # For each feature
 touch src/features/auth/events/index.ts
@@ -661,15 +680,14 @@ touch src/features/ticket/events/index.ts
 ```
 
 **Step 2:** Export arrays from each feature
+
 ```typescript
 // src/features/auth/events/index.ts
-export const AUTH_FUNCTIONS = [
-  eventSignUpWelcomeEmail,
-  eventPasswordReset,
-];
+export const AUTH_FUNCTIONS = [eventSignUpWelcomeEmail, eventPasswordReset];
 ```
 
 **Step 3:** Update route.ts
+
 ```typescript
 // Import all registries
 import { AUTH_FUNCTIONS } from "@/features/auth/events";
@@ -691,6 +709,7 @@ const ALL_FUNCTIONS = [
 **When to migrate:** 40-50 functions, too many manual imports
 
 **Benefits:**
+
 - Automatic registration
 - Less boilerplate
 - Cleaner route.ts
@@ -706,7 +725,7 @@ const ALL_FUNCTIONS = [
 ```typescript
 // Add this temporarily to route.ts
 console.log("Registered functions:", ALL_FUNCTIONS.length);
-ALL_FUNCTIONS.forEach(fn => {
+ALL_FUNCTIONS.forEach((fn) => {
   console.log(`  - ${fn.id}`);
 });
 ```
@@ -715,7 +734,7 @@ ALL_FUNCTIONS.forEach(fn => {
 
 ```typescript
 // Detect duplicate IDs
-const ids = ALL_FUNCTIONS.map(fn => fn.id);
+const ids = ALL_FUNCTIONS.map((fn) => fn.id);
 const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
 if (duplicates.length > 0) {
   console.error("Duplicate function IDs:", duplicates);
@@ -730,7 +749,7 @@ if (duplicates.length > 0) {
 const EXPECTED_COUNT = 23;
 if (ALL_FUNCTIONS.length !== EXPECTED_COUNT) {
   console.warn(
-    `Expected ${EXPECTED_COUNT} functions, got ${ALL_FUNCTIONS.length}`
+    `Expected ${EXPECTED_COUNT} functions, got ${ALL_FUNCTIONS.length}`,
   );
 }
 ```
@@ -738,4 +757,3 @@ if (ALL_FUNCTIONS.length !== EXPECTED_COUNT) {
 ---
 
 **Recommendation:** Start with **Solution 1** (Manual) now. Upgrade to **Solution 2** (Registry) when you hit ~40-50 functions.
-

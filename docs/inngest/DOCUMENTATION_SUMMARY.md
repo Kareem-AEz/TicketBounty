@@ -9,7 +9,9 @@
 ## 🎯 What's New
 
 ### ⭐ NEW: Production Pitfalls & Tips
+
 We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle-tested guide featuring:
+
 - 14 critical production pitfalls based on common patterns
 - Illustrative examples showing typical costs and impacts
 - Do's and Don'ts quick reference
@@ -27,10 +29,12 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ### 🚀 GUIDES/ (4 files) - Deep Learning
 
 #### 1. [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md) ⭐ **START HERE**
+
 **What:** Real-world production mistakes and how to avoid them  
 **When to read:** Before writing any production code  
 **Time:** 30-45 minutes  
 **Key topics:**
+
 - 14 critical production pitfalls with real costs
 - Not wrapping in steps (can lead to significant revenue loss)
 - Blocking API responses (99% → 94% conversion drop)
@@ -45,10 +49,12 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ---
 
 #### 2. [BEST_PRACTICES.md](./GUIDES/BEST_PRACTICES.md)
+
 **What:** Comprehensive guide to architecture and organization  
 **When to read:** After pitfalls, before building  
 **Time:** 60-90 minutes  
 **Key topics:**
+
 - Architecture principles
 - Project structure by feature
 - Event naming conventions
@@ -61,10 +67,12 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ---
 
 #### 3. [MESSAGING_PATTERNS.md](./GUIDES/MESSAGING_PATTERNS.md)
+
 **What:** Advanced event-driven patterns  
 **When to read:** When designing complex workflows  
 **Time:** 45-60 minutes  
 **Key topics:**
+
 - 6 core patterns (Command, Event, Saga, Fan-Out, Fan-In, Choreography)
 - Messaging styles (Fire & Forget, Request-Reply, Batch)
 - Event routing strategies
@@ -76,10 +84,12 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ---
 
 #### 4. [ROUTING_ARCHITECTURE.md](./GUIDES/ROUTING_ARCHITECTURE.md)
+
 **What:** How to organize route.ts as you scale  
 **When to read:** When you have 10+ functions  
 **Time:** 30 minutes  
 **Key topics:**
+
 - 3 solutions for different scales (< 50, 50-150, 150+)
 - Manual organization by feature
 - Semi-automated registry
@@ -93,10 +103,12 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ### 🔍 QUICK_REFERENCE/ (2 files) - Daily Lookup
 
 #### 5. [CHEATSHEET.md](./QUICK_REFERENCE/CHEATSHEET.md) 📖 **PRINT THIS**
+
 **What:** One-page reference for common tasks  
 **When to use:** Daily reference, keep open while coding  
 **Time:** 5 minutes to scan, forever to reference  
 **Key content:**
+
 - Basic setup templates
 - Event triggering patterns
 - Step operations (run, sleep, waitForEvent)
@@ -111,10 +123,12 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ---
 
 #### 6. [QUICK_REFERENCE.md](./QUICK_REFERENCE/QUICK_REFERENCE.md)
+
 **What:** Syntax lookup and pattern reference  
 **When to use:** When you need specific syntax  
 **Time:** As needed for lookups  
 **Key content:**
+
 - Function structure templates
 - Event naming table
 - Trigger patterns
@@ -128,10 +142,12 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ### 📚 LEARNING/ (3 files) - Onboarding
 
 #### 7. [SUMMARY.md](./LEARNING/SUMMARY.md)
+
 **What:** High-level overview of all docs  
 **When to read:** First introduction to Inngest  
 **Time:** 15-20 minutes  
 **Key topics:**
+
 - Documentation overview
 - Quick start guide
 - Architecture visualization
@@ -143,10 +159,12 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ---
 
 #### 8. [INDEX.md](./LEARNING/INDEX.md)
+
 **What:** Navigation guide  
 **When to use:** Finding specific documentation  
 **Time:** 5 minutes  
 **Key content:**
+
 - Complete documentation index
 - Multiple learning paths
 - Use case navigation
@@ -155,10 +173,12 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ---
 
 #### 9. [FOR_YOUR_PROJECT.md](./LEARNING/FOR_YOUR_PROJECT.md)
+
 **What:** Specific guidance for "The Road to Next" app  
 **When to read:** When implementing in your project  
 **Time:** 30-45 minutes  
 **Key topics:**
+
 - Current implementation review
 - Suggested enhancements (tickets, comments, accounts)
 - Integration points
@@ -172,14 +192,17 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ## 🚀 Quick Start Guide
 
 ### If you have 5 minutes
+
 1. Read: [CHEATSHEET.md](./QUICK_REFERENCE/CHEATSHEET.md)
 2. Bookmark it for daily use
 
 ### If you have 30 minutes (Recommended First Path)
+
 1. Read: [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md) (learn what NOT to do)
 2. Scan: [CHEATSHEET.md](./QUICK_REFERENCE/CHEATSHEET.md) (quick reference)
 
 ### If you have 2 hours (Complete Onboarding)
+
 1. Read: [SUMMARY.md](./LEARNING/SUMMARY.md) (overview)
 2. Read: [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md) (avoid mistakes)
 3. Read: [BEST_PRACTICES.md](./GUIDES/BEST_PRACTICES.md) (comprehensive patterns)
@@ -187,6 +210,7 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 5. Read: [FOR_YOUR_PROJECT.md](./LEARNING/FOR_YOUR_PROJECT.md) (your app specifics)
 
 ### If you're building complex workflows
+
 1. Read: [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)
 2. Study: [MESSAGING_PATTERNS.md](./GUIDES/MESSAGING_PATTERNS.md)
 3. Reference: [BEST_PRACTICES.md](./GUIDES/BEST_PRACTICES.md)
@@ -196,6 +220,7 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ## 📊 Documentation Quality Metrics
 
 ### Coverage
+
 - ✅ Basic concepts: Comprehensive
 - ✅ Advanced patterns: Comprehensive
 - ✅ Real-world examples: 20+ with code
@@ -205,6 +230,7 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 - ✅ Project-specific guidance: Detailed roadmap
 
 ### Real-World Value
+
 - 💰 **Cost patterns:** Illustrates typical production issues and their impacts
 - ⚡ **Performance improvements:** Shows common optimization results (96% response time reduction)
 - 📈 **Success patterns:** Demonstrates typical improvements (94% → 99.8% success rate)
@@ -216,17 +242,20 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 ## 🎯 Learning Paths by Role
 
 ### New Developer
+
 1. [SUMMARY.md](./LEARNING/SUMMARY.md) - Understand the basics
 2. [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md) - Learn common mistakes
 3. [CHEATSHEET.md](./QUICK_REFERENCE/CHEATSHEET.md) - Keep as reference
 4. [BEST_PRACTICES.md](./GUIDES/BEST_PRACTICES.md) - Deep dive
 
 ### Senior Developer
+
 1. [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md) - Review production issues
 2. [MESSAGING_PATTERNS.md](./GUIDES/MESSAGING_PATTERNS.md) - Advanced patterns
 3. [ROUTING_ARCHITECTURE.md](./GUIDES/ROUTING_ARCHITECTURE.md) - Scale strategies
 
 ### Tech Lead / Architect
+
 1. [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md) - Understand risks
 2. [MESSAGING_PATTERNS.md](./GUIDES/MESSAGING_PATTERNS.md) - Pattern selection
 3. [BEST_PRACTICES.md](./GUIDES/BEST_PRACTICES.md) - Architecture review
@@ -239,11 +268,13 @@ We've added **[PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)** - a battle
 Before deploying to production, ensure you've:
 
 ### Documentation
+
 - [ ] Read [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)
 - [ ] Reviewed [BEST_PRACTICES.md](./GUIDES/BEST_PRACTICES.md)
 - [ ] Bookmarked [CHEATSHEET.md](./QUICK_REFERENCE/CHEATSHEET.md)
 
 ### Code Quality
+
 - [ ] All operations wrapped in `step.run()`
 - [ ] Timeouts set on all `waitForEvent()`
 - [ ] Idempotency keys for all side effects
@@ -253,12 +284,14 @@ Before deploying to production, ensure you've:
 - [ ] No sensitive data in event payloads
 
 ### Testing
+
 - [ ] Tested locally with `inngest dev`
 - [ ] Test endpoint created for triggering events
 - [ ] Error scenarios tested
 - [ ] Timeout scenarios tested
 
 ### Monitoring
+
 - [ ] Global failure handler configured
 - [ ] Alerts set up for critical functions
 - [ ] Logging integration configured
@@ -268,21 +301,22 @@ Before deploying to production, ensure you've:
 
 ## 🆘 Troubleshooting Quick Links
 
-| Problem | Solution Document | Section |
-|---------|------------------|---------|
-| Function never runs | [ROUTING_ARCHITECTURE.md](./GUIDES/ROUTING_ARCHITECTURE.md) | Pitfall #1 |
-| Slow API responses | [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md) | Pitfall #2 |
-| Duplicate charges | [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md) | Pitfall #4 |
-| Resource leaks | [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md) | Pitfall #3 |
-| High costs | [MESSAGING_PATTERNS.md](./GUIDES/MESSAGING_PATTERNS.md) | Cost Optimization |
-| Complex workflow design | [MESSAGING_PATTERNS.md](./GUIDES/MESSAGING_PATTERNS.md) | Pattern Selection |
-| Organizing 50+ functions | [ROUTING_ARCHITECTURE.md](./GUIDES/ROUTING_ARCHITECTURE.md) | Solution 2 |
+| Problem                  | Solution Document                                           | Section           |
+| ------------------------ | ----------------------------------------------------------- | ----------------- |
+| Function never runs      | [ROUTING_ARCHITECTURE.md](./GUIDES/ROUTING_ARCHITECTURE.md) | Pitfall #1        |
+| Slow API responses       | [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)       | Pitfall #2        |
+| Duplicate charges        | [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)       | Pitfall #4        |
+| Resource leaks           | [PITFALLS_AND_TIPS.md](./GUIDES/PITFALLS_AND_TIPS.md)       | Pitfall #3        |
+| High costs               | [MESSAGING_PATTERNS.md](./GUIDES/MESSAGING_PATTERNS.md)     | Cost Optimization |
+| Complex workflow design  | [MESSAGING_PATTERNS.md](./GUIDES/MESSAGING_PATTERNS.md)     | Pattern Selection |
+| Organizing 50+ functions | [ROUTING_ARCHITECTURE.md](./GUIDES/ROUTING_ARCHITECTURE.md) | Solution 2        |
 
 ---
 
 ## 💡 Key Takeaways
 
 ### Top 5 Production Rules
+
 1. **Wrap everything in steps** - No steps = no retries = lost money
 2. **Never block API responses** - Fire events, return immediately
 3. **Always set timeouts** - waitForEvent() without timeout = resource leak
@@ -290,6 +324,7 @@ Before deploying to production, ensure you've:
 5. **Set concurrency limits** - Protect shared resources from exhaustion
 
 ### Top 5 Performance Tips
+
 1. **Use parallel execution** - Independent steps should run concurrently
 2. **Batch large datasets** - Don't process 10,000 items one-by-one
 3. **Set appropriate concurrency** - Balance speed with resource limits
@@ -310,12 +345,14 @@ Before deploying to production, ensure you've:
 ## 🎓 Documentation Maintenance
 
 ### When to Update
+
 - New patterns discovered in production
 - Cost/performance metrics change
 - New Inngest features released
 - Team feedback on clarity
 
 ### How to Contribute
+
 1. Document real production issues in PITFALLS_AND_TIPS.md
 2. Add real metrics and costs when available
 3. Keep examples current with latest syntax
@@ -329,5 +366,4 @@ Before deploying to production, ensure you've:
 
 **Happy Building! 🚀**
 
-*Questions? See [START_HERE.md](./START_HERE.md) for navigation help.*
-
+_Questions? See [START_HERE.md](./START_HERE.md) for navigation help._

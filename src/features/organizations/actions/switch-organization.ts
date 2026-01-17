@@ -22,17 +22,17 @@ export const switchOrganization = async (organizationId: string) => {
     if (!userOrganization)
       return toErrorActionState(new Error("Organization not found"));
 
-    await prisma.$transaction(async (tx) => {
-      await tx.membership.updateMany({
+    await prisma.$transaction([
+      prisma.membership.updateMany({
         where: {
           userId: user.id,
         },
         data: {
           isActive: false,
         },
-      });
+      }),
 
-      await tx.membership.update({
+      prisma.membership.update({
         where: {
           userId_organizationId: {
             userId: user.id,
@@ -42,8 +42,8 @@ export const switchOrganization = async (organizationId: string) => {
         data: {
           isActive: true,
         },
-      });
-    });
+      }),
+    ]);
 
     revalidatePath(organizationsPath());
     return toSuccessActionState({
