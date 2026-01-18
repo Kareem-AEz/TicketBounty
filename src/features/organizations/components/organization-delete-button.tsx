@@ -22,6 +22,8 @@ export default function OrganizationDeleteButton({
     description: "Are you sure you want to delete this organization?",
     confirmLabel: "Delete",
     cancelLabel: "Cancel",
+    loadingLabel: "Deleting organization...",
+
     trigger: (isPending) => (
       <Button
         variant="destructive"

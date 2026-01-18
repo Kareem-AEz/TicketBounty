@@ -25,10 +25,11 @@ import {
 import { Button } from "@/components/ui/button";
 
 type ConfirmDialogueProps = {
-  title: string;
-  description: string;
-  confirmLabel: string;
-  cancelLabel: string;
+  title?: string;
+  description?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  loadingLabel?: string;
   action: () => Promise<ActionState | undefined>;
   trigger: ((isPending: boolean) => React.ReactElement) | React.ReactElement;
   onSuccess?: (data: ActionState) => void;
@@ -41,6 +42,7 @@ export const useConfirmDialog = ({
   description = "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
+  loadingLabel = "Loading...",
   action,
   trigger,
   onSuccess,
@@ -84,7 +86,7 @@ export const useConfirmDialog = ({
       });
 
       toast.promise(promise, {
-        loading: "Loading...",
+        loading: loadingLabel,
         success: (data) => {
           return data?.message || "Success!";
         },
@@ -96,7 +98,7 @@ export const useConfirmDialog = ({
       // Clear the ref after using it
       promiseRef.current = null;
     }
-  }, [isPending]);
+  }, [isPending, loadingLabel]);
 
   useActionFeedback(actionState ?? EMPTY_ACTION_STATE, {
     onSuccess: ({ actionState }) => {
