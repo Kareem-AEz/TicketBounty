@@ -4,7 +4,7 @@ import { getAuthOrRedirect } from "./get-auth-or-redirect";
 export const useAuthQuery = () => {
   return useQuery({
     queryKey: ["auth", "guard"],
-    queryFn: getAuthOrRedirect, // Let redirect errors bubble up naturally
+    queryFn: () => getAuthOrRedirect(), // Let redirect errors bubble up naturally
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     retry: false, // Don't retry redirect errors
