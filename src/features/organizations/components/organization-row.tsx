@@ -26,10 +26,12 @@ type Organization = Awaited<
 
 type OrganizationRowProps = {
   organization: Organization;
+  limitedAccess?: boolean;
 };
 
 export default function OrganizationRow({
   organization,
+  limitedAccess = false,
 }: OrganizationRowProps) {
   const { deletingUserOrganizationId } = useDeletingUserOrganization();
   const isActive = organization.membershipByUser.isActive;
@@ -55,10 +57,30 @@ export default function OrganizationRow({
     />
   );
 
+  const editButton = (
+    <Button variant="outline" size="icon" disabled={isAnyDeleting}>
+      <LucidePencil />
+    </Button>
+  );
+
+  const viewButton = (
+    <Button variant="outline" size="icon" disabled={isAnyDeleting}>
+      <LucideExternalLink />
+    </Button>
+  );
+
   const deleteButton = (
     <OrganizationDeleteButton organizationId={organization.id} />
   );
 
+  const buttons = (
+    <>
+      {switchButton}
+      {!limitedAccess && viewButton}
+      {!limitedAccess && editButton}
+      {!limitedAccess && deleteButton}
+    </>
+  );
   return (
     <TableRow className="relative" key={organization.id}>
       <TableCell>
@@ -81,16 +103,7 @@ export default function OrganizationRow({
       </TableCell>
       <TableCell>{organization._count.memberships}</TableCell>
       <TableCell>
-        <motion.div className="flex w-full gap-x-2">
-          {switchButton}
-          <Button variant="outline" size="icon" disabled={isAnyDeleting}>
-            <LucideExternalLink />
-          </Button>
-          <Button variant="outline" size="icon" disabled={isAnyDeleting}>
-            <LucidePencil />
-          </Button>
-          {deleteButton}
-        </motion.div>
+        <motion.div className="flex w-full gap-x-2">{buttons}</motion.div>
       </TableCell>
       <TableCell>
         <AnimatePresence mode="popLayout">

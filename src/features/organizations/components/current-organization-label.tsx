@@ -13,7 +13,7 @@ export default function CurrentOrganizationLabel() {
       variant="outline"
       className="bg-secondary/80 fixed right-10 bottom-10 z-50 flex h-8 items-center gap-2 px-4 font-mono text-pretty"
     >
-      <LucideBuilding2 className="size-4! -translate-y-[1px]" />
+      <LucideBuilding2 className="size-4! -translate-y-px" />
       <span className="max-w-32 truncate">
         {currentActiveOrganization.name}
       </span>

@@ -6,7 +6,9 @@ export const getCurrentActiveOrganization = async () => {
   if (!user) return null;
 
   const organizations = await getOrganizationsByUserId();
-  return organizations.find(
-    (organization) => organization.membershipByUser?.isActive,
+  return (
+    organizations.find(
+      (organization) => organization.membershipByUser?.isActive,
+    ) ?? null
   );
 };

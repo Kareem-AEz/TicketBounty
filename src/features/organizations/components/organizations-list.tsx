@@ -20,7 +20,12 @@ import { DeletingUserOrganizationProvider } from "../contexts/deleting-organizat
 import { getOrganizationsByUserId } from "../queries/get-organizations-by-user-id";
 import OrganizationRow from "./organization-row";
 
-export default async function OrganizationsList() {
+interface OrganizationsListProps {
+  limitedAccess?: boolean;
+}
+export default async function OrganizationsList({
+  limitedAccess = false,
+}: OrganizationsListProps) {
   const organizations = await getOrganizationsByUserId();
   const isEmpty = organizations.length === 0;
 
@@ -75,6 +80,7 @@ export default async function OrganizationsList() {
             <OrganizationRow
               key={organization.id}
               organization={organization}
+              limitedAccess={limitedAccess}
             />
           ))}
         </TableBody>
