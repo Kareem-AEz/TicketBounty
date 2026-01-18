@@ -41,6 +41,7 @@ model Membership {
   @@id([userId, organizationId])
   @@index([userId])
   @@index([organizationId])
+  @@index([userId, isActive])
 }
 
 model User {
