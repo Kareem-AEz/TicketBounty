@@ -23,11 +23,16 @@ export default function OrganizationDeleteButton({
     confirmLabel: "Delete",
     cancelLabel: "Cancel",
     trigger: (isPending) => (
-      <Button variant="outline" size="icon" disabled={isPending}>
+      <Button
+        variant="destructive"
+        className="relative"
+        size="icon"
+        disabled={isPending}
+      >
         <AnimatePresence mode="popLayout" initial={false}>
           {isPending ? (
             <motion.div
-              key="loading"
+              key="loading-delete"
               initial={{ opacity: 0, scale: 0.8, filter: "blur(6px)" }}
               animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
               exit={{ opacity: 0, scale: 0.8, filter: "blur(6px)" }}
@@ -36,7 +41,7 @@ export default function OrganizationDeleteButton({
             </motion.div>
           ) : (
             <motion.div
-              key="trash"
+              key="trash-delete"
               initial={{ opacity: 0, scale: 0.8, filter: "blur(6px)" }}
               animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
               exit={{ opacity: 0, scale: 0.8, filter: "blur(6px)" }}

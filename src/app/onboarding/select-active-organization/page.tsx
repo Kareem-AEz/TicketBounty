@@ -39,7 +39,7 @@ export default async function SelectActiveOrganizationPage() {
           </div>
         }
       >
-        <OrganizationsList />
+        <OrganizationsList limitedAccess />
       </Suspense>
     </div>
   );
