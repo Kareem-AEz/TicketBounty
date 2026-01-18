@@ -11,6 +11,7 @@ import Sidebar from "@/components/sidebar/components/sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import EmailVerificationAlert from "@/features/auth/components/email-verification-alert";
+import CurrentOrganizationLabel from "@/features/organizations/components/current-organization-label";
 import { getSEOTags } from "@/lib/seo-tags";
 import {
   generateOrganizationStructuredData,
@@ -112,6 +113,7 @@ export default function RootLayout({
                   </div>
                 </div>
                 <Toaster />
+                <CurrentOrganizationLabel />
               </ReactQueryProvider>
             </ThemeProvider>
           </PostHogAuthWrapper>
