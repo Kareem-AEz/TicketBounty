@@ -46,6 +46,7 @@ export const switchOrganization = async (organizationId: string) => {
     ]);
 
     revalidatePath(organizationsPath());
+
     return toSuccessActionState({
       status: "SUCCESS",
       message: "Organization switched",

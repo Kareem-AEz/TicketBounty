@@ -1,7 +1,9 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useActionState } from "react";
 import Form from "@/components/form/form";
+import { useActionFeedback } from "@/components/form/hooks/useActionFeedback";
 import { EMPTY_ACTION_STATE } from "@/components/form/utils/to-action-state";
 import { switchOrganization } from "../actions/switch-organization";
 
@@ -18,6 +20,16 @@ const OrganizationSwitchButton = ({
     switchOrganization.bind(null, organizationId),
     EMPTY_ACTION_STATE,
   );
+
+  const queryClient = useQueryClient();
+
+  useActionFeedback(actionState, {
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ["current-active-organization"],
+      });
+    },
+  });
 
   return (
     <Form action={action} actionState={actionState}>
