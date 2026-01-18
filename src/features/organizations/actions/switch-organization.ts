@@ -8,31 +8,42 @@ import {
 import { getAuth } from "@/features/auth/queries/get-auth";
 import prisma from "@/lib/prisma";
 import { organizationsPath } from "@/paths";
-import { getOrganizationsByUserId } from "../queries/get-organizations-by-user-id";
 
 export const switchOrganization = async (organizationId: string) => {
   const { user } = await getAuth();
   if (!user) return toErrorActionState(new Error("Unauthorized"));
 
   try {
-    const userOrganizations = await getOrganizationsByUserId();
-    const userOrganization = userOrganizations.find(
-      (organization) => organization.id === organizationId,
-    );
-    if (!userOrganization)
-      return toErrorActionState(new Error("Organization not found"));
+    // Use transaction callback to ensure atomic operations and prevent race conditions
+    await prisma.$transaction(async (tx) => {
+      // Verify membership exists INSIDE transaction (acquires row lock)
+      const membership = await tx.membership.findUnique({
+        where: {
+          userId_organizationId: {
+            userId: user.id,
+            organizationId,
+          },
+        },
+        select: { userId: true },
+      });
 
-    await prisma.$transaction([
-      prisma.membership.updateMany({
+      if (!membership) {
+        throw new Error("Organization not found");
+      }
+
+      // Deactivate all currently active memberships for this user
+      await tx.membership.updateMany({
         where: {
           userId: user.id,
+          isActive: true,
         },
         data: {
           isActive: false,
         },
-      }),
+      });
 
-      prisma.membership.update({
+      // Activate the target organization
+      await tx.membership.update({
         where: {
           userId_organizationId: {
             userId: user.id,
@@ -42,8 +53,8 @@ export const switchOrganization = async (organizationId: string) => {
         data: {
           isActive: true,
         },
-      }),
-    ]);
+      });
+    });
 
     revalidatePath(organizationsPath());
 
