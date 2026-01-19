@@ -11,7 +11,7 @@
   // ═══════════════════════════════════════════════════════════
   "workbench.editor.customLabels.enabled": true,
   "workbench.editor.customLabels.patterns": {
-    "**/app/**/{page,layout,template,loading,error,not-found,route}.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/app/**/{page,layout,template,loading,error,not-found,route}.{tsx,ts,jsx,js}": "${filename} | ${dirname}",
     "**/index.{tsx,ts,jsx,js}": "${dirname} | index",
     "**/features/**/actions/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
     "**/features/**/components/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
