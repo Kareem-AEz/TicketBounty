@@ -11,12 +11,15 @@ import {
 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
+import Link from "next/link";
 import SubmitButton from "@/components/form/submit-button";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { organizationPath } from "@/paths";
 import { useDeletingUserOrganization } from "../contexts/deleting-organization-context";
 import { getOrganizationsByUserId } from "../queries/get-organizations-by-user-id";
+import MemberDeleteButton from "./member-delete-button";
 import OrganizationDeleteButton from "./organization-delete-button";
 import OrganizationSwitchButton from "./organization-switch-button";
 
@@ -64,9 +67,18 @@ export default function OrganizationRow({
   );
 
   const viewButton = (
-    <Button variant="outline" size="icon" disabled={isAnyDeleting}>
-      <LucideExternalLink />
+    <Button asChild variant="outline" size="icon" disabled={isAnyDeleting}>
+      <Link href={organizationPath(organization.id)}>
+        <LucideExternalLink />
+      </Link>
     </Button>
+  );
+
+  const leaveButton = (
+    <MemberDeleteButton
+      memberId={organization.membershipByUser.userId}
+      organizationId={organization.id}
+    />
   );
 
   const deleteButton = (
@@ -78,6 +90,7 @@ export default function OrganizationRow({
       {switchButton}
       {!limitedAccess && viewButton}
       {!limitedAccess && editButton}
+      {!limitedAccess && leaveButton}
       {!limitedAccess && deleteButton}
     </>
   );

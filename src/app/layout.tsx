@@ -10,6 +10,7 @@ import Header from "@/components/header";
 import Sidebar from "@/components/sidebar/components/sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import EmailVerificationAlert from "@/features/auth/components/email-verification-alert";
 import CurrentOrganizationLabel from "@/features/organizations/components/current-organization-label";
 import { getSEOTags } from "@/lib/seo-tags";
@@ -93,27 +94,29 @@ export default function RootLayout({
           <PostHogAuthWrapper>
             <ThemeProvider>
               <ReactQueryProvider>
-                <ReactQueryDevtools />
+                <TooltipProvider>
+                  <ReactQueryDevtools />
 
-                <Header />
+                  <Header />
 
-                <div className="flex">
-                  <Sidebar />
+                  <div className="flex">
+                    <Sidebar />
 
-                  <div className="flex flex-1 flex-col">
-                    <main
-                      id="main"
-                      className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-clip px-8 py-24 pl-28"
-                    >
-                      <EmailVerificationAlert className="mx-auto mb-4 w-full max-w-2xl" />
+                    <div className="flex flex-1 flex-col">
+                      <main
+                        id="main"
+                        className="bg-secondary/20 flex min-h-screen flex-1 flex-col overflow-y-clip px-8 py-24 pl-28"
+                      >
+                        <EmailVerificationAlert className="mx-auto mb-4 w-full max-w-2xl" />
 
-                      <NuqsAdapter>{children}</NuqsAdapter>
-                    </main>
-                    <Footer />
+                        <NuqsAdapter>{children}</NuqsAdapter>
+                      </main>
+                      <Footer />
+                    </div>
                   </div>
-                </div>
-                <Toaster />
-                <CurrentOrganizationLabel />
+                  <Toaster />
+                  <CurrentOrganizationLabel />
+                </TooltipProvider>
               </ReactQueryProvider>
             </ThemeProvider>
           </PostHogAuthWrapper>

@@ -100,11 +100,18 @@ const seed = async () => {
 
     // Create memberships
     await tx.membership.createMany({
-      data: {
-        organizationId: createdOrganization.id,
-        userId: createdUsers[0].id,
-        isActive: true,
-      },
+      data: [
+        {
+          organizationId: createdOrganization.id,
+          userId: createdUsers[0].id,
+          isActive: true,
+        },
+        {
+          organizationId: createdOrganization.id,
+          userId: createdUsers[1].id,
+          isActive: false,
+        },
+      ],
     });
 
     // Create tickets

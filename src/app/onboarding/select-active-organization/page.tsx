@@ -20,8 +20,8 @@ export default async function SelectActiveOrganizationPage() {
   return (
     <div className="flex flex-1 flex-col gap-y-8">
       <Heading
-        title="Select Active Organization"
-        description="Select the active organization you want to use"
+        title="Select Organization to Activate"
+        description="Select the organization you want to activate"
         action={
           <Button asChild>
             <Link href={onboardingPath()}>

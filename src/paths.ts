@@ -18,3 +18,5 @@ export const createOrganizationPath = () => "/organizations/create" as const;
 export const onboardingPath = () => "/onboarding" as const;
 export const selectActiveOrganizationPath = () =>
   "onboarding/select-active-organization" as const;
+export const organizationPath = (organizationId: string) =>
+  `/organizations/${organizationId}` as const;
