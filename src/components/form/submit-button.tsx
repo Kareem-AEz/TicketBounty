@@ -54,8 +54,8 @@ function SubmitButton({
       variant={variant}
       size={size}
       className={cn("", className)}
-      disabled={props.disabled || isWorking}
       {...props}
+      disabled={props.disabled || isWorking}
     >
       {isWorking ? (
         <motion.div
