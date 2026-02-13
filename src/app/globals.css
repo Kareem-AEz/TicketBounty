@@ -261,6 +261,12 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+body,
+html {
+  scrollbar-gutter: stable;
+  width: 100%;
+}
+
 :root {
   --radius: 0.65rem;
   --background: oklch(1 0 0);
@@ -336,8 +342,5 @@
   }
   body {
     @apply bg-background text-foreground;
-    scrollbar-gutter: stable;
-    /* Fallback for older browsers */
-    overflow-y: scroll;
   }
 }

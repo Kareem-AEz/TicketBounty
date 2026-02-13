@@ -105,11 +105,13 @@ const seed = async () => {
           organizationId: createdOrganization.id,
           userId: createdUsers[0].id,
           isActive: true,
+          membershipRole: "ADMIN",
         },
         {
           organizationId: createdOrganization.id,
           userId: createdUsers[1].id,
           isActive: false,
+          membershipRole: "MEMBER",
         },
       ],
     });

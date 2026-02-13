@@ -37,11 +37,17 @@ model Membership {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   isActive        Boolean       @default(false)
+  membershipRole  MembershipRole @default(MEMBER)
 
   @@id([userId, organizationId])
   @@index([userId])
   @@index([organizationId])
   @@index([userId, isActive])
+}
+
+enum MembershipRole {
+  MEMBER
+  ADMIN
 }
 
 model User {
