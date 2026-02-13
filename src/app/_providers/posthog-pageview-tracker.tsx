@@ -20,6 +20,11 @@ export default function PostHogPageViewTracker() {
       posthog.capture("$pageview", {
         $current_url: url,
       });
+
+      // Opt out of capturing on localhost
+      if (window.location.hostname === "localhost") {
+        posthog.opt_out_capturing();
+      }
     }
   }, [pathname, searchParams, posthog]);
 

@@ -12,7 +12,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       person_profiles: "identified_only",
       capture_pageview: false, // We handle this manually in the tracker
       capture_exceptions: true,
-      debug: process.env.NODE_ENV === "development",
+      // debug: process.env.NODE_ENV === "development",
       disable_session_recording: true,
 
       // GDPR Compliance:
