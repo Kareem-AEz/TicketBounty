@@ -77,7 +77,8 @@
     "zxcvbn": "^4.4.2"
   },
   "overrides": {
-    "hono": "^4.11.9"
+    "hono": "^4.11.9",
+    "lodash": "^4.17.23"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
