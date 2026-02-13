@@ -33,6 +33,7 @@ export const createOrganization = async (
           create: {
             userId: user.id,
             isActive: false,
+            membershipRole: "ADMIN",
           },
         },
       },

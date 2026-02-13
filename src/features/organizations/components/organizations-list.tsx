@@ -1,4 +1,5 @@
 import { LucideUsers } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -16,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { createOrganizationPath } from "@/paths";
 import { DeletingUserOrganizationProvider } from "../contexts/deleting-organization-context";
 import { getOrganizationsByUserId } from "../queries/get-organizations-by-user-id";
 import OrganizationRow from "./organization-row";
@@ -43,7 +45,7 @@ export default async function OrganizationsList({
         </EmptyHeader>
         <EmptyContent>
           <Button variant="outline" size="sm">
-            Create Organization
+            <Link href={createOrganizationPath()}>Create Organization</Link>
           </Button>
         </EmptyContent>
       </Empty>
@@ -68,6 +70,9 @@ export default async function OrganizationsList({
             </TableHead>
             <TableHead className="bg-background/95 backdrop-blur-sm">
               Members
+            </TableHead>
+            <TableHead className="bg-background/95 backdrop-blur-sm">
+              Role
             </TableHead>
             <TableHead className="bg-background/95 backdrop-blur-sm">
               Actions

@@ -5,8 +5,8 @@ import {
   toSuccessActionState,
 } from "@/components/form/utils/to-action-state";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
+import { getMembershipsByOrganizationId } from "@/features/memberships/queries/get-memberships-by-organization-id";
 import prisma from "@/lib/prisma";
-import { getMembershipsByOrganizationId } from "../queries/get-memberships-by-organization-id";
 
 export async function deleteOrganizationMember(
   organizationId: string,
