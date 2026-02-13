@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
 import Heading from "@/components/heading";
 import Spinner from "@/components/spinner";
-import OrganizationMembersList from "@/features/organizations/components/organization-members-list";
+import OrganizationMembersList from "@/features/memberships/components/membershib-list";
 import { getOrganizationById } from "@/features/organizations/queries/get-organization-by-id";
 import { homePath, organizationsPath } from "@/paths";
 const breadcrumbs: Breadcrumb[] = [

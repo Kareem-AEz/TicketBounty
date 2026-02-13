@@ -7,6 +7,7 @@ import {
   LucideArrowRightLeft,
   LucideCheck,
   LucideExternalLink,
+  LucideInfo,
   LucidePencil,
 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
@@ -15,6 +16,11 @@ import Link from "next/link";
 import SubmitButton from "@/components/form/submit-button";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { organizationPath } from "@/paths";
 import { useDeletingUserOrganization } from "../contexts/deleting-organization-context";
@@ -109,12 +115,31 @@ export default function OrganizationRow({
           )}
         </AnimatePresence>
       </TableCell>
-      <TableCell>{organization.id}</TableCell>
+      <TableCell className="">{organization.id}</TableCell>
       <TableCell>{organization.name}</TableCell>
       <TableCell>
         {format(organization.membershipByUser.joinedAt, "yyyy/MM/dd, hh:mm a")}
       </TableCell>
       <TableCell>{organization._count.memberships}</TableCell>
+      <TableCell className="font-mono tracking-wider capitalize">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="inline-flex cursor-default items-center gap-x-2">
+              <span className="flex items-center gap-x-1">
+                {organization.membershipByUser.membershipRole}{" "}
+                <LucideInfo className="text-muted-foreground size-3.5 -translate-y-[0.3px]" />
+              </span>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <span className="text-muted-foreground font-mono text-xs">
+              {organization.membershipByUser.membershipRole === "ADMIN"
+                ? "You are the admin of the organization."
+                : "You are a member of the organization."}
+            </span>
+          </TooltipContent>
+        </Tooltip>
+      </TableCell>
       <TableCell>
         <motion.div className="flex w-full gap-x-2">{buttons}</motion.div>
       </TableCell>
