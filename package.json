@@ -81,6 +81,7 @@
     "lodash": "^4.17.23"
   },
   "devDependencies": {
+    "@eslint/compat": "^2.0.2",
     "@eslint/eslintrc": "^3",
     "@react-email/preview-server": "^5.2.8",
     "@tailwindcss/postcss": "^4",
