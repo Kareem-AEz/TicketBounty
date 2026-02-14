@@ -53,3 +53,5 @@ next-env.d.ts
 /scripts
 /AI
 /GEMINI.md
+.gemini/
+gha-creds-*.json
