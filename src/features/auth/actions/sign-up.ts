@@ -3,7 +3,7 @@
 import argon2 from "@node-rs/argon2";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import z from "zod";
+import { z } from "zod/v4";
 import {
   ActionState,
   toErrorActionState,
