@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useConfirmDialog } from "@/lib/hooks/use-confirm-dialog";
-import { deleteUserOrganization } from "../actions/delete-user-organization";
+import { deleteOrganization } from "../actions/delete-organization";
 import { useDeletingUserOrganization } from "../contexts/deleting-organization-context";
 
 type OrganizationDeleteButtonProps = {
@@ -19,7 +19,8 @@ export default function OrganizationDeleteButton({
 
   const [dialog, dialogTrigger] = useConfirmDialog({
     title: "Delete Organization",
-    description: "Are you sure you want to delete this organization?",
+    description:
+      "Are you sure you want to delete this organization? This action cannot be undone. All data associated with this organization will be permanently deleted.",
     confirmLabel: "Delete",
     cancelLabel: "Cancel",
     loadingLabel: "Deleting organization...",
@@ -54,7 +55,7 @@ export default function OrganizationDeleteButton({
         </AnimatePresence>
       </Button>
     ),
-    action: deleteUserOrganization.bind(null, organizationId),
+    action: deleteOrganization.bind(null, organizationId),
     onPendingChange: (isPending) => {
       setDeletingUserOrganizationId(isPending ? organizationId : null);
     },

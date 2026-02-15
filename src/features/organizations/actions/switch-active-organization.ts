@@ -9,7 +9,7 @@ import { getAuth } from "@/features/auth/queries/get-auth";
 import prisma from "@/lib/prisma";
 import { organizationsPath } from "@/paths";
 
-export const switchOrganization = async (organizationId: string) => {
+export const switchActiveOrganization = async (organizationId: string) => {
   const { user } = await getAuth();
   if (!user) return toErrorActionState(new Error("Unauthorized"));
 

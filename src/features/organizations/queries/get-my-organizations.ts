@@ -1,14 +1,19 @@
 "use server";
 
 import { getAuth } from "@/features/auth/queries/get-auth";
+import { Prisma, PrismaClient } from "@/generated/client";
 import prisma from "@/lib/prisma";
 
-export const getOrganizationsByUserId = async () => {
+export const getMyOrganizations = async (
+  { tx = prisma }: { tx: PrismaClient | Prisma.TransactionClient } = {
+    tx: prisma,
+  },
+) => {
   const { user } = await getAuth();
   const userId = user?.id;
   if (!userId) return [];
 
-  const organizations = await prisma.organization.findMany({
+  const organizations = await tx.organization.findMany({
     where: {
       memberships: {
         some: { userId },

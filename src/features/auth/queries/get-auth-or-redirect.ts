@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getOrganizationsByUserId } from "@/features/organizations/queries/get-organizations-by-user-id";
+import { getMyOrganizations } from "@/features/organizations/queries/get-my-organizations";
 import {
   onboardingPath,
   selectActiveOrganizationPath,
@@ -19,14 +19,14 @@ export const getAuthOrRedirect = async ({
     redirect(signInPath());
   }
 
-  const organizations = await getOrganizationsByUserId();
+  const organizations = await getMyOrganizations();
   if (organizations.length === 0) {
     redirect(onboardingPath());
   }
 
   if (checkActiveOrganization) {
     const hasActiveOrganization = organizations.some(
-      (organization) => organization.membershipByUser?.isActive,
+      (organization) => organization?.membershipByUser?.isActive ?? false,
     );
     if (!hasActiveOrganization) {
       redirect(selectActiveOrganizationPath());

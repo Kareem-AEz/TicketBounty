@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 
-export const getOrganizationById = async (organizationId: string) => {
+export const getOrganization = async (organizationId: string) => {
   const organization = await prisma.organization.findUnique({
     where: { id: organizationId },
   });

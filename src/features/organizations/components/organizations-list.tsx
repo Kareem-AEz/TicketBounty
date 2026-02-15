@@ -19,16 +19,16 @@ import {
 } from "@/components/ui/table";
 import { createOrganizationPath } from "@/paths";
 import { DeletingUserOrganizationProvider } from "../contexts/deleting-organization-context";
-import { getOrganizationsByUserId } from "../queries/get-organizations-by-user-id";
+import { getMyOrganizations } from "../queries/get-my-organizations";
 import OrganizationRow from "./organization-row";
 
-interface OrganizationsListProps {
+type OrganizationsListProps = {
   limitedAccess?: boolean;
-}
+};
 export default async function OrganizationsList({
   limitedAccess = false,
 }: OrganizationsListProps) {
-  const organizations = await getOrganizationsByUserId();
+  const organizations = await getMyOrganizations();
   const isEmpty = organizations.length === 0;
 
   if (isEmpty) {

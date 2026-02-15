@@ -15,9 +15,8 @@ import {
 } from "@/components/ui/tooltip";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import MemberDeleteButton from "@/features/organizations/components/member-delete-button";
-import { getOrganizationMembers } from "@/features/organizations/queries/get-organization-members";
-import { MembershipRole } from "@/generated/enums";
-import { getMembership } from "../queries/get-membership";
+import { getMembershipsByOrganization } from "../queries/get-memberships-by-organization";
+import { membershipSelectors } from "../utils/membership-selectors";
 import MemberRoleSelect from "./member-role-select";
 
 type OrganizationMembersListProps = {
@@ -27,10 +26,11 @@ export default async function OrganizationMembersList({
   organizationId,
 }: OrganizationMembersListProps) {
   const user = await getAuthOrRedirect();
-  const members = await getOrganizationMembers(organizationId);
-  const userMembership = await getMembership(organizationId, user.id);
-
-  const isUserAdmin = userMembership?.membershipRole === MembershipRole.ADMIN;
+  const members = await getMembershipsByOrganization(organizationId);
+  const { isAdmin, onlyAdminId } = membershipSelectors({
+    memberships: members,
+    userId: user.id,
+  });
 
   return (
     <Table containerClassName="overflow-visible px-4   " className="w-full">
@@ -91,11 +91,12 @@ export default async function OrganizationMembersList({
                 )}
               </TableCell>
               <TableCell className="text-muted-foreground w-[250px] font-mono text-xs tracking-wider uppercase">
-                {isUserAdmin ? (
+                {isAdmin ? (
                   <MemberRoleSelect
                     currentRole={member.membershipRole}
                     organizationId={organizationId}
                     userId={member.userId}
+                    lastAdminId={onlyAdminId}
                   />
                 ) : (
                   <span className="text-muted-foreground font-mono text-xs tracking-wider uppercase">
@@ -115,7 +116,7 @@ export default async function OrganizationMembersList({
                 )}
               </TableCell>
               <TableCell className="flex items-center gap-x-2">
-                {isUserAdmin && deleteMemberButton}
+                {isAdmin && deleteMemberButton}
               </TableCell>
             </TableRow>
           );

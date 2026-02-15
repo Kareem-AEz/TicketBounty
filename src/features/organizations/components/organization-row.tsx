@@ -24,14 +24,12 @@ import {
 import { cn } from "@/lib/utils";
 import { organizationPath } from "@/paths";
 import { useDeletingUserOrganization } from "../contexts/deleting-organization-context";
-import { getOrganizationsByUserId } from "../queries/get-organizations-by-user-id";
+import { getMyOrganizations } from "../queries/get-my-organizations";
 import MemberDeleteButton from "./member-delete-button";
 import OrganizationDeleteButton from "./organization-delete-button";
 import OrganizationSwitchButton from "./organization-switch-button";
 
-type Organization = Awaited<
-  ReturnType<typeof getOrganizationsByUserId>
->[number];
+type Organization = Awaited<ReturnType<typeof getMyOrganizations>>[number];
 
 type OrganizationRowProps = {
   organization: Organization;
