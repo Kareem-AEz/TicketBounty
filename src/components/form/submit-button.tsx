@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import React, { useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { cn } from "@/lib/utils";
@@ -39,6 +39,7 @@ function SubmitButton({
   const { pending: formPending } = useFormStatus();
   const isWorking = formPending || pending;
   const prevPendingRef = useRef(isWorking);
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     // If pending was true and is now false, submission finished
@@ -59,10 +60,12 @@ function SubmitButton({
     >
       {isWorking ? (
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={
+            shouldReduceMotion ? undefined : { opacity: 0, scale: 0.9 }
+          }
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.2 }}
+          exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.9 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
         >
           <Spinner size="sm" />
         </motion.div>
@@ -71,7 +74,7 @@ function SubmitButton({
       )}
 
       <motion.span
-        layout="position"
+        layout={shouldReduceMotion ? undefined : "position"}
         className="flex items-center gap-2 select-none"
         style={{
           originY: "0px",

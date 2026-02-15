@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import React, { useState } from "react";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
@@ -11,14 +11,12 @@ import SideBarItem from "./sidebar-item";
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isFetched } = useAuth();
-  // const [isTransitioning, setIsTransitioning] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   const isMobile = useIsMobile();
 
   const handleToggle = (o: boolean) => {
-    // setIsTransitioning(true);
     setIsOpen(o);
-    // setTimeout(() => setIsTransitioning(false), 400);
   };
 
   if (!user || !isFetched) return null;
@@ -27,7 +25,12 @@ export default function Sidebar() {
     <>
       <div
         id="sidebar-overlay"
-        className="pointer-events-none fixed top-0 left-0 z-30 h-full w-full bg-black/50 opacity-0 backdrop-blur-xs duration-200 ease-[cubic-bezier(0.424,0.154,0.526,0.836)]"
+        className={cn(
+          "fixed inset-0 z-30 bg-black/50 backdrop-blur-xs transition-opacity duration-200 ease-out",
+          isOpen
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0",
+        )}
       />
       <nav
         id="sidebar"
@@ -49,14 +52,26 @@ export default function Sidebar() {
               "flex flex-col gap-2 space-y-2 px-2 py-2",
               isOpen && !isMobile ? "md:w-full md:self-start" : "self-end",
             )}
-            transition={{
-              type: "spring",
-              duration: 0.4,
-              bounce: 0.05,
-            }}
-            initial={{ opacity: 0, scale: 0.9, filter: "blur(6px)" }}
+            transition={
+              shouldReduceMotion
+                ? { duration: 0 }
+                : {
+                    type: "spring",
+                    duration: 0.4,
+                    bounce: 0.05,
+                  }
+            }
+            initial={
+              shouldReduceMotion
+                ? false
+                : { opacity: 0, scale: 0.9, filter: "blur(6px)" }
+            }
             animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, scale: 0.9, filter: "blur(6px)" }}
+            exit={
+              shouldReduceMotion
+                ? undefined
+                : { opacity: 0, scale: 0.9, filter: "blur(6px)" }
+            }
           >
             {SIDEBAR_ITEMS.map((item) => (
               <SideBarItem

@@ -8,7 +8,12 @@ import {
   LucideSquareArrowOutUpRight,
   LucideUser,
 } from "lucide-react";
-import { AnimatePresence, motion, MotionConfig } from "motion/react";
+import {
+  AnimatePresence,
+  motion,
+  MotionConfig,
+  useReducedMotion,
+} from "motion/react";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
@@ -48,6 +53,9 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
   const isMobile = useIsMobile();
   const [ref, { height }] = useMeasure();
   const [isMounted, setIsMounted] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+
+  console.log(shouldReduceMotion);
 
   const isMine = user?.id === ticket.userId;
 
@@ -71,19 +79,25 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
 
   return (
     <MotionConfig
-      transition={{ type: "spring", duration: 0.4681, bounce: 0.05 }}
+      transition={
+        shouldReduceMotion
+          ? { duration: 0 }
+          : { type: "spring", duration: 0.4, bounce: 0.05 }
+      }
     >
       <motion.div
         initial={{
           height: "auto",
           opacity: 0,
-          transition: {
-            duration: 0,
-            opacity: { type: "spring", duration: 0.2, bounce: 0 },
-          },
+          transition: shouldReduceMotion
+            ? { duration: 0 }
+            : {
+                duration: 0,
+                opacity: { type: "spring", duration: 0.2, bounce: 0 },
+              },
         }}
         animate={isMounted ? { height, opacity: 1 } : false}
-        exit={{ opacity: 0, height: 0 }}
+        exit={shouldReduceMotion ? undefined : { opacity: 0, height: 0 }}
         key={ticket.id}
         className={cn(
           "w-full max-w-lg self-center will-change-auto",
@@ -103,21 +117,29 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                 <Card className="w-full overflow-hidden">
                   <motion.div
                     layoutId={`ticket-${ticket.id}-content${isDetail ? "-detail" : "normal"}`}
-                    layout="position"
-                    initial={{
-                      opacity: 0,
-                      filter: "blur(6px)",
-                    }}
+                    layout={shouldReduceMotion ? false : "position"}
+                    initial={
+                      shouldReduceMotion
+                        ? false
+                        : {
+                            opacity: 0,
+                            filter: "blur(6px)",
+                          }
+                    }
                     animate={{
                       opacity: 1,
                       filter: "blur(0px)",
                     }}
-                    exit={{
-                      opacity: 0,
-                      filter: "blur(6px)",
-                    }}
+                    exit={
+                      shouldReduceMotion
+                        ? undefined
+                        : {
+                            opacity: 0,
+                            filter: "blur(6px)",
+                          }
+                    }
                     transition={{
-                      duration: 0.2,
+                      duration: shouldReduceMotion ? 0 : 0.2,
                       bounce: 0,
                     }}
                     className="flex flex-col gap-y-4 will-change-transform"
@@ -158,21 +180,29 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                     >
                       <motion.div
                         layoutId={`ticket-${ticket.id}-content${isDetail ? "-detail" : "normal"}`}
-                        layout="position"
-                        initial={{
-                          opacity: 0,
-                          filter: "blur(10px)",
-                        }}
+                        layout={shouldReduceMotion ? false : "position"}
+                        initial={
+                          shouldReduceMotion
+                            ? undefined
+                            : {
+                                opacity: 0,
+                                filter: "blur(10px)",
+                              }
+                        }
                         animate={{
                           opacity: 1,
                           filter: "blur(0px)",
                         }}
-                        exit={{
-                          opacity: 0,
-                          filter: "blur(10px)",
-                        }}
+                        exit={
+                          shouldReduceMotion
+                            ? undefined
+                            : {
+                                opacity: 0,
+                                filter: "blur(10px)",
+                              }
+                        }
                         transition={{
-                          duration: 0.2,
+                          duration: shouldReduceMotion ? 0 : 0.2,
                           bounce: 0,
                         }}
                         className="flex flex-col gap-y-4 will-change-transform"
@@ -235,7 +265,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                         "group/buttons flex shrink-0 flex-col gap-y-2 overflow-hidden mask-l-from-75% p-1 py-0 pt-2 will-change-transform",
                         isMobile && "mask-l-from-85% mask-l-to-100%",
                       )}
-                      layout="position"
+                      layout={shouldReduceMotion ? false : "position"}
                     >
                       {!isDetail && (
                         <>
