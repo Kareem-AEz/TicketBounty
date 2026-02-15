@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import Form from "@/components/form/form";
 import { useActionFeedback } from "@/components/form/hooks/useActionFeedback";
 import { EMPTY_ACTION_STATE } from "@/components/form/utils/to-action-state";
-import { switchOrganization } from "../actions/switch-organization";
+import { switchActiveOrganization } from "../actions/switch-active-organization";
 
 type OrganizationSwitchButtonProps = {
   organizationId: string;
@@ -17,7 +17,7 @@ const OrganizationSwitchButton = ({
   trigger,
 }: OrganizationSwitchButtonProps) => {
   const [actionState, action] = useActionState(
-    switchOrganization.bind(null, organizationId),
+    switchActiveOrganization.bind(null, organizationId),
     EMPTY_ACTION_STATE,
   );
 
@@ -26,7 +26,7 @@ const OrganizationSwitchButton = ({
   useActionFeedback(actionState, {
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ["current-active-organization"],
+        queryKey: ["active-organization"],
       });
     },
   });

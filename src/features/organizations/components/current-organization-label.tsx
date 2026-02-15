@@ -15,7 +15,7 @@ export default function CurrentOrganizationLabel() {
     >
       <LucideBuilding2 className="size-4! -translate-y-px" />
       <span className="max-w-32 truncate">
-        {currentActiveOrganization.name}
+        {currentActiveOrganization?.name}
       </span>
     </Badge>
   );

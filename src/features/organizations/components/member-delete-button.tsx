@@ -5,8 +5,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/hooks/use-auth";
+import { removeMember } from "@/features/memberships/actions/remove-member";
 import { useConfirmDialog } from "@/lib/hooks/use-confirm-dialog";
-import { deleteOrganizationMember } from "../actions/delete-organization-member";
 
 type OrganizationDeleteButtonProps = {
   memberId: string;
@@ -61,12 +61,7 @@ export default function MemberDeleteButton({
         </AnimatePresence>
       </Button>
     ),
-    action: deleteOrganizationMember.bind(
-      null,
-      organizationId,
-      memberId,
-      isCurrentUser,
-    ),
+    action: removeMember.bind(null, organizationId, memberId),
 
     onSuccess: () => {
       router.refresh();

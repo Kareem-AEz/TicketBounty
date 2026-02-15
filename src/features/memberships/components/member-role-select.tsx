@@ -1,5 +1,5 @@
 "use client";
-import { startTransition, useActionState } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useActionFeedback } from "@/components/form/hooks/useActionFeedback";
 import { EMPTY_ACTION_STATE } from "@/components/form/utils/to-action-state";
@@ -13,30 +13,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { MembershipRole } from "@/generated/enums";
-import { updateMembershipRole } from "../actions/update-membership-role";
+import { updateMemberRole } from "../actions/update-member-role";
 
 type MemberRoleSelectProps = {
   currentRole: MembershipRole;
   organizationId: string;
   userId: string;
+  lastAdminId?: string | null;
 };
 
 export default function MemberRoleSelect({
   currentRole,
   organizationId,
   userId,
+  lastAdminId = null,
 }: MemberRoleSelectProps) {
   const possibleMembershipRoles = Object.values(MembershipRole);
-  const [actionState, action] = useActionState(
+  const [role, setRole] = useState<MembershipRole>(currentRole);
+  const [actionState, action, isPending] = useActionState(
     async (prevState: unknown, role: MembershipRole) =>
-      updateMembershipRole(organizationId, userId, role),
+      updateMemberRole(organizationId, userId, role),
     EMPTY_ACTION_STATE,
   );
 
-  const handleRoleChange = (role: MembershipRole) => {
+  const isLastAdmin = lastAdminId === userId;
+  const isDisabled = isPending || isLastAdmin;
+
+  const handleRoleChange = (newRole: MembershipRole) => {
+    setRole(newRole);
     startTransition(() => {
-      action(role);
+      action(newRole);
     });
   };
 
@@ -46,11 +58,33 @@ export default function MemberRoleSelect({
     },
     onError({ actionState }) {
       toast.error(actionState.message);
+      setRole(currentRole);
     },
   });
 
-  return (
-    <Select defaultValue={currentRole} onValueChange={handleRoleChange}>
+  useEffect(() => {
+    setRole(currentRole);
+  }, [currentRole]);
+
+  const select = isLastAdmin ? (
+    <Tooltip>
+      <Select value={role} disabled={true}>
+        <TooltipTrigger asChild>
+          <SelectTrigger className="w-full max-w-48 font-mono tracking-wider uppercase">
+            <SelectValue className="text-muted-foreground font-mono text-xs tracking-wider uppercase">
+              {role}
+            </SelectValue>
+          </SelectTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          <span className="text-muted-foreground font-mono text-xs">
+            You cannot change the role of the last admin
+          </span>
+        </TooltipContent>
+      </Select>
+    </Tooltip>
+  ) : (
+    <Select value={role} onValueChange={handleRoleChange} disabled={isDisabled}>
       <SelectTrigger className="w-full max-w-48 font-mono tracking-wider uppercase">
         <SelectValue placeholder="Select role" />
       </SelectTrigger>
@@ -71,4 +105,6 @@ export default function MemberRoleSelect({
       </SelectContent>
     </Select>
   );
+
+  return select;
 }

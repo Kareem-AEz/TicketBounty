@@ -6,13 +6,13 @@ import Heading from "@/components/heading";
 import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
 import OrganizationsList from "@/features/organizations/components/organizations-list";
-import { getOrganizationsByUserId } from "@/features/organizations/queries/get-organizations-by-user-id";
+import { getMyOrganizations } from "@/features/organizations/queries/get-my-organizations";
 import { onboardingPath, organizationsPath } from "@/paths";
 
 export default async function SelectActiveOrganizationPage() {
-  const organizations = await getOrganizationsByUserId();
+  const organizations = await getMyOrganizations();
   const hasActiveOrganization = organizations.some(
-    (organization) => organization.membershipByUser?.isActive,
+    (organization) => organization?.membershipByUser?.isActive ?? false,
   );
   if (hasActiveOrganization) {
     redirect(organizationsPath());

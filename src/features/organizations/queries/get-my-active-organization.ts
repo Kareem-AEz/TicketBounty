@@ -1,11 +1,11 @@
 import { getAuth } from "@/features/auth/queries/get-auth";
-import { getOrganizationsByUserId } from "./get-organizations-by-user-id";
+import { getMyOrganizations } from "./get-my-organizations";
 
-export const getCurrentActiveOrganization = async () => {
+export const getMyActiveOrganization = async () => {
   const { user } = await getAuth();
   if (!user) return null;
 
-  const organizations = await getOrganizationsByUserId();
+  const organizations = await getMyOrganizations();
   return (
     organizations.find(
       (organization) => organization.membershipByUser?.isActive,

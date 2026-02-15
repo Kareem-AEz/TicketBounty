@@ -10,8 +10,9 @@ import { MembershipRole } from "@/generated/enums";
 import prisma from "@/lib/prisma";
 import { organizationPath } from "@/paths";
 import { getMembership } from "../queries/get-membership";
+import { getMembershipsByOrganization } from "../queries/get-memberships-by-organization";
 
-export const updateMembershipRole = async (
+export const updateMemberRole = async (
   organizationId: string,
   memberId: string,
   role: MembershipRole,
@@ -29,6 +30,19 @@ export const updateMembershipRole = async (
         throw new Error("You are not a member of this organization");
       if (userMembership.membershipRole !== MembershipRole.ADMIN)
         throw new Error("You are not an admin of this organization");
+
+      // Check if the member is the last admin
+      const memberships = await getMembershipsByOrganization(organizationId, {
+        tx,
+      });
+      const lastAdmins = (memberships ?? []).filter(
+        (membership) => membership.membershipRole === MembershipRole.ADMIN,
+      );
+      const isUpdatingLastAdmin =
+        lastAdmins.length === 1 && lastAdmins[0].userId === memberId;
+
+      if (isUpdatingLastAdmin)
+        throw new Error("You cannot update the role of the last admin");
 
       await tx.membership.update({
         where: {
