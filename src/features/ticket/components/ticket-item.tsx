@@ -55,8 +55,6 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
   const [isMounted, setIsMounted] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
-  console.log(shouldReduceMotion);
-
   const isMine = user?.id === ticket.userId;
 
   useEffect(() => {
