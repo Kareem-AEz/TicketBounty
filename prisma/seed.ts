@@ -69,6 +69,17 @@ const comments = [
 ];
 
 const seed = async () => {
+  const databaseUrl = process.env.DATABASE_URL;
+  const directUrl = process.env.DIRECT_URL;
+
+  if (!databaseUrl || !directUrl)
+    throw new Error("DATABASE_URL or DIRECT_URL is not set");
+
+  if (databaseUrl.includes("supabase") || directUrl.includes("supabase"))
+    throw new Error(
+      "❌❌❌ SEEDING ABORTED! ❌❌❌\n\n🚨 ATTEMPTED TO SEED THE PRODUCTION DATABASE (SUPABASE).\n\nTHIS OPERATION IS STRICTLY FORBIDDEN!\n\n",
+    );
+
   console.log("Seeding database...");
 
   const start = performance.now();
@@ -139,7 +150,6 @@ const seed = async () => {
 
   await prisma.$disconnect();
 };
-
 seed()
   .then(() => {
     console.log("✅ Seed completed");
