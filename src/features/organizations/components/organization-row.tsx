@@ -8,7 +8,6 @@ import {
   LucideCheck,
   LucideExternalLink,
   LucideInfo,
-  LucidePencil,
 } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
@@ -21,12 +20,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MembershipRole } from "@/generated/enums";
 import { cn } from "@/lib/utils";
 import { organizationPath } from "@/paths";
 import { useDeletingUserOrganization } from "../contexts/deleting-organization-context";
 import { getMyOrganizations } from "../queries/get-my-organizations";
 import MemberDeleteButton from "./member-delete-button";
 import OrganizationDeleteButton from "./organization-delete-button";
+import OrganizationEditButton from "./organization-edit-button";
 import OrganizationSwitchButton from "./organization-switch-button";
 
 type Organization = Awaited<ReturnType<typeof getMyOrganizations>>[number];
@@ -43,6 +44,8 @@ export default function OrganizationRow({
   const { deletingUserOrganizationId } = useDeletingUserOrganization();
   const isActive = organization.membershipByUser.isActive;
   const isAnyDeleting = deletingUserOrganizationId === organization.id;
+  const isAdmin =
+    organization.membershipByUser.membershipRole === MembershipRole.ADMIN;
 
   const switchButton = (
     <OrganizationSwitchButton
@@ -64,10 +67,8 @@ export default function OrganizationRow({
     />
   );
 
-  const editButton = (
-    <Button variant="outline" size="icon" disabled={isAnyDeleting}>
-      <LucidePencil />
-    </Button>
+  const editButton = isAdmin && (
+    <OrganizationEditButton organizationId={organization.id} />
   );
 
   const viewButton = (
@@ -85,7 +86,7 @@ export default function OrganizationRow({
     />
   );
 
-  const deleteButton = (
+  const deleteButton = isAdmin && (
     <OrganizationDeleteButton organizationId={organization.id} />
   );
 
@@ -93,8 +94,8 @@ export default function OrganizationRow({
     <>
       {switchButton}
       {!limitedAccess && viewButton}
-      {!limitedAccess && editButton}
       {!limitedAccess && leaveButton}
+      {!limitedAccess && editButton}
       {!limitedAccess && deleteButton}
     </>
   );
