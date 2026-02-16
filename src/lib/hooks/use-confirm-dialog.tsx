@@ -3,6 +3,7 @@ import {
   cloneElement,
   useActionState,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -14,7 +15,6 @@ import {
 } from "@/components/form/utils/to-action-state";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -26,11 +26,13 @@ import { Button } from "@/components/ui/button";
 
 type ConfirmDialogueProps = {
   title?: string;
+  body?: ({ actionState }: { actionState: ActionState }) => React.ReactNode;
+  autoClose?: boolean;
   description?: string;
   confirmLabel?: string;
   cancelLabel?: string;
   loadingLabel?: string;
-  action: () => Promise<ActionState | undefined>;
+  action: (formData: FormData) => Promise<ActionState | undefined>;
   trigger: ((isPending: boolean) => React.ReactElement) | React.ReactElement;
   onSuccess?: (data: ActionState) => void;
   onError?: (error: ActionState) => void;
@@ -39,6 +41,8 @@ type ConfirmDialogueProps = {
 
 export const useConfirmDialog = ({
   title = "Are you absolutely sure?",
+  body: BodyComponent = ({ actionState }) => <></>,
+  autoClose = true,
   description = "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
@@ -53,10 +57,12 @@ export const useConfirmDialog = ({
   const promiseRef = useRef<Promise<ActionState | undefined> | null>(null);
 
   // Wrapper action that stores the promise for toast.promise
-  const wrappedAction = async () => {
-    const promise = action();
+  const wrappedAction = async (state: ActionState, formData: FormData) => {
+    const promise = action(formData);
     promiseRef.current = promise;
-    return promise;
+    const result = await promise;
+
+    return result ?? state;
   };
 
   const [actionState, formAction, isPending] = useActionState(
@@ -64,12 +70,16 @@ export const useConfirmDialog = ({
     EMPTY_ACTION_STATE,
   );
 
-  const dialogTrigger = cloneElement(
-    typeof trigger === "function" ? trigger(isPending) : trigger,
-    {
-      onClick: () => setIsOpen((state) => !state),
-    } as React.HTMLAttributes<HTMLElement>,
-  );
+  const dialogTrigger = useMemo(() => {
+    return cloneElement(
+      typeof trigger === "function" ? trigger(isPending) : trigger,
+      {
+        onClick: () => {
+          setIsOpen((state) => !state);
+        },
+      } as React.HTMLAttributes<HTMLElement>,
+    );
+  }, [trigger, isPending]);
 
   useEffect(() => {
     onPendingChange?.(isPending);
@@ -102,8 +112,8 @@ export const useConfirmDialog = ({
 
   useActionFeedback(actionState ?? EMPTY_ACTION_STATE, {
     onSuccess: ({ actionState }) => {
-      setIsOpen(false);
       onSuccess?.(actionState);
+      setIsOpen(false);
     },
     onError: ({ actionState }) => {
       onError?.(actionState);
@@ -113,25 +123,31 @@ export const useConfirmDialog = ({
   const dialog = (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>
-            {cancelLabel}
-          </AlertDialogCancel>
-          <form action={formAction} className="contents">
-            <AlertDialogAction asChild>
-              <Button type="submit" disabled={isPending}>
-                {confirmLabel}
-              </Button>
-            </AlertDialogAction>
-          </form>
-        </AlertDialogFooter>
+        <form action={formAction} className="contents">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{title}</AlertDialogTitle>
+            <AlertDialogDescription>{description}</AlertDialogDescription>
+            {BodyComponent && <BodyComponent actionState={actionState} />}
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>
+              {cancelLabel}
+            </AlertDialogCancel>
+
+            <Button
+              type="submit"
+              disabled={isPending}
+              onClick={() => {
+                if (autoClose) setIsOpen(false);
+              }}
+            >
+              {confirmLabel}
+            </Button>
+          </AlertDialogFooter>
+        </form>
       </AlertDialogContent>
     </AlertDialog>
   );
 
-  return [dialog, dialogTrigger] as const;
+  return [dialog, dialogTrigger, actionState, { isOpen, setIsOpen }] as const;
 };
