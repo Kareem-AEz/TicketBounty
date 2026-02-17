@@ -1,5 +1,5 @@
-import { SearchParams } from "nuqs/server";
-import React, { Suspense } from "react";
+import { SearchParams } from "nuqs";
+import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
 import Heading from "@/components/heading";
@@ -18,27 +18,7 @@ import TicketUpsertForm from "@/features/ticket/components/ticket-upsert-form";
 import TicketsList from "@/features/ticket/components/tickets-list";
 import { ticketSearchParamsCache } from "@/features/ticket/utils/search-params";
 import { copy } from "@/lib/copy";
-import { getSEOTags } from "@/lib/seo-tags";
 import { homePath } from "@/paths";
-
-export const metadata = getSEOTags({
-  title: "My Tickets",
-  description: "All your tickets in one place",
-  keywords: [
-    "tickets",
-    "ticket management",
-    "ticket system",
-    "ticket tracking",
-    "road to next",
-    "the road to next",
-  ],
-  openGraph: {
-    title: "My Tickets - The Road to Next",
-    description: "All your tickets in one place",
-    images: ["/og-image 1x.jpg"],
-  },
-  canonicalUrlRelative: "/tickets",
-});
 
 const breadcrumbs: Breadcrumb[] = [
   {
@@ -46,23 +26,25 @@ const breadcrumbs: Breadcrumb[] = [
     href: homePath(),
   },
   {
-    label: "My Tickets",
+    label: "Organization Tickets",
   },
 ];
 
-type TicketsPagePropsType = {
+type OrganizationTicketsPagePropsType = {
   searchParams: Promise<SearchParams>;
 };
 
-async function page({ searchParams }: TicketsPagePropsType) {
+export default async function OrganizationTicketsPage({
+  searchParams,
+}: OrganizationTicketsPagePropsType) {
   const user = await getAuthOrRedirect();
 
   return (
     <>
       <div className="flex flex-1 flex-col gap-y-8">
         <Heading
-          title="My Tickets"
-          description="All your tickets in one place"
+          title="Organization Tickets"
+          description="All your organization's tickets in one place"
         />
 
         <Breadcrumbs breadcrumbs={breadcrumbs} />
@@ -72,7 +54,12 @@ async function page({ searchParams }: TicketsPagePropsType) {
             <CardHeader>
               <CardTitle>{"Create a new ticket"}</CardTitle>
               <CardDescription>
-                {"Add a new ticket to your list"}
+                <div className="flex items-center gap-x-2 text-sm">
+                  <span>Add a new ticket to your organization:</span>
+                  <span className="text-primary font-mono text-xs font-medium tracking-wider">
+                    [{user.activeOrganization?.name}]
+                  </span>
+                </div>
               </CardDescription>
             </CardHeader>
 
@@ -85,6 +72,7 @@ async function page({ searchParams }: TicketsPagePropsType) {
             <Suspense fallback={<Spinner />}>
               <TicketsList
                 user={user}
+                showOrganizationTickets
                 searchParams={ticketSearchParamsCache.parse(await searchParams)}
               />
             </Suspense>
@@ -96,5 +84,3 @@ async function page({ searchParams }: TicketsPagePropsType) {
     </>
   );
 }
-
-export default page;

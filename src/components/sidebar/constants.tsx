@@ -9,6 +9,7 @@ import {
   accountProfilePath,
   homePath,
   organizationsPath,
+  organizationTicketsPath,
   ticketsPath,
 } from "@/paths";
 import { SidebarItem } from "./types";
@@ -17,6 +18,11 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
   {
     label: "All Tickets",
     href: homePath(),
+    icon: <LucideLibrary />,
+  },
+  {
+    label: "Organization Tickets",
+    href: organizationTicketsPath(),
     icon: <LucideLibrary />,
   },
   {

@@ -12,13 +12,16 @@ async function TicketsList({
   user,
   isAllTickets,
   searchParams,
+  showOrganizationTickets = false,
 }: {
   user?: User;
   isAllTickets?: boolean;
   searchParams?: TicketParsedSearchParams;
+  showOrganizationTickets?: boolean;
 }) {
   const { data: tickets, metadata } = await getTickets(
     isAllTickets ? undefined : user?.id,
+    showOrganizationTickets,
     searchParams,
   );
   const key = `ticket-`;
