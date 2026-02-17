@@ -1,5 +1,5 @@
 "use client";
-import { startTransition, useActionState, useEffect, useState } from "react";
+import { startTransition, useActionState, useOptimistic } from "react";
 import { toast } from "sonner";
 import { useActionFeedback } from "@/components/form/hooks/useActionFeedback";
 import { EMPTY_ACTION_STATE } from "@/components/form/utils/to-action-state";
@@ -28,26 +28,31 @@ type MemberRoleSelectProps = {
   lastAdminId?: string | null;
 };
 
+const possibleMembershipRoles = Object.values(MembershipRole);
+
 export default function MemberRoleSelect({
   currentRole,
   organizationId,
   userId,
   lastAdminId = null,
 }: MemberRoleSelectProps) {
-  const possibleMembershipRoles = Object.values(MembershipRole);
-  const [role, setRole] = useState<MembershipRole>(currentRole);
   const [actionState, action, isPending] = useActionState(
     async (prevState: unknown, role: MembershipRole) =>
       updateMemberRole(organizationId, userId, role),
     EMPTY_ACTION_STATE,
   );
 
+  const [optimisticRole, setOptimisticRole] = useOptimistic(
+    currentRole,
+    (state, newRole: MembershipRole) => newRole,
+  );
+
   const isLastAdmin = lastAdminId === userId;
   const isDisabled = isPending || isLastAdmin;
 
   const handleRoleChange = (newRole: MembershipRole) => {
-    setRole(newRole);
     startTransition(() => {
+      setOptimisticRole(newRole);
       action(newRole);
     });
   };
@@ -58,21 +63,18 @@ export default function MemberRoleSelect({
     },
     onError({ actionState }) {
       toast.error(actionState.message);
-      setRole(currentRole);
     },
   });
 
-  useEffect(() => {
-    setRole(currentRole);
-  }, [currentRole]);
-
   const select = isLastAdmin ? (
     <Tooltip>
-      <Select value={role} disabled={true}>
+      <Select value={optimisticRole} disabled={true}>
         <TooltipTrigger asChild>
           <SelectTrigger className="w-full max-w-48 font-mono tracking-wider uppercase">
             <SelectValue className="text-muted-foreground font-mono text-xs tracking-wider uppercase">
-              {role}
+              <span className="text-muted-foreground font-mono text-xs tracking-wider uppercase">
+                [{optimisticRole}]
+              </span>
             </SelectValue>
           </SelectTrigger>
         </TooltipTrigger>
@@ -84,7 +86,11 @@ export default function MemberRoleSelect({
       </Select>
     </Tooltip>
   ) : (
-    <Select value={role} onValueChange={handleRoleChange} disabled={isDisabled}>
+    <Select
+      value={optimisticRole}
+      onValueChange={handleRoleChange}
+      disabled={isDisabled}
+    >
       <SelectTrigger className="w-full max-w-48 font-mono tracking-wider uppercase">
         <SelectValue placeholder="Select role" />
       </SelectTrigger>

@@ -33,7 +33,7 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
   );
 
   // Track form values for analytics
-  const [bounty, setBounty] = useState(
+  const [bounty, setBounty] = useState(() =>
     fromCent(ticket?.bounty ?? 0).toString(),
   );
 
