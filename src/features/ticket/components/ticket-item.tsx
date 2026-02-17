@@ -2,9 +2,11 @@
 
 import { User } from "lucia";
 import {
+  LucideBuilding2,
   LucideClipboardClock,
   LucideMoreVertical,
   LucidePencil,
+  LucideSkull,
   LucideSquareArrowOutUpRight,
   LucideUser,
 } from "lucide-react";
@@ -27,7 +29,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { isOwner } from "@/features/auth/utils/is-owner";
-import type { Prisma } from "@/generated/client";
 import { copy } from "@/lib/copy";
 import { centToCurrency } from "@/lib/currency";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
@@ -36,14 +37,13 @@ import { cn } from "@/lib/utils";
 import { ticketPath, ticketsPath } from "@/paths";
 import { deleteTicket } from "../actions/delete-ticket";
 import { TICKET_STATUS_ICONS } from "../constants";
+import { getTickets } from "../queries/get-tickets";
 import DetailButton from "./detail-button";
 import TicketDropdownMenu from "./ticket-dropdown-menu";
 import TicketUpsertForm from "./ticket-upsert-form";
 
 type TicketItemProps = {
-  ticket: Prisma.TicketGetPayload<{
-    include: { user: { select: { id: true; username: true } } };
-  }>;
+  ticket: Awaited<ReturnType<typeof getTickets>>["data"][number];
   isDetail?: boolean;
   user?: User;
 };
@@ -107,7 +107,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
             {isEditing && (
               <motion.div
                 layoutId={`ticket-${ticket.id}-background${isDetail ? "-detail" : "normal"}`}
-                className="relative z-2"
+                className="relative z-2 w-full"
                 style={{
                   borderRadius: "calc(var(--radius) /* 0.25rem */ + 0.125rem",
                 }}
@@ -163,12 +163,11 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                 <>
                   <motion.div
                     layoutId={`ticket-${ticket.id}-background${isDetail ? "-detail" : "normal"}`}
-                    className="w-full max-w-xl will-change-auto"
+                    className="w-full max-w-xl min-w-0 flex-1 will-change-auto"
                   >
                     <Card
                       className={cn(
-                        "h-full w-full max-w-md",
-                        isDetail && "max-w-xl",
+                        "h-full w-full",
                         !isDetail && "pointer-events-none",
                       )}
                       style={{
@@ -226,31 +225,65 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                           </CardTitle>
                         </CardHeader>
 
-                        <CardContent>
-                          <span
+                        <CardContent className="w-full">
+                          <p
                             className={cn(
-                              "text-muted-foreground line-clamp-2 text-sm whitespace-pre-wrap",
+                              "text-muted-foreground line-clamp-2 text-sm break-words whitespace-pre-wrap",
                               ticket.status === "DONE" && "line-through",
                               isDetail && "line-clamp-none",
                             )}
                           >
                             {ticket.content}
-                          </span>
+                          </p>
                         </CardContent>
 
                         <CardFooter>
-                          <div className="flex w-full justify-between">
-                            <span className="text-muted-foreground flex items-center gap-x-1 text-xs font-bold">
+                          <div className="flex w-full flex-col justify-between gap-y-1.5">
+                            <div className="text-muted-foreground flex w-full items-center gap-x-1 text-xs font-bold">
                               <LucideClipboardClock size={14} />
-                              {ticket.deadline}
-                              <span className="mx-1">•</span>
-                              <LucideUser size={14} />
-                              {ticket.user.username}
-                            </span>
+                              <span className="flex items-center gap-x-1">
+                                <span>{ticket.deadline}</span>
+                              </span>
 
-                            <span className="text-muted-foreground ml-auto text-xs font-bold">
-                              {centToCurrency(ticket.bounty)}
-                            </span>
+                              <span className="mx-1">•</span>
+
+                              {ticket.user?.username ? (
+                                <>
+                                  <LucideUser size={14} />
+                                  <span className="flex items-center gap-x-1">
+                                    {ticket.user.username}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <LucideSkull size={14} />
+                                  <span className="flex items-center gap-x-1">
+                                    Deleted User
+                                  </span>
+                                </>
+                              )}
+
+                              <span className="text-muted-foreground ml-auto text-xs font-bold">
+                                {centToCurrency(ticket.bounty)}
+                              </span>
+                            </div>
+
+                            <div className="text-muted-foreground flex items-center gap-x-1 text-xs font-bold">
+                              {ticket.organization?.name ? (
+                                <>
+                                  <LucideBuilding2 size={14} />
+                                  <span className="flex items-center gap-x-1">
+                                    {ticket.organization?.name}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-destructive/80 text-xs font-bold">
+                                    Deleted Organization
+                                  </span>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </CardFooter>
                       </motion.div>
@@ -274,7 +307,10 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                             href={ticketPath(ticket.id)}
                             prefetchOnHover={true}
                           />
-                          {isOwner(user?.id ?? "", ticket.userId) && (
+                          {isOwner(
+                            user?.id ?? "",
+                            ticket.userId ?? undefined,
+                          ) && (
                             <>
                               <DetailButton
                                 index={1}
@@ -307,50 +343,51 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                         </>
                       )}
 
-                      {isDetail && isOwner(user?.id ?? "", ticket.userId) && (
-                        <>
-                          <DetailButton
-                            index={0}
-                            icon={<LucidePencil />}
-                            label={copy.actions.edit}
-                            onClick={() => setIsEditing(true)}
-                            animate={false}
-                          />
+                      {isDetail &&
+                        isOwner(user?.id ?? "", ticket.userId ?? undefined) && (
+                          <>
+                            <DetailButton
+                              index={0}
+                              icon={<LucidePencil />}
+                              label={copy.actions.edit}
+                              onClick={() => setIsEditing(true)}
+                              animate={false}
+                            />
 
-                          <DeleteButton
-                            onDelete={async () => {
-                              const result = await deleteTicket({
-                                id: ticket.id,
-                                isDetail,
-                              });
-                              if (result.status === "SUCCESS") {
+                            <DeleteButton
+                              onDelete={async () => {
+                                const result = await deleteTicket({
+                                  id: ticket.id,
+                                  isDetail,
+                                });
+                                if (result.status === "SUCCESS") {
+                                  return {
+                                    success: true,
+                                    message: result.message,
+                                  };
+                                }
                                 return {
-                                  success: true,
+                                  success: false,
                                   message: result.message,
                                 };
-                              }
-                              return {
-                                success: false,
-                                message: result.message,
-                              };
-                            }}
-                            animate={false}
-                          />
+                              }}
+                              animate={false}
+                            />
 
-                          <TicketDropdownMenu
-                            ticket={ticket}
-                            trigger={
-                              <Button
-                                variant={"outline"}
-                                size={"icon"}
-                                className="ml-2"
-                              >
-                                <LucideMoreVertical />
-                              </Button>
-                            }
-                          />
-                        </>
-                      )}
+                            <TicketDropdownMenu
+                              ticket={ticket}
+                              trigger={
+                                <Button
+                                  variant={"outline"}
+                                  size={"icon"}
+                                  className="ml-2"
+                                >
+                                  <LucideMoreVertical />
+                                </Button>
+                              }
+                            />
+                          </>
+                        )}
                     </motion.div>
                   )}
                 </>

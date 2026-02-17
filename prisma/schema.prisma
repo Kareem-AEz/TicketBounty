@@ -23,6 +23,9 @@ model Organization {
   createdAt     DateTime      @default(now()) @db.Timestamptz
   updatedAt     DateTime      @updatedAt @db.Timestamptz
 
+  tickets Ticket[]
+
+
   name        String
   memberships Membership[]
 }
@@ -117,9 +120,14 @@ model Ticket {
   title         String
   content       String        @db.Text
   status        TicketStatus  @default(OPEN)
-  userId        String
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userId        String?
+  user          User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
   comments      TicketComment[]
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
 
   deadline      String       
   bounty        Int

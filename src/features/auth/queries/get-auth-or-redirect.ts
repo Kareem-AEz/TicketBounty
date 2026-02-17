@@ -24,14 +24,16 @@ export const getAuthOrRedirect = async ({
     redirect(onboardingPath());
   }
 
+  let activeOrganization = null;
+
   if (checkActiveOrganization) {
-    const hasActiveOrganization = organizations.some(
-      (organization) => organization?.membershipByUser?.isActive ?? false,
+    activeOrganization = organizations.find(
+      (organization) => organization?.membershipByUser?.isActive,
     );
-    if (!hasActiveOrganization) {
+    if (!activeOrganization) {
       redirect(selectActiveOrganizationPath());
     }
   }
 
-  return user;
+  return { ...user, activeOrganization };
 };

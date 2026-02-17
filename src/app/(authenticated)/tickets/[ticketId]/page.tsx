@@ -106,7 +106,7 @@ async function page({ params }: TicketPageProps) {
     <div className="flex flex-col gap-y-8">
       <Breadcrumbs breadcrumbs={[...breadcrumbs, { label: ticket.title }]} />
       <Separator className="mb-8" />
-      <div className="self-center">
+      <div className="flex w-full justify-center">
         <TicketItem ticket={ticket} isDetail user={user} />
       </div>
 

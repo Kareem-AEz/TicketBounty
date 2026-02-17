@@ -13,6 +13,12 @@ export const getTicket = cache(async (id: string) => {
           username: true,
         },
       },
+      organization: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 

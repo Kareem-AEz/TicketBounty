@@ -63,6 +63,12 @@ export const getTickets = async (
             username: true,
           },
         },
+        organization: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     }),
     prisma.ticket.count({ where }),
