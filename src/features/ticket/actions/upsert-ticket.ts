@@ -56,7 +56,10 @@ export const upsertTicket = async (
         },
       });
 
-      if (!fetchedTicket || !isOwner(user.id, fetchedTicket.userId)) {
+      if (
+        !fetchedTicket ||
+        !isOwner(user.id, fetchedTicket.userId ?? undefined)
+      ) {
         return toErrorActionState(
           "You are not the owner of this ticket",
           formData,
@@ -84,7 +87,7 @@ export const upsertTicket = async (
         id: validatedFields.id || "",
       },
       update: dbData,
-      create: dbData,
+      create: { ...dbData, organizationId: user.activeOrganization?.id },
     });
 
     revalidatePath(ticketsPath());

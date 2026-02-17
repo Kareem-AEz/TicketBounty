@@ -132,6 +132,7 @@ const seed = async () => {
       data: tickets.map((ticket) => ({
         ...ticket,
         userId: createdUsers[0].id,
+        organizationId: createdOrganization.id,
       })),
     });
 

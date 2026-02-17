@@ -29,7 +29,7 @@ export async function deleteTicket({
       },
     });
 
-    if (!isOwner(user.id, ticket?.userId) || !ticket) {
+    if (!isOwner(user.id, ticket?.userId ?? undefined) || !ticket) {
       return toErrorActionState("You are not the owner of this ticket");
     }
 
