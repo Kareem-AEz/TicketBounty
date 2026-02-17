@@ -55,15 +55,6 @@ export const getTickets = async (
   const take = searchParams && Number(searchParams.size);
   const skip = searchParams && searchParams.page * (take ?? 0);
 
-  console.log("where", where);
-  console.log("userId", userId);
-  console.log("searchParams", searchParams);
-  console.log("isValidSize", isValidSize);
-  console.log("take", take);
-  console.log("skip", skip);
-  console.log("showOrganizationTickets", showOrganizationTickets);
-  console.log("activeOrganization", activeOrganization);
-
   const [tickets, total] = await prisma.$transaction([
     prisma.ticket.findMany({
       skip,

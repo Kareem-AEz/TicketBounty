@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { copy } from "@/lib/copy";
 
 function Error({ error, reset }: { error: Error; reset: () => void }) {
-  console.log(error.message);
   return (
     <Placeholder
       label={error.message || copy.errors.general}
