@@ -1,5 +1,6 @@
 import "./globals.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
@@ -24,7 +25,6 @@ import PostHogAuthWrapper from "./_providers/posthog-auth-wrapper";
 import PostHogPageViewTracker from "./_providers/posthog-pageview-tracker";
 import { PostHogProvider } from "./_providers/posthog-provider";
 import ReactQueryProvider from "./_providers/react-query/react-query-provider";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -90,7 +90,7 @@ export default function RootLayout({
         />
 
         <NextTopLoader color="var(--primary)" showSpinner={false} height={2} />
-
+        <SpeedInsights />
         <PostHogProvider>
           <Suspense fallback={null}>
             <PostHogPageViewTracker />
