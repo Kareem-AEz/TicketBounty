@@ -2,6 +2,7 @@ import "./globals.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
+import Script from "next/script";
 import NextTopLoader from "nextjs-toploader";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Suspense } from "react";
@@ -66,19 +67,22 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${pixellari.variable} overflow-x-hidden antialiased`}
       >
         {/* Structured Data */}
-        <script
+        <Script
+          id="structured-data-organization"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationData),
           }}
         />
-        <script
+        <Script
+          id="structured-data-website"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(websiteData),
           }}
         />
-        <script
+        <Script
+          id="structured-data-software"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(softwareData),

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import config from "@/config";
 
 /**
@@ -54,7 +55,8 @@ export const getSEOTags = ({
  */
 export const renderSchemaTags = () => {
   return (
-    <script
+    <Script
+      id="structured-data-software-application"
       type="application/ld+json"
       dangerouslySetInnerHTML={{
         __html: JSON.stringify({

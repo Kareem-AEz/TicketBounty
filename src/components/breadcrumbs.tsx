@@ -1,7 +1,7 @@
 import { LucideSlash } from "lucide-react";
 import React, { Fragment } from "react";
 import {
-  Breadcrumb,
+  Breadcrumb as BreadcrumbWrapper,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
@@ -14,15 +14,17 @@ export type Breadcrumb = {
   href?: string;
 };
 
+const EMPTY_BREADCRUMBS: Breadcrumb[] = [];
+
 export default function Breadcrumbs({
-  breadcrumbs = [],
+  breadcrumbs = EMPTY_BREADCRUMBS,
   className,
 }: {
   breadcrumbs: Breadcrumb[];
   className?: string;
 }) {
   return (
-    <Breadcrumb>
+    <BreadcrumbWrapper>
       <BreadcrumbList className={className}>
         {breadcrumbs.map((breadcrumb, index) => {
           let item = (
@@ -51,6 +53,6 @@ export default function Breadcrumbs({
           );
         })}
       </BreadcrumbList>
-    </Breadcrumb>
+    </BreadcrumbWrapper>
   );
 }

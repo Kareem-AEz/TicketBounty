@@ -6,6 +6,5 @@ export default function AuthenticatedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // TODO: Add auth guard with React Query
   return <AuthGuard>{children}</AuthGuard>;
 }

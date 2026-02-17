@@ -24,10 +24,10 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     if (error && isRedirectError(error)) {
       const redirectUrl = getRedirectUrl(error);
       if (redirectUrl) {
-        router.push(redirectUrl);
+        router.replace(redirectUrl);
       } else {
         // Fallback to sign-in if we can't extract the URL
-        router.push(signInPath());
+        router.replace(signInPath());
       }
     }
   }, [error, router]);

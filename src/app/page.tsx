@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { SearchParams } from "nuqs/server";
 import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -32,7 +33,8 @@ async function HomePage({ searchParams }: HomePagePropsType) {
 
   return (
     <>
-      <script
+      <Script
+        id="structured-data-website"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
