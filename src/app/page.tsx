@@ -1,4 +1,3 @@
-import Script from "next/script";
 import { SearchParams } from "nuqs/server";
 import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -9,7 +8,6 @@ import { getAuth } from "@/features/auth/queries/get-auth";
 import TicketsList from "@/features/ticket/components/tickets-list";
 import { ticketSearchParamsCache } from "@/features/ticket/utils/search-params";
 import { copy } from "@/lib/copy";
-import { generateWebsiteStructuredData } from "@/lib/seo";
 import { getSEOTags } from "@/lib/seo-tags";
 
 export const metadata = getSEOTags({
@@ -17,7 +15,7 @@ export const metadata = getSEOTags({
   description:
     "Manage and track all your tickets in one place. View, create, and organize tickets with our intuitive ticket management system.",
   openGraph: {
-    title: "All Tickets - The Road to Next",
+    title: "All Tickets - Ticket Bounty",
     images: ["/og-image 1x.jpg"],
   },
   canonicalUrlRelative: "/",
@@ -29,15 +27,9 @@ type HomePagePropsType = {
 
 async function HomePage({ searchParams }: HomePagePropsType) {
   const { user } = await getAuth();
-  const structuredData = generateWebsiteStructuredData();
 
   return (
     <>
-      <Script
-        id="structured-data-website"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
       <div className="flex flex-1 flex-col gap-y-8">
         <Heading
           title="All Tickets"

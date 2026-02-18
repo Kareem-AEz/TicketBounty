@@ -9,6 +9,25 @@ import type {
 import config from "@/config";
 
 /**
+ * Generate canonical URL for a given path
+ * @param path - The path to generate canonical URL for
+ * @returns Canonical URL string
+ */
+export function getCanonicalUrl(path: string = "/"): string {
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `https://${config.domainName}${cleanPath}`;
+}
+
+/**
+ * Generate Open Graph URL for a given path
+ * @param path - The path to generate OG URL for
+ * @returns Open Graph URL string
+ */
+export function getOpenGraphUrl(path: string = "/"): string {
+  return getCanonicalUrl(path);
+}
+
+/**
  * Generate structured data for articles/blog posts
  */
 export function generateArticleStructuredData({
@@ -33,7 +52,7 @@ export function generateArticleStructuredData({
     "@type": "Article",
     headline: title,
     description,
-    url,
+    url: getCanonicalUrl(url),
     datePublished: publishedDate,
     dateModified: modifiedDate || publishedDate,
     author: {
@@ -45,7 +64,7 @@ export function generateArticleStructuredData({
       name: config.appName,
       logo: {
         "@type": "ImageObject",
-        url: `https://${config.domainName}/icon.png`,
+        url: getCanonicalUrl("/icon.png"),
       },
     },
     ...(image && {
@@ -65,8 +84,8 @@ export function generateOrganizationStructuredData(): WithContext<Organization> 
     "@context": "https://schema.org",
     "@type": "Organization",
     name: config.appName,
-    url: `https://${config.domainName}`,
-    logo: `https://${config.domainName}/icon.png`,
+    url: getCanonicalUrl("/"),
+    logo: getCanonicalUrl("/icon.png"),
     description: config.appDescription,
     founder: {
       "@type": "Person",
@@ -87,7 +106,7 @@ export function generateWebsiteStructuredData(): WithContext<WebSite> {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: config.appName,
-    url: `https://${config.domainName}`,
+    url: getCanonicalUrl("/"),
     description: config.appDescription,
     publisher: {
       "@type": "Organization",
@@ -97,7 +116,7 @@ export function generateWebsiteStructuredData(): WithContext<WebSite> {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `https://${config.domainName}/tickets?search={search_term_string}`,
+        urlTemplate: `${getCanonicalUrl("/tickets")}?search={search_term_string}`,
       },
     },
   };
@@ -116,7 +135,7 @@ export function generateBreadcrumbStructuredData(
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: `https://${config.domainName}${item.url}`,
+      item: getCanonicalUrl(item.url),
     })),
   };
 }
@@ -130,7 +149,7 @@ export function generateSoftwareApplicationStructuredData(): WithContext<Softwar
     "@type": "SoftwareApplication",
     name: config.appName,
     description: config.appDescription,
-    url: `https://${config.domainName}`,
+    url: getCanonicalUrl("/"),
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web Browser",
     author: {

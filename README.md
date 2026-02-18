@@ -2,7 +2,7 @@
   <img src="public/og-image 1x.jpg" alt="The Road to Next" width="100%" />
 </p>
 
-<h1 align="center">The Road to Next</h1>
+<h1 align="center">Ticket Bounty</h1>
 
 <p align="center">
   <strong>A production-grade playground for building modern, scalable web applications with Next.js 16.</strong>

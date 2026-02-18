@@ -5,7 +5,7 @@ import { CardCompact } from "@/components/card-compact";
 import Heading from "@/components/heading";
 import AccountProfileForm from "@/features/accounts/components/account-profile-form";
 import AccountTabs from "@/features/accounts/components/account-tabs";
-import { getCanonicalUrl } from "@/lib/seo";
+import { getCanonicalUrl } from "@/lib/structured-data";
 import { homePath } from "@/paths";
 
 export const metadata: Metadata = {
@@ -15,35 +15,35 @@ export const metadata: Metadata = {
     "profile",
     "account",
     "management",
-    "the road to next",
-    "road to next",
+    "Ticket Bounty",
+    "Ticket Bounty",
   ],
   openGraph: {
-    title: "Profile - The Road to Next",
+    title: "Profile - Ticket Bounty",
     description: "Manage your profile",
     images: [
       {
         url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
-        alt: "Profile - The Road to Next",
+        alt: "Profile - Ticket Bounty",
       },
     ],
     url: "https://ticket-bounty-pi.vercel.app/account/profile",
-    siteName: "The Road to Next",
+    siteName: "Ticket Bounty",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Profile - The Road to Next",
+    title: "Profile - Ticket Bounty",
     description: "Manage your profile",
     images: [
       {
         url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
-        alt: "Profile - The Road to Next",
+        alt: "Profile - Ticket Bounty",
       },
     ],
     creator: "@KareemAhmedEz",

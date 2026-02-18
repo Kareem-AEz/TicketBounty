@@ -157,7 +157,7 @@ const EmailVerification = ({
                 className="m-0 text-[12px]"
                 style={{ color: colors.mutedForegroundLight }}
               >
-                © {currentYear} The Road to Next.
+                © {currentYear} Ticket Bounty.
                 <br />
                 Built with clarity by Kareem Ahmed.
               </Text>
