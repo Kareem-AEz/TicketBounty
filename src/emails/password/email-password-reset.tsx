@@ -182,7 +182,7 @@ const PasswordResetEmail = ({
                 className="m-0 text-[12px]"
                 style={{ color: colors.mutedForegroundLight }}
               >
-                © {currentYear} The Road to Next. Built with clarity by Kareem
+                © {currentYear} Ticket Bounty. Built with clarity by Kareem
                 Ahmed.
               </Text>
             </Section>

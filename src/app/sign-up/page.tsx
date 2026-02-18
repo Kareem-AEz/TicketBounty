@@ -5,7 +5,7 @@ import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
 import { CardCompact } from "@/components/card-compact";
 import { Separator } from "@/components/ui/separator";
 import SignUpForm from "@/features/auth/components/sign-up-form";
-import { getCanonicalUrl } from "@/lib/seo";
+import { getCanonicalUrl } from "@/lib/structured-data";
 import { homePath, signInPath } from "@/paths";
 
 export const metadata: Metadata = {
@@ -15,35 +15,35 @@ export const metadata: Metadata = {
     "sign up",
     "account",
     "management",
-    "the road to next",
-    "road to next",
+    "Ticket Bounty",
+    "The Road to Next",
   ],
   openGraph: {
-    title: "Sign Up - The Road to Next",
+    title: "Sign Up - Ticket Bounty",
     description: "Sign up to create an account to get started",
     images: [
       {
         url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
-        alt: "Sign Up - The Road to Next",
+        alt: "Sign Up - Ticket Bounty",
       },
     ],
     url: "https://ticket-bounty-pi.vercel.app/sign-up",
-    siteName: "The Road to Next",
+    siteName: "Ticket Bounty",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sign Up - The Road to Next",
+    title: "Sign Up - Ticket Bounty",
     description: "Sign up to create an account to get started",
     images: [
       {
         url: "/og-image 1x.jpg",
         width: 1200,
         height: 630,
-        alt: "Sign Up - The Road to Next",
+        alt: "Sign Up - Ticket Bounty",
       },
     ],
     creator: "@KareemAhmedEz",

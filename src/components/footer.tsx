@@ -28,7 +28,7 @@ export default async function Footer({
         </p>
 
         <p className="text-muted-foreground mt-2 text-xs">
-          © {new Date().getFullYear()} The Road to Next. All rights reserved.
+          © {new Date().getFullYear()} Ticket Bounty. All rights reserved.
         </p>
 
         <div className="flex items-center">

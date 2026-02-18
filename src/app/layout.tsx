@@ -45,8 +45,8 @@ const pixellari = localFont({
 
 export const metadata = getSEOTags({
   title: {
-    template: "%s | The Road to Next",
-    default: "The Road to Next - Ticket Management System",
+    template: "%s | Ticket Bounty",
+    default: "Ticket Bounty - Ticket Management System",
   },
   canonicalUrlRelative: "/",
 });

@@ -97,7 +97,7 @@ const seed = async () => {
     // Create organization
     const createdOrganization = await tx.organization.create({
       data: {
-        name: "The Road to Next",
+        name: "Ticket Bounty",
       },
     });
 

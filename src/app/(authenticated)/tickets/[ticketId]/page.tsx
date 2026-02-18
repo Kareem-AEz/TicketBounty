@@ -8,7 +8,7 @@ import Comments from "@/features/comment/components/comments";
 import { getComments } from "@/features/comment/queries/get-comments";
 import TicketItem from "@/features/ticket/components/ticket-item";
 import { getTicket } from "@/features/ticket/queries/get-ticket";
-import { getCanonicalUrl } from "@/lib/seo";
+import { getCanonicalUrl } from "@/lib/structured-data";
 import { homePath, ticketsPath } from "@/paths";
 
 type TicketPageProps = {
@@ -58,11 +58,11 @@ export async function generateMetadata({
           url: "/og-image 1x.jpg",
           width: 1200,
           height: 630,
-          alt: `${ticket.title} - The Road to Next`,
+          alt: `${ticket.title} - Ticket Bounty`,
         },
       ],
       url: `https://ticket-bounty-pi.vercel.app/tickets/${ticketId}`,
-      siteName: "The Road to Next",
+      siteName: "Ticket Bounty",
       locale: "en_US",
       type: "website",
     },
@@ -75,7 +75,7 @@ export async function generateMetadata({
           url: "/og-image 1x.jpg",
           width: 1200,
           height: 630,
-          alt: `${ticket.title} - The Road to Next`,
+          alt: `${ticket.title} - Ticket Bounty`,
         },
       ],
     },

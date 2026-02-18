@@ -1,4 +1,4 @@
-// Delightfully creative micro-copy for The Road to Next ✨
+// Delightfully creative micro-copy for Ticket Bounty ✨
 export const copy = {
   // Actions - all user interactions
   actions: {
