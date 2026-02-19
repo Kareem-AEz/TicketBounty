@@ -1,46 +1,103 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
-  output = "../src/generated"
+  provider        = "prisma-client"
+  output          = "../src/generated"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider   = "postgresql"
+  extensions = [pg_trgm]
 }
 
 // ------------------------------
-// Users
+// Auth
+// ------------------------------
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  email         String    @unique
+  emailVerified DateTime? @db.Timestamptz
+  username      String    @unique
+  passwordHash  String
+
+  sessions               Session[]
+  passwordResetTokens    PasswordResetToken[]
+  emailVerificationToken EmailVerificationToken[]
+  memberships            Membership[]
+  tickets                Ticket[]
+  comments               TicketComment[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime @db.Timestamptz
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  tokenHash String   @id
+  createdAt DateTime @default(now()) @db.Timestamptz
+  expiresAt DateTime @db.Timestamptz
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz
+  expiresAt DateTime @db.Timestamptz
+
+  email String
+  code  String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([email])
+  @@index([expiresAt])
+}
+
+// ------------------------------
+// Organizations
 // ------------------------------
 
 model Organization {
-  id            String        @id @default(cuid())
-  createdAt     DateTime      @default(now()) @db.Timestamptz
-  updatedAt     DateTime      @updatedAt @db.Timestamptz
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
 
-  tickets Ticket[]
+  name String
 
-
-  name        String
   memberships Membership[]
+  tickets     Ticket[]
 }
 
 model Membership {
-  joinedAt      DateTime      @default(now()) @db.Timestamptz
+  joinedAt DateTime @default(now()) @db.Timestamptz
 
-  userId        String
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  membershipRole   MembershipRole @default(MEMBER)
+  isActive         Boolean        @default(false)
+  canDeleteTickets Boolean        @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  isActive        Boolean       @default(false)
-  membershipRole  MembershipRole @default(MEMBER)
 
   @@id([userId, organizationId])
   @@index([userId])
@@ -53,101 +110,45 @@ enum MembershipRole {
   ADMIN
 }
 
-model User {
-  id                                String                                @id @default(cuid())
-  createdAt                         DateTime                              @default(now()) @db.Timestamptz
-  updatedAt                         DateTime                              @updatedAt @db.Timestamptz
-
-  email                             String                                @unique
-  emailVerified                     DateTime?                             @db.Timestamptz
-  emailVerificationToken            EmailVerificationToken[]
-  passwordHash                      String
-  passwordResetTokens               PasswordResetToken[]
-  sessions                          Session[]
-  tickets                           Ticket[]  
-  comments                          TicketComment[]
-  username                          String                                @unique
-  
-  memberships                       Membership[]
-}
-
-model PasswordResetToken {
-  tokenHash     String        @id
-  createdAt     DateTime      @default(now()) @db.Timestamptz
-  expiresAt     DateTime      @db.Timestamptz
-
-  userId        String
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model EmailVerificationToken {
-  id            String        @id @default(cuid())
-  code          String
-  email         String
-  createdAt     DateTime      @default(now()) @db.Timestamptz
-  expiresAt     DateTime      @db.Timestamptz 
-
-  userId        String
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([email])
-  @@index([expiresAt])
-}
-
-model Session {
-  id            String        @id
-  userId        String
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  expiresAt     DateTime      @db.Timestamptz
-
-  @@index([userId])
-  @@index([expiresAt])
-}
-
 // ------------------------------
 // Tickets
 // ------------------------------
 
 model Ticket {
-  id            String        @id @default(cuid())
-  createdAt     DateTime      @default(now()) @db.Timestamptz
-  updatedAt     DateTime      @updatedAt @db.Timestamptz
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
 
-  title         String
-  content       String        @db.Text
-  status        TicketStatus  @default(OPEN)
+  title    String
+  content  String       @db.Text
+  status   TicketStatus @default(OPEN)
+  deadline String
+  bounty   Int
 
-  userId        String?
-  user          User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  comments      TicketComment[]
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
 
-  deadline      String       
-  bounty        Int
+  comments TicketComment[]
 
-  // Core performance indexes
+  // Core indexes
   @@index([userId])
   @@index([status])
   @@index([createdAt])
   @@index([bounty])
-  
+
   // Composite indexes for common query patterns
   @@index([userId, status])
   @@index([userId, createdAt])
   @@index([userId, bounty])
   @@index([status, createdAt])
   @@index([status, bounty])
-  
-  // Text search indexes (temporarily disabled - enable pg_trgm first)
-  // @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
-  // @@index([content(ops: raw("gin_trgm_ops"))], type: Gin)
+
+  // Text search indexes
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([content(ops: raw("gin_trgm_ops"))], type: Gin)
 }
 
 enum TicketStatus {
@@ -157,17 +158,17 @@ enum TicketStatus {
 }
 
 model TicketComment {
-  id            String        @id @default(cuid())
-  createdAt     DateTime      @default(now()) @db.Timestamptz
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz
 
-  content       String        @db.Text
-  ticketId      String
-  ticket        Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  content String @db.Text
 
-  userId        String?
-  user          User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
-  // Optimized indexes for comment queries
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
   @@index([ticketId])
   @@index([userId])
   @@index([ticketId, createdAt])

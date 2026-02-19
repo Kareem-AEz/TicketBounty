@@ -1,37 +1,63 @@
 import { useCallback } from "react";
 import { toast } from "sonner";
 
-const activeToasts = new Map<string, string>();
+let activeToasts = "";
+let lastToastId: string | number | undefined;
 
 export function useToast() {
   const showToast = useCallback(
-    (message: string, params?: { key?: string }) => {
+    (message: string | React.ReactNode, params?: { key?: string }) => {
+      // Create a stable key and sanitize it for CSS class compatibility
       const uniqueKey = `${params?.key ?? ""}-${message}`;
-      const toastKey = `toast-${btoa(uniqueKey).slice(0, 16)}`;
+      const toastKey = `tkey-${btoa(encodeURIComponent(uniqueKey))}`;
 
-      if (activeToasts.has(toastKey)) {
-        document
-          .querySelector(`.${toastKey}`)
-          ?.animate(
+      if (activeToasts === toastKey && lastToastId !== undefined) {
+        toast(message, {
+          id: lastToastId,
+          className: `${toastKey} tid-${lastToastId}`,
+          duration: 4000,
+        });
+
+        // Use a small timeout to ensure sonner has updated the DOM before selecting
+        const target = document.querySelector(
+          `.tid-${lastToastId}`,
+        ) as HTMLElement;
+        if (target) {
+          target.animate(
             [
-              { transform: "scale(1)" },
-              { transform: "scale(0.95)" },
-              { transform: "scale(1.02)" },
-              { transform: "scale(1)" },
+              { transform: "translateX(0px)" },
+              { transform: "translateX(-5px)" },
+              { transform: "translateX(10px)" },
+              { transform: "translateX(0px)" },
             ],
-            { duration: 300, easing: "ease" },
+            { duration: 276, easing: "ease-out" },
           );
+        }
         return;
       }
 
-      const id = toast(message, {
-        className: toastKey,
+      // Generate a unique ID for this instance to prevent dismissal collisions
+      const id = Math.random().toString(36).slice(2, 9);
+      toast(message, {
+        id,
+        className: `${toastKey} tid-${id}`,
         duration: 4000,
-        onDismiss: () => activeToasts.delete(toastKey),
-        onAutoClose: () => activeToasts.delete(toastKey),
+        onDismiss: () => {
+          if (lastToastId === id) {
+            activeToasts = "";
+            lastToastId = undefined;
+          }
+        },
+        onAutoClose: () => {
+          if (lastToastId === id) {
+            activeToasts = "";
+            lastToastId = undefined;
+          }
+        },
       });
 
-      activeToasts.set(toastKey, id.toString());
+      activeToasts = toastKey;
+      lastToastId = id;
     },
     [],
   );

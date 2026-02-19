@@ -49,7 +49,7 @@ export default function OrganizationRow({
 
   const switchButton = (
     <OrganizationSwitchButton
-      organizationId={organization.id}
+      organization={organization}
       trigger={
         <SubmitButton
           variant={isActive ? "default" : "outline"}
