@@ -15,9 +15,10 @@ import {
 } from "@/components/ui/tooltip";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import MemberDeleteButton from "@/features/organizations/components/member-delete-button";
+import { MembershipRole } from "@/generated/enums";
 import { getMembershipsByOrganization } from "../queries/get-memberships-by-organization";
 import { membershipSelectors } from "../utils/membership-selectors";
-import MemberRoleSelect from "./member-role-select";
+import MembershipFieldSelector from "./membership-field-selector";
 
 type OrganizationMembersListProps = {
   organizationId: string;
@@ -27,7 +28,7 @@ export default async function OrganizationMembersList({
 }: OrganizationMembersListProps) {
   const user = await getAuthOrRedirect();
   const members = await getMembershipsByOrganization(organizationId);
-  const { isAdmin, onlyAdminId } = membershipSelectors({
+  const { isAdmin, onlyAdminId, isOnlyAdmin } = membershipSelectors({
     memberships: members,
     userId: user.id,
   });
@@ -51,6 +52,9 @@ export default async function OrganizationMembersList({
           </TableHead>
           <TableHead className="bg-background/95 backdrop-blur-sm">
             Verified
+          </TableHead>
+          <TableHead className="bg-background/95 backdrop-blur-sm">
+            Can Delete Tickets
           </TableHead>
           <TableHead className="bg-background/95 backdrop-blur-sm">
             Actions
@@ -92,11 +96,21 @@ export default async function OrganizationMembersList({
               </TableCell>
               <TableCell className="text-muted-foreground w-[250px] font-mono text-xs tracking-wider uppercase">
                 {isAdmin ? (
-                  <MemberRoleSelect
-                    currentRole={member.membershipRole}
+                  <MembershipFieldSelector
                     organizationId={organizationId}
                     userId={member.userId}
-                    lastAdminId={onlyAdminId}
+                    field="membershipRole"
+                    currentValue={member.membershipRole}
+                    options={Object.values(MembershipRole).map((role) => ({
+                      label: role,
+                      value: role,
+                    }))}
+                    disabled={isOnlyAdmin && member.userId === onlyAdminId}
+                    disabledReason={
+                      isOnlyAdmin && member.userId === onlyAdminId
+                        ? "You cannot change the role of the last admin"
+                        : undefined
+                    }
                   />
                 ) : (
                   <span className="text-muted-foreground font-mono text-xs tracking-wider uppercase">
@@ -114,6 +128,18 @@ export default async function OrganizationMembersList({
                 ) : (
                   <span>[Un-verified]</span>
                 )}
+              </TableCell>
+              <TableCell>
+                <MembershipFieldSelector
+                  organizationId={organizationId}
+                  userId={member.userId}
+                  field="canDeleteTickets"
+                  currentValue={member.canDeleteTickets}
+                  options={[
+                    { label: "Yes", value: true },
+                    { label: "No", value: false },
+                  ]}
+                />
               </TableCell>
               <TableCell className="flex items-center gap-x-2">
                 {isAdmin && deleteMemberButton}

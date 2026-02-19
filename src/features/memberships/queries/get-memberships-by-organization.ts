@@ -16,9 +16,7 @@ export const getMembershipsByOrganization = async (
         },
       },
     },
-    orderBy: {
-      joinedAt: "desc",
-    },
+    orderBy: [{ joinedAt: "desc" }, { userId: "asc" }],
   });
   return memberships;
 };

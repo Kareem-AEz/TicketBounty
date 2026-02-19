@@ -2,24 +2,27 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useActionState } from "react";
-import Form from "@/components/form/form";
 import { useActionFeedback } from "@/components/form/hooks/useActionFeedback";
 import { EMPTY_ACTION_STATE } from "@/components/form/utils/to-action-state";
+import { Organization } from "@/generated/client";
+import { useToast } from "@/hooks/use-toast";
 import { switchActiveOrganization } from "../actions/switch-active-organization";
 
 type OrganizationSwitchButtonProps = {
-  organizationId: string;
+  organization: Organization;
   trigger: React.ReactElement;
 };
 
 const OrganizationSwitchButton = ({
-  organizationId,
+  organization,
   trigger,
 }: OrganizationSwitchButtonProps) => {
   const [actionState, action] = useActionState(
-    switchActiveOrganization.bind(null, organizationId),
+    switchActiveOrganization.bind(null, organization.id),
     EMPTY_ACTION_STATE,
   );
+
+  const { toast } = useToast();
 
   const queryClient = useQueryClient();
 
@@ -28,14 +31,24 @@ const OrganizationSwitchButton = ({
       queryClient.invalidateQueries({
         queryKey: ["active-organization"],
       });
+      toast(
+        <div className="flex items-center gap-x-2">
+          <span className="">Organization Switched to:</span>
+          <span className="text-primary font-mono text-xs font-medium tracking-wider">
+            {organization?.name}
+          </span>
+        </div>,
+        {
+          key: `organization-switch-${organization.id}`,
+        },
+      );
+    },
+    onError() {
+      toast("Failed to switch organization");
     },
   });
 
-  return (
-    <Form action={action} actionState={actionState}>
-      {trigger}
-    </Form>
-  );
+  return <form action={action}>{trigger}</form>;
 };
 
 export default OrganizationSwitchButton;

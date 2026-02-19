@@ -27,7 +27,6 @@ export const updateOrganization = async (
       data: { name },
     });
     revalidatePath(organizationsPath());
-    await Promise.resolve(new Promise((resolve) => setTimeout(resolve, 1000)));
     return toSuccessActionState({
       status: "SUCCESS",
       message: "Organization edited",

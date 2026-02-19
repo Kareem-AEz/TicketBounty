@@ -19,7 +19,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { MembershipRole } from "@/generated/enums";
-import { updateMemberRole } from "../actions/update-member-role";
+import { updateMembership } from "../actions/update-membership";
 
 type MemberRoleSelectProps = {
   currentRole: MembershipRole;
@@ -38,7 +38,7 @@ export default function MemberRoleSelect({
 }: MemberRoleSelectProps) {
   const [actionState, action, isPending] = useActionState(
     async (prevState: unknown, role: MembershipRole) =>
-      updateMemberRole(organizationId, userId, role),
+      updateMembership(organizationId, userId, { membershipRole: role }),
     EMPTY_ACTION_STATE,
   );
 
