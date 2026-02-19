@@ -11,7 +11,6 @@ import { MembershipRole } from "@/generated/enums";
 import prisma from "@/lib/prisma";
 import { organizationPath } from "@/paths";
 import { getMembership } from "../queries/get-membership";
-import { getMembershipsByOrganization } from "../queries/get-memberships-by-organization";
 
 export const updateMembership = async (
   organizationId: string,
@@ -24,9 +23,22 @@ export const updateMembership = async (
     const userId = user.id;
 
     await prisma.$transaction(async (tx) => {
-      const userMembership = await getMembership(organizationId, userId, {
-        tx,
-      });
+      const isRoleChange =
+        !!data?.membershipRole && data.membershipRole !== MembershipRole.ADMIN;
+
+      const [userMembership, otherAdminCount] = await Promise.all([
+        getMembership(organizationId, userId, { tx }),
+        isRoleChange
+          ? tx.membership.count({
+              where: {
+                organizationId,
+                membershipRole: MembershipRole.ADMIN,
+                userId: { not: memberId },
+              },
+            })
+          : Promise.resolve(null),
+      ]);
+
       if (!userMembership)
         throw new Error("You are not a member of this organization");
       if (
@@ -35,20 +47,8 @@ export const updateMembership = async (
       )
         throw new Error("You are not an admin of this organization");
 
-      if (data?.membershipRole) {
-        // Check if the member is the last admin
-        const memberships = await getMembershipsByOrganization(organizationId, {
-          tx,
-        });
-        const lastAdmins = (memberships ?? []).filter(
-          (membership) => membership.membershipRole === MembershipRole.ADMIN,
-        );
-        const isUpdatingLastAdmin =
-          lastAdmins.length === 1 && lastAdmins[0].userId === memberId;
-
-        if (isUpdatingLastAdmin && data.membershipRole !== MembershipRole.ADMIN)
-          throw new Error("You cannot update the role of the last admin");
-      }
+      if (isRoleChange && otherAdminCount === 0)
+        throw new Error("You cannot update the role of the last admin");
 
       await tx.membership.update({
         where: {
