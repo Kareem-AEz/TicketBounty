@@ -31,6 +31,8 @@ model User {
   memberships            Membership[]
   tickets                Ticket[]
   comments               TicketComment[]
+
+  @@index([username(ops: raw("gin_trgm_ops"))], type: Gin)
 }
 
 model Session {
