@@ -379,6 +379,34 @@ html {
   }
 }
 
+/* Ambient glow behind main content */
+#main {
+  position: relative;
+}
+#main::before {
+  content: "";
+  position: absolute;
+  top: 8rem;
+  left: 50%;
+  width: 40rem;
+  height: 40rem;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at center,
+    oklch(0.795 0.184 86.047 / 6%) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+.dark #main::before {
+  background: radial-gradient(
+    ellipse at center,
+    oklch(0.795 0.184 86.047 / 4%) 0%,
+    transparent 70%
+  );
+}
+
 /* Accessibility: Respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *,

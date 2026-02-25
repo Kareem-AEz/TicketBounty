@@ -12,15 +12,19 @@ function Heading({ title, description, action }: HeadingProps) {
     <>
       <div className="flex items-center justify-between px-8">
         <div className="">
-          <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
+          <h2 className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
+            {title}
+          </h2>
           {description && (
-            <p className="text-muted-foreground mt-2 text-sm">{description}</p>
+            <p className="text-muted-foreground mt-2 text-sm tracking-wide">
+              {description}
+            </p>
           )}
         </div>
         <div className="flex items-center gap-x-2">{action}</div>
       </div>
 
-      <Separator className="" />
+      <Separator className="via-border/60 bg-gradient-to-r from-transparent to-transparent" />
     </>
   );
 }

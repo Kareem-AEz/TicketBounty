@@ -16,7 +16,7 @@ export default function Spinner({ size = "lg", className }: SpinnerProps) {
     <div className="flex flex-1 items-center justify-center">
       <div
         className={cn(
-          "animate-spin rounded-full border-solid border-gray-300 border-t-gray-900 [animation-duration:0.761s] dark:border-gray-600 dark:border-t-gray-100",
+          "animate-spin rounded-full border-solid border-muted border-t-primary [animation-duration:0.761s]",
           sizeClasses[size],
           className,
         )}

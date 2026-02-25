@@ -11,7 +11,7 @@ export default async function Footer({
       className="font-pixellari bg-secondary/20 flex flex-col items-center justify-center pl-[7rem] tracking-wider"
       {...props}
     >
-      <Separator className="mask-r-from-95% mask-r-to-100% mask-l-from-95% mask-l-to-100%" />
+      <Separator className="mask-r-from-95% mask-r-to-100% mask-l-from-95% mask-l-to-100% opacity-50" />
 
       <div className="flex flex-col items-center justify-center py-12">
         <p className="text-muted-foreground flex items-center gap-x-1 text-sm">

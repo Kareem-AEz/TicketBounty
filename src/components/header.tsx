@@ -46,8 +46,11 @@ function Header() {
           href={homePath()}
           data-umami-event="home route"
         >
-          <LucideKanban className="size-6" />
-          <h1 className="text-lg font-semibold">TicketBounty</h1>
+          <LucideKanban className="text-primary size-6" />
+          <h1 className="text-lg font-semibold tracking-tight">
+            Ticket
+            <span className="text-primary">Bounty</span>
+          </h1>
         </Link>
       </div>
       <div className="flex items-center gap-2">

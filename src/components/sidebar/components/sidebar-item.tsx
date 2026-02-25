@@ -33,10 +33,14 @@ export default function SideBarItem({
         className={cn(
           buttonVariants({ variant: "ghost" }),
           "group relative flex h-12 justify-center",
-          isActive && "bg-muted hover:bg-muted font-bold",
+          isActive &&
+            "bg-primary/10 hover:bg-primary/15 text-primary font-bold",
         )}
         aria-label={item.label}
       >
+        {isActive && (
+          <span className="bg-primary absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full" />
+        )}
         <div className="flex h-5 w-5 items-center justify-center">
           {item.icon}
         </div>
