@@ -84,7 +84,6 @@ export const getTickets = async (
 
   return {
     data: tickets,
-
     metadata: { total, hasNextPage: total > (skip ?? 0) + (take ?? 0) },
   };
 };

@@ -26,3 +26,25 @@
 {"sessionId":"58d1df","runId":"post-fix","location":"get-tickets.ts:21","message":"after getMyActiveOrganization","data":{"pool":{"total":1,"idle":1,"waiting":0},"elapsedMs":4,"hasActiveOrg":false},"timestamp":1772063668809,"hypothesisId":"H-B"}
 {"sessionId":"58d1df","runId":"post-fix","location":"get-tickets.ts:67","message":"before $transaction","data":{"pool":{"total":1,"idle":1,"waiting":0},"elapsedMs":4,"hasUsernameSearch":false,"skip":0,"take":10},"timestamp":1772063668809,"hypothesisId":"H-B"}
 {"sessionId":"58d1df","runId":"post-fix","location":"get-tickets.ts:success","message":"$transaction SUCCEEDED","data":{"pool":{"total":1,"idle":1,"waiting":0},"elapsedMs":29,"ticketCount":4,"total":4},"timestamp":1772063668834,"hypothesisId":"H-B"}
+{"sessionId":"58d1df","location":"get-tickets.ts:start","message":"getTickets start","data":{"dbHost":"aws-1-eu-central-1.pooler.supabase.com:6543","isPgBouncer":true},"timestamp":1772065043751,"hypothesisId":"H-A,H-D"}
+{"sessionId":"58d1df","location":"get-tickets.ts:afterOrg","message":"after getMyActiveOrganization","data":{"elapsedMs":5},"timestamp":1772065043756,"hypothesisId":"H-C"}
+{"sessionId":"58d1df","location":"get-tickets.ts:start","message":"getTickets start","data":{"dbHost":"aws-1-eu-central-1.pooler.supabase.com:6543","isPgBouncer":true},"timestamp":1772065065552,"hypothesisId":"H-A,H-D"}
+{"sessionId":"58d1df","location":"get-tickets.ts:afterOrg","message":"after getMyActiveOrganization","data":{"elapsedMs":2},"timestamp":1772065065554,"hypothesisId":"H-C"}
+{"sessionId":"58d1df","location":"get-tickets.ts:beforeTx","message":"before $transaction","data":{"elapsedMs":2,"skip":0,"take":10},"timestamp":1772065065554,"hypothesisId":"H-A,H-B"}
+{"sessionId":"58d1df","location":"get-tickets.ts:txFail","message":"$transaction FAILED","data":{"elapsedMs":2017,"errorCode":"P2028","errorMsg":"\nInvalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"default\"].ticket.findMany()` invocation in\nD:\\Programming\\Web\\Projects\\t"},"timestamp":1772065067569,"hypothesisId":"H-A,H-B,H-C,H-D"}
+{"sessionId":"58d1df","location":"get-tickets.ts:start","message":"getTickets start","data":{"dbHost":"aws-1-eu-central-1.pooler.supabase.com:6543","isPgBouncer":true},"timestamp":1772065189497,"hypothesisId":"H-A,H-D"}
+{"sessionId":"58d1df","location":"get-tickets.ts:afterOrg","message":"after getMyActiveOrganization","data":{"elapsedMs":2},"timestamp":1772065189499,"hypothesisId":"H-C"}
+{"sessionId":"58d1df","location":"get-tickets.ts:beforeTx","message":"before $transaction","data":{"elapsedMs":3,"skip":0,"take":10},"timestamp":1772065189500,"hypothesisId":"H-A,H-B"}
+{"sessionId":"58d1df","location":"get-tickets.ts:start","message":"getTickets start","data":{"dbHost":"aws-1-eu-central-1.pooler.supabase.com:6543","isPgBouncer":true},"timestamp":1772065190219,"hypothesisId":"H-A,H-D"}
+{"sessionId":"58d1df","location":"get-tickets.ts:afterOrg","message":"after getMyActiveOrganization","data":{"elapsedMs":2},"timestamp":1772065190221,"hypothesisId":"H-C"}
+{"sessionId":"58d1df","location":"get-tickets.ts:beforeTx","message":"before $transaction","data":{"elapsedMs":2,"skip":0,"take":10},"timestamp":1772065190221,"hypothesisId":"H-A,H-B"}
+{"sessionId":"58d1df","location":"get-tickets.ts:txSuccess","message":"$transaction SUCCEEDED","data":{"elapsedMs":880},"timestamp":1772065190377,"hypothesisId":"H-A,H-B"}
+{"sessionId":"58d1df","location":"get-tickets.ts:txSuccess","message":"$transaction SUCCEEDED","data":{"elapsedMs":604},"timestamp":1772065190823,"hypothesisId":"H-A,H-B"}
+{"sessionId":"58d1df","location":"get-tickets.ts:start","message":"getTickets start","data":{"dbHost":"aws-1-eu-central-1.pooler.supabase.com:6543","isPgBouncer":true},"timestamp":1772065225563,"hypothesisId":"H-A,H-D"}
+{"sessionId":"58d1df","location":"get-tickets.ts:afterOrg","message":"after getMyActiveOrganization","data":{"elapsedMs":2},"timestamp":1772065225565,"hypothesisId":"H-C"}
+{"sessionId":"58d1df","location":"get-tickets.ts:beforeTx","message":"before $transaction","data":{"elapsedMs":2,"skip":0,"take":10},"timestamp":1772065225565,"hypothesisId":"H-A,H-B"}
+{"sessionId":"58d1df","location":"get-tickets.ts:txSuccess","message":"$transaction SUCCEEDED","data":{"elapsedMs":616},"timestamp":1772065226179,"hypothesisId":"H-A,H-B"}
+{"sessionId":"58d1df","location":"get-tickets.ts:start","message":"getTickets start","data":{"dbHost":"aws-1-eu-central-1.pooler.supabase.com:6543","isPgBouncer":true},"timestamp":1772065229372,"hypothesisId":"H-A,H-D"}
+{"sessionId":"58d1df","location":"get-tickets.ts:afterOrg","message":"after getMyActiveOrganization","data":{"elapsedMs":2},"timestamp":1772065229374,"hypothesisId":"H-C"}
+{"sessionId":"58d1df","location":"get-tickets.ts:beforeTx","message":"before $transaction","data":{"elapsedMs":2,"skip":0,"take":10},"timestamp":1772065229374,"hypothesisId":"H-A,H-B"}
+{"sessionId":"58d1df","location":"get-tickets.ts:txSuccess","message":"$transaction SUCCEEDED","data":{"elapsedMs":373},"timestamp":1772065229745,"hypothesisId":"H-A,H-B"}
