@@ -88,7 +88,11 @@ export default function RootLayout({
             __html: JSON.stringify(softwareData),
           }}
         />
-
+        <Script
+          src="/cdn/seline"
+          data-token="d56466f0c386f3b"
+          strategy="afterInteractive"
+        />
         <NextTopLoader color="var(--primary)" showSpinner={false} height={2} />
         <SpeedInsights />
         <PostHogProvider>

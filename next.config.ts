@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
         source: "/ingest/:path*",
         destination: "https://eu.i.posthog.com/:path*",
       },
+      {
+        source: "/cdn/seline",
+        destination: "https://cdn.seline.com/seline.js",
+      },
     ];
   },
 
