@@ -13,20 +13,27 @@ This project is a **living laboratory** for modern full-stack development. It is
 We view the application as a biological system:
 
 ### 🧠 The Brain (Next.js App Router)
+
 The central nervous system. It decides what to render on the server (fast, secure) and what to ship to the client (interactive).
+
 - **Server Components:** The default state. Used for fetching data and rendering static content.
 - **Server Actions:** The muscles. They mutate data directly from the UI without API endpoints.
 
 ### 🗄️ The Memory (Prisma + PostgreSQL)
+
 Our long-term storage.
+
 - **Prisma:** The type-safe lens through which we view our data.
 - **PostgreSQL:** The bedrock.
 
 ### ⚡ The Nervous System (Inngest)
+
 Handles asynchronous impulses. When a user signs up, we don't block their request to send a welcome email. We fire a signal to Inngest, which handles the "heavy lifting" in the background, ensuring the UI remains snappy.
 
 ### 👁️ The Senses (PostHog)
-Our observation deck. We don't just count page views; we track *intent*.
+
+Our observation deck. We don't just count page views; we track _intent_.
+
 - **Events:** "Ticket Created", "Bounty Updated".
 - **Session Replay:** Watching how users actually struggle with the UI.
 
@@ -35,26 +42,31 @@ Our observation deck. We don't just count page views; we track *intent*.
 ## 3. THE TECH STACK (The Tools)
 
 ### Core Framework
-*   **Next.js 16 (Beta):** The latest and greatest.
-*   **React 19:** Utilizing the **React Compiler** for automatic memoization.
-*   **TypeScript 5:** Strict mode enabled.
+
+- **Next.js 16 (Beta):** The latest and greatest.
+- **React 19:** Utilizing the **React Compiler** for automatic memoization.
+- **TypeScript 5:** Strict mode enabled.
 
 ### Data & State
-*   **Prisma ORM:** Database schema and client.
-*   **React Query:** Server state management (caching, optimistic updates).
-*   **Nuqs:** URL-driven state management (shareable filters).
-*   **Zod:** The gatekeeper for data validation.
+
+- **Prisma ORM:** Database schema and client.
+- **React Query:** Server state management (caching, optimistic updates).
+- **Nuqs:** URL-driven state management (shareable filters).
+- **Zod:** The gatekeeper for data validation.
 
 ### Authentication & Security
-*   **Lucia Auth:** Session-based authentication. We own the session table.
-*   **Argon2:** Secure password hashing.
+
+- **Lucia Auth:** Session-based authentication. We own the session table.
+- **Argon2:** Secure password hashing.
 
 ### Infrastructure & Async
-*   **Inngest:** Durable background job execution.
-*   **Resend:** Email delivery service.
+
+- **Inngest:** Durable background job execution.
+- **Resend:** Email delivery service.
 
 ### Analytics
-*   **PostHog:** Product analytics and feature flags. (Replaces Umami).
+
+- **PostHog:** Product analytics and feature flags. (Replaces Umami).
 
 ---
 
@@ -82,20 +94,24 @@ src/
 ## 5. DOCUMENTATION INDEX
 
 ### 📘 Deep Dives
-*   **[PostHog Analytics Guide](docs/POSTHOG_GUIDE.md):** How we track events and handle privacy.
-*   **[React Query Guide](REACT_QUERY_GUIDE.md):** Mastering server state and optimistic updates.
-*   **[Nuqs Guide](docs/NUQS_GUIDE.md):** Managing state in the URL.
-*   **[Inngest Guide](docs/inngest/DOCUMENTATION_SUMMARY.md):** Background jobs and event-driven architecture.
+
+- **[PostHog Analytics Guide](docs/POSTHOG_GUIDE.md):** How we track events and handle privacy.
+- **[React Query Guide](REACT_QUERY_GUIDE.md):** Mastering server state and optimistic updates.
+- **[Nuqs Guide](docs/NUQS_GUIDE.md):** Managing state in the URL.
+- **[Inngest Guide](docs/inngest/DOCUMENTATION_SUMMARY.md):** Background jobs and event-driven architecture.
 
 ### 🛠️ Developer Guides
-*   **[Structure Data](docs/STRUCTURED_DATA.md):** How we handle SEO rich snippets.
+
+- **[Structure Data](docs/STRUCTURED_DATA.md):** How we handle SEO rich snippets.
 
 ---
 
 ## 6. KEY CONCEPTS & PATTERNS
 
 ### A. The "Optimistic UI" Pattern
+
 We don't wait for the server. When a user creates a ticket:
+
 1.  **React Query** immediately updates the cache with the new ticket (temp ID).
 2.  The UI updates instantly.
 3.  The **Server Action** runs in the background.
@@ -103,17 +119,21 @@ We don't wait for the server. When a user creates a ticket:
 5.  If it fails, the UI rolls back and shows an error toast.
 
 ### B. The "URL as State" Pattern (Nuqs)
+
 We avoid `useState` for filters.
+
 - **Wrong:** `const [search, setSearch] = useState('')`
 - **Right:** `const [search, setSearch] = useQueryState('search')`
-> This makes every filtered view shareable and bookmarkable.
+  > This makes every filtered view shareable and bookmarkable.
 
 ### C. The "Event-Driven" Pattern (Inngest)
+
 We decouple side effects from main actions.
+
 - **Action:** User changes password.
 - **Event:** `app/password.reset` is fired.
 - **Listener:** Inngest function `send-password-reset-email` picks it up.
 
 ---
 
-*Written with the "High-Fidelity" mindset: Clear, Educational, and Technically Accurate.*
+_Written with the "High-Fidelity" mindset: Clear, Educational, and Technically Accurate._
