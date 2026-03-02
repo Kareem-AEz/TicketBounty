@@ -1,7 +1,10 @@
+import { getAuth } from "@/features/auth/queries/get-auth";
+import { isOwner } from "@/features/auth/utils/is-owner";
 import { getMyActiveOrganization } from "@/features/organizations/queries/get-my-active-organization";
 import prisma from "@/lib/prisma";
 import { TICKET_PAGE_SIZE } from "../constants";
 import { TicketParsedSearchParams } from "../utils/search-params";
+import { getTicketPermission } from "./get-ticket-permission";
 
 export const getTickets = async (
   userId?: string,
@@ -9,6 +12,7 @@ export const getTickets = async (
   searchParams?: TicketParsedSearchParams,
 ) => {
   const activeOrganization = await getMyActiveOrganization();
+  const { user } = await getAuth();
 
   const where = {
     ...(!showOrganizationTickets && { userId }),
@@ -82,8 +86,27 @@ export const getTickets = async (
     prisma.ticket.count({ where }),
   ]);
 
+  const permissions = await Promise.all(
+    tickets.map((t) =>
+      getTicketPermission({
+        organizationId: t.organizationId ?? "",
+        userId: t.userId ?? "",
+      }),
+    ),
+  );
+
   return {
-    data: tickets,
+    data: tickets.map((t, index) => {
+      return {
+        ...t,
+        permissions: {
+          canDeleteTickets:
+            (isOwner(user?.id ?? "", t.userId ?? undefined) &&
+              permissions[index]?.canDeleteTickets) ??
+            false,
+        },
+      };
+    }),
     metadata: { total, hasNextPage: total > (skip ?? 0) + (take ?? 0) },
   };
 };

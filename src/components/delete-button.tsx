@@ -2,7 +2,6 @@
 
 import { LucideTrash2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import DetailButton from "@/features/ticket/components/detail-button";
+import { usePatchedToast } from "@/hooks/use-toast";
 
 type DeleteButtonProps = {
   onDelete: () => Promise<{ success: boolean; message?: string }>;
@@ -39,6 +39,7 @@ function DeleteButton({
 }: DeleteButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = usePatchedToast();
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -47,13 +48,13 @@ function DeleteButton({
       const result = await onDelete();
 
       if (result.success) {
-        toast.success(result.message || "Deleted successfully");
+        toast(result.message || "Deleted successfully");
         setIsOpen(false);
       } else {
-        toast.error(result.message || "Failed to delete");
+        toast(result.message || "Failed to delete");
       }
     } catch (error) {
-      toast.error(
+      toast(
         error instanceof Error ? error.message : "An unexpected error occurred",
       );
     } finally {
