@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { useActionFeedback } from "@/components/form/hooks/useActionFeedback";
 import { EMPTY_ACTION_STATE } from "@/components/form/utils/to-action-state";
 import { Organization } from "@/generated/client";
-import { useToast } from "@/hooks/use-toast";
+import { usePatchedToast } from "@/hooks/use-toast";
 import { switchActiveOrganization } from "../actions/switch-active-organization";
 
 type OrganizationSwitchButtonProps = {
@@ -22,7 +22,7 @@ const OrganizationSwitchButton = ({
     EMPTY_ACTION_STATE,
   );
 
-  const { toast } = useToast();
+  const { toast } = usePatchedToast();
 
   const queryClient = useQueryClient();
 

@@ -10,6 +10,7 @@ import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect"
 import { isOwner } from "@/features/auth/utils/is-owner";
 import prisma from "@/lib/prisma";
 import { homePath, ticketsPath } from "@/paths";
+import { getTicketPermission } from "../queries/get-ticket-permission";
 
 type DeleteTicketProps = {
   id: string;
@@ -30,7 +31,20 @@ export async function deleteTicket({
     });
 
     if (!isOwner(user.id, ticket?.userId ?? undefined) || !ticket) {
-      return toErrorActionState("You are not the owner of this ticket");
+      return toErrorActionState(
+        new Error("You are not the owner of this ticket"),
+      );
+    }
+
+    const permissions = await getTicketPermission({
+      organizationId: ticket?.organizationId ?? "",
+      userId: ticket?.userId ?? "",
+    });
+
+    if (!permissions.canDeleteTickets) {
+      return toErrorActionState(
+        new Error("You are not allowed to delete this ticket"),
+      );
     }
 
     await prisma.ticket.delete({
