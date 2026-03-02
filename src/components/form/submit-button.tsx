@@ -60,9 +60,7 @@ function SubmitButton({
     >
       {isWorking ? (
         <motion.div
-          initial={
-            shouldReduceMotion ? undefined : { opacity: 0, scale: 0.9 }
-          }
+          initial={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.9 }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
