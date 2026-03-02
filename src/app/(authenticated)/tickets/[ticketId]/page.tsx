@@ -44,7 +44,7 @@ export async function generateMetadata({
     title: ticket.title,
     description: ticket.content,
     keywords: [
-      ticket.title,
+      ticket.title ?? "",
       "tickets",
       "ticket management",
       "ticket system",
@@ -99,6 +99,10 @@ async function page({ params }: TicketPageProps) {
   ]);
 
   if (!ticket) {
+    notFound();
+  }
+
+  if (!ticket.title) {
     notFound();
   }
 
