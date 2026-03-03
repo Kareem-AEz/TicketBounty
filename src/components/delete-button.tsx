@@ -86,7 +86,7 @@ function DeleteButton({
           />
         </span>
       </TooltipTrigger>
-      <TooltipContent>
+      <TooltipContent className="flex flex-col items-start">
         <span>You do not have permission to delete this item.</span>
         <span className="text-muted-foreground font-mono text-xs">
           Please contact your administrator to request permission.
