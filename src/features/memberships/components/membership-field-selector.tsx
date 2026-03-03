@@ -4,6 +4,7 @@ import React, {
   startTransition,
   useActionState,
   useEffect,
+  useMemo,
   useOptimistic,
   useRef,
 } from "react";
@@ -81,10 +82,13 @@ export default function MembershipFieldSelector<
     });
   };
 
-  const label = (
-    <span className="text-muted-foreground bg-muted-foreground/5 rounded-md px-2 py-0.5 font-mono text-xs tracking-wider uppercase">
-      {field}
-    </span>
+  const label = useMemo(
+    () => (
+      <span className="text-muted-foreground bg-muted-foreground/5 shrink-0 rounded-md px-2 py-0.5 font-mono text-xs tracking-wider uppercase">
+        {field}
+      </span>
+    ),
+    [field],
   );
 
   useEffect(() => {
@@ -104,7 +108,6 @@ export default function MembershipFieldSelector<
           </div>
         ),
         success: (data) => {
-          console.log(data);
           return (
             <div className="flex items-center gap-1">
               {label}
@@ -114,9 +117,9 @@ export default function MembershipFieldSelector<
         },
         error: (error) => {
           return (
-            <div className="flex items-center gap-1">
+            <div className="flex flex-col items-start pl-2">
               {label}
-              Failed to update
+              {error.message || "Failed to update"}
             </div>
           );
         },
@@ -124,7 +127,7 @@ export default function MembershipFieldSelector<
 
       promiseRef.current = null;
     }
-  }, [isPending]);
+  }, [isPending, label]);
 
   const select = (
     <Select
@@ -163,9 +166,11 @@ export default function MembershipFieldSelector<
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <div>{select}</div>
+          <span className="inline-flex" tabIndex={-1}>
+            {select}
+          </span>
         </TooltipTrigger>
-        <TooltipContent>
+        <TooltipContent side="right">
           <span className="text-muted-foreground font-mono text-xs">
             {disabledReason}
           </span>

@@ -13,6 +13,7 @@ type DetailButtonProps = {
   label: string;
   animate?: boolean;
   prefetchOnHover?: boolean;
+  canDelete?: boolean;
 } & (
   | {
       href?: undefined;
@@ -35,6 +36,7 @@ function DetailButton({
   props,
   animate = true,
   prefetchOnHover = false,
+  canDelete = true,
 }: DetailButtonProps) {
   const isMobile = useIsMobile();
   const [shouldPrefetch, setShouldPrefetch] = useState(!prefetchOnHover);
@@ -78,11 +80,12 @@ function DetailButton({
     ...commonProps,
     className: isMobile ? mobileClassName : desktopClassName,
     style: isMobile ? undefined : desktopStyle,
+    disabled: !canDelete,
   };
 
   if (href) {
     return (
-      <Button {...buttonProps} asChild aria-label={label}>
+      <Button {...buttonProps} asChild aria-label={label} disabled={!canDelete}>
         <Link
           href={href}
           prefetch={shouldPrefetch ? true : false}
@@ -96,7 +99,12 @@ function DetailButton({
   }
 
   return (
-    <Button {...buttonProps} onClick={onClick} aria-label={label}>
+    <Button
+      {...buttonProps}
+      onClick={onClick}
+      aria-label={label}
+      disabled={!canDelete}
+    >
       {icon}
     </Button>
   );

@@ -41,6 +41,13 @@ export const updateMembership = async (
 
       if (!userMembership)
         throw new Error("You are not a member of this organization");
+
+      if (
+        userMembership.membershipRole !== MembershipRole.ADMIN &&
+        !isRoleChange
+      )
+        throw new Error("You do not have permission to update this field");
+
       if (
         data?.membershipRole &&
         userMembership.membershipRole !== MembershipRole.ADMIN
