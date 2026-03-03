@@ -55,8 +55,6 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
   const [isMounted, setIsMounted] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
-  console.log("canDeleteTickets", ticket.permissions.canDeleteTickets);
-
   const isMine = user?.id === ticket.userId;
 
   useEffect(() => {
@@ -320,28 +318,27 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                                 label={copy.actions.edit}
                                 onClick={() => setIsEditing(true)}
                               />
-                              {ticket.permissions.canDeleteTickets && (
-                                <DeleteButton
-                                  onDelete={async () => {
-                                    const result = await deleteTicket({
-                                      id: ticket.id,
-                                      isDetail,
-                                    });
-                                    if (result.status === "SUCCESS") {
-                                      return {
-                                        success: true,
-                                        message: result.message,
-                                      };
-                                    }
+                              <DeleteButton
+                                onDelete={async () => {
+                                  const result = await deleteTicket({
+                                    id: ticket.id,
+                                    isDetail,
+                                  });
+                                  if (result.status === "SUCCESS") {
                                     return {
-                                      success: false,
+                                      success: true,
                                       message: result.message,
                                     };
-                                  }}
-                                  index={2}
-                                  animate={true}
-                                />
-                              )}
+                                  }
+                                  return {
+                                    success: false,
+                                    message: result.message,
+                                  };
+                                }}
+                                index={2}
+                                animate={true}
+                                canDelete={ticket.permissions.canDeleteTickets}
+                              />
                             </>
                           )}
                         </>

@@ -139,6 +139,8 @@ export default async function OrganizationMembersList({
                     { label: "Yes", value: true },
                     { label: "No", value: false },
                   ]}
+                  disabled={!isAdmin}
+                  disabledReason="You don't have permission to update this field"
                 />
               </TableCell>
               <TableCell className="flex items-center gap-x-2">

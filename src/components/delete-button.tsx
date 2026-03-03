@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import DetailButton from "@/features/ticket/components/detail-button";
 import { usePatchedToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 type DeleteButtonProps = {
   onDelete: () => Promise<{ success: boolean; message?: string }>;
@@ -25,6 +26,7 @@ type DeleteButtonProps = {
   index?: number;
   animate?: boolean;
   trigger?: React.ReactNode;
+  canDelete?: boolean;
 };
 
 function DeleteButton({
@@ -36,6 +38,7 @@ function DeleteButton({
   index = 0,
   animate = true,
   trigger,
+  canDelete = true,
 }: DeleteButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -62,17 +65,40 @@ function DeleteButton({
     }
   };
 
-  return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogTrigger asChild>
-        {trigger || (
+  const triggerComponent = canDelete ? (
+    <DetailButton
+      index={index}
+      icon={icon}
+      label={label}
+      animate={animate}
+      canDelete={canDelete}
+    />
+  ) : (
+    <Tooltip disableHoverableContent>
+      <TooltipTrigger asChild>
+        <span className="inline-flex">
           <DetailButton
             index={index}
             icon={icon}
             label={label}
             animate={animate}
+            canDelete={canDelete}
           />
-        )}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>
+        <span>You do not have permission to delete this item.</span>
+        <span className="text-muted-foreground font-mono text-xs">
+          Please contact your administrator to request permission.
+        </span>
+      </TooltipContent>
+    </Tooltip>
+  );
+
+  return (
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      <AlertDialogTrigger asChild>
+        {trigger || triggerComponent}
       </AlertDialogTrigger>
 
       <AlertDialogContent>
