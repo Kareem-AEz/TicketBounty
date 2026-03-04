@@ -32,7 +32,26 @@ model User {
   tickets                Ticket[]
   comments               TicketComment[]
 
+  invitationsSent Invitations[]
+
   @@index([username(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model Invitations {
+  email     String
+  tokenHash String   @unique
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  invitedByUserId String?
+  invitedByUser   User?   @relation(fields: [invitedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([organizationId])
+  @@index([invitedByUserId])
 }
 
 model Session {
@@ -86,6 +105,7 @@ model Organization {
 
   memberships Membership[]
   tickets     Ticket[]
+  invitations Invitations[]
 }
 
 model Membership {
@@ -140,14 +160,12 @@ model Ticket {
   @@index([status])
   @@index([createdAt])
   @@index([bounty])
-
   // Composite indexes for common query patterns
   @@index([userId, status])
   @@index([userId, createdAt])
   @@index([userId, bounty])
   @@index([status, createdAt])
   @@index([status, bounty])
-
   // Text search indexes
   @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
   @@index([content(ops: raw("gin_trgm_ops"))], type: Gin)
