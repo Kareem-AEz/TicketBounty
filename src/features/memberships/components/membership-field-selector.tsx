@@ -162,7 +162,7 @@ export default function MembershipFieldSelector<
     </Select>
   );
 
-  if (disabledReason) {
+  if (disabledReason && disabled) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
