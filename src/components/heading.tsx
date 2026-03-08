@@ -5,11 +5,13 @@ interface HeadingProps {
   title: string;
   description: string;
   action?: React.ReactNode;
+  tabs?: React.ReactNode;
 }
 
-function Heading({ title, description, action }: HeadingProps) {
+function Heading({ title, description, action, tabs }: HeadingProps) {
   return (
     <>
+      {tabs}
       <div className="flex items-center justify-between px-8">
         <div className="">
           <h2 className="text-3xl font-bold tracking-tight">{title}</h2>

@@ -37,6 +37,7 @@ export default async function Footer({
             rel="noopener noreferrer"
             href="https://x.com/KareemAhmedEz"
             aria-label="Kareem Ahmed's X profile"
+            className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-secondary/20"
           >
             <TwitterIcon
               className="fill-muted-foreground hover:fill-primary box-content size-4 p-2 opacity-80 transition-all hover:opacity-100"
@@ -49,6 +50,7 @@ export default async function Footer({
             rel="noopener noreferrer"
             href="https://github.com/Kareem-AEz/TicketBounty"
             aria-label="Kareem Ahmed's GitHub profile"
+            className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-secondary/20"
           >
             <GithubIcon
               className="fill-muted-foreground hover:fill-primary box-content size-4 p-2 opacity-80 transition-all hover:opacity-100"
