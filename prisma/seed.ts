@@ -1,7 +1,7 @@
 import "dotenv/config";
 import argon2 from "@node-rs/argon2";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@/generated/client";
+import { Invitations, PrismaClient, User } from "@/generated/client";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -11,7 +11,7 @@ const prisma = new PrismaClient({
   adapter,
 });
 
-const users = [
+const users: Omit<User, "id" | "createdAt" | "updatedAt" | "passwordHash">[] = [
   {
     username: "admin",
     email: "admin@example.com",
@@ -20,6 +20,25 @@ const users = [
   {
     username: "Kareem Ahmed",
     email: "kemoahmedahmedkemo@gmail.com",
+    emailVerified: null,
+  },
+];
+
+// No, this is not correct.
+// Omit<Invitations[], ...> means you are omitting keys from an array type, not from the Invitation type itself.
+// You likely want: Omit<Invitations, "organizationId" | "invitedByUserId">[]
+const invitations: Omit<Invitations, "organizationId" | "invitedByUserId">[] = [
+  {
+    email: "test@example.com",
+    tokenHash: crypto.randomUUID(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    email: "test2@example.com",
+    tokenHash: crypto.randomUUID(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
 ];
 
@@ -142,6 +161,15 @@ const seed = async () => {
         ...comment,
         ticketId: createdTickets[0].id,
         userId: createdUsers[1].id,
+      })),
+    });
+
+    // Create invitations
+    await tx.invitations.createMany({
+      data: invitations.map((invitation) => ({
+        ...invitation,
+        organizationId: createdOrganization.id,
+        invitedByUserId: createdUsers[0].id,
       })),
     });
   });

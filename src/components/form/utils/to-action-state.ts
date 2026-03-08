@@ -1,28 +1,30 @@
 import { z } from "zod/v4";
 import { copy } from "@/lib/copy";
 
-export type ActionState = {
+export type ActionState<T = unknown> = {
   status?: "SUCCESS" | "ERROR";
   message: string;
   payload?: FormData;
   fieldErrors?: Record<string, string[] | undefined>;
   timestamp: number;
   ticketId?: string;
+  data?: T;
 };
 
-export const EMPTY_ACTION_STATE: ActionState = {
+export const EMPTY_ACTION_STATE: ActionState<unknown> = {
   status: undefined,
   message: "",
   payload: undefined,
   fieldErrors: undefined,
   timestamp: Date.now(),
   ticketId: undefined,
+  data: undefined,
 };
 
-export const toErrorActionState = (
+export const toErrorActionState = <T>(
   error: unknown,
   formData?: FormData,
-): ActionState => {
+): ActionState<T> => {
   // Zod errors
   if (error instanceof z.ZodError) {
     return {
@@ -32,6 +34,7 @@ export const toErrorActionState = (
       fieldErrors: z.flattenError(error).fieldErrors,
       timestamp: Date.now(),
       ticketId: undefined,
+      data: undefined as T | undefined,
     };
 
     // Other errors
@@ -43,6 +46,7 @@ export const toErrorActionState = (
       fieldErrors: undefined,
       timestamp: Date.now(),
       ticketId: undefined,
+      data: undefined as T | undefined,
     };
   }
 
@@ -54,20 +58,23 @@ export const toErrorActionState = (
     fieldErrors: undefined,
     timestamp: Date.now(),
     ticketId: undefined,
+    data: undefined as T | undefined,
   };
 };
 
-export const toSuccessActionState = ({
+export const toSuccessActionState = <T>({
   status,
   message,
   payload,
   ticketId,
+  data,
 }: {
   status: ActionState["status"];
   message: string;
   payload?: FormData;
   ticketId?: string;
-}): ActionState => {
+  data?: T;
+}): ActionState<T> => {
   return {
     status,
     message,
@@ -75,5 +82,6 @@ export const toSuccessActionState = ({
     timestamp: Date.now(),
     payload,
     ticketId,
+    data,
   };
 };
