@@ -1,20 +1,10 @@
 import { Suspense } from "react";
-import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
 import Heading from "@/components/heading";
 import Spinner from "@/components/spinner";
-import OrganizationMembersList from "@/features/memberships/components/membership-list";
+import InvitationList from "@/features/invitation/components/invitation-list";
 import { getOrganization } from "@/features/organizations/queries/get-organization";
-import { homePath, organizationsPath } from "@/paths";
-const breadcrumbs: Breadcrumb[] = [
-  {
-    label: "Home",
-    href: homePath(),
-  },
-  {
-    label: "Organizations",
-    href: organizationsPath(),
-  },
-];
+import OrganizationBreadcrumbs from "../_navigation/organization-breadcrumbs";
+
 export default async function OrganizationPage({
   params,
 }: {
@@ -27,13 +17,8 @@ export default async function OrganizationPage({
     <div className="flex flex-1 flex-col gap-y-8">
       <Heading
         title={organization?.name ?? "Organization"}
-        description="Manage memberships of your organization"
-      />
-      <Breadcrumbs
-        breadcrumbs={[
-          ...breadcrumbs,
-          { label: organization?.name ?? "Organization" },
-        ]}
+        description="Manage invitations for your organization"
+        tabs={<OrganizationBreadcrumbs />}
       />
 
       <Suspense
@@ -43,7 +28,7 @@ export default async function OrganizationPage({
           </div>
         }
       >
-        <OrganizationMembersList organizationId={organizationId} />
+        <InvitationList organizationId={organizationId} />
       </Suspense>
     </div>
   );

@@ -7,6 +7,7 @@ import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
 import OrganizationsList from "@/features/organizations/components/organizations-list";
 import { createOrganizationPath, homePath } from "@/paths";
+
 const breadcrumbs: Breadcrumb[] = [
   {
     label: "Home",
@@ -16,6 +17,7 @@ const breadcrumbs: Breadcrumb[] = [
     label: "Organizations",
   },
 ];
+
 export default function OrganizationsPage() {
   return (
     <div className="flex flex-1 flex-col gap-y-8">
@@ -30,8 +32,8 @@ export default function OrganizationsPage() {
             </Link>
           </Button>
         }
+        tabs={<Breadcrumbs breadcrumbs={breadcrumbs} />}
       />
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
 
       <Suspense
         fallback={

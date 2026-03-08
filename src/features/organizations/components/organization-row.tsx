@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/tooltip";
 import { MembershipRole } from "@/generated/enums";
 import { cn } from "@/lib/utils";
-import { organizationPath } from "@/paths";
+import { organizationMembershipsPath } from "@/paths";
 import { useDeletingUserOrganization } from "../contexts/deleting-organization-context";
 import { getMyOrganizations } from "../queries/get-my-organizations";
 import MemberDeleteButton from "./member-delete-button";
@@ -73,7 +73,7 @@ export default function OrganizationRow({
 
   const viewButton = (
     <Button asChild variant="outline" size="icon" disabled={isAnyDeleting}>
-      <Link href={organizationPath(organization.id)}>
+      <Link href={organizationMembershipsPath(organization.id)}>
         <LucideExternalLink />
       </Link>
     </Button>

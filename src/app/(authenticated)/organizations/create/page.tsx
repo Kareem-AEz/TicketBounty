@@ -25,8 +25,8 @@ export default function CreateOrganizationPage() {
       <Heading
         title="Create Organization"
         description="Create a new organization"
+        tabs={<Breadcrumbs breadcrumbs={breadcrumbs} />}
       />
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
 
       <div className="mx-auto flex w-full max-w-md flex-1 items-center justify-center">
         <CardCompact
