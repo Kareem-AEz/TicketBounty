@@ -9,7 +9,7 @@ import { getAuth } from "@/features/auth/queries/get-auth";
 import { Membership } from "@/generated/client";
 import { MembershipRole } from "@/generated/enums";
 import prisma from "@/lib/prisma";
-import { organizationPath } from "@/paths";
+import { organizationMembershipsPath } from "@/paths";
 import { getMembership } from "../queries/get-membership";
 
 export const updateMembership = async (
@@ -70,7 +70,7 @@ export const updateMembership = async (
     return toErrorActionState(error);
   }
 
-  revalidatePath(organizationPath(organizationId));
+  revalidatePath(organizationMembershipsPath(organizationId));
 
   return toSuccessActionState({
     status: "SUCCESS",

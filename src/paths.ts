@@ -20,8 +20,10 @@ export const accountPasswordPath = () => "/account/password" as const;
 // Organizations
 export const organizationsPath = () => "/organizations" as const;
 export const createOrganizationPath = () => "/organizations/create" as const;
-export const organizationPath = (organizationId: string) =>
-  `/organizations/${organizationId}` as const;
+export const organizationMembershipsPath = (organizationId: string) =>
+  `/organizations/${organizationId}/memberships` as const;
+export const organizationInvitationsPath = (organizationId: string) =>
+  `/organizations/${organizationId}/invitations` as const;
 
 // Onboarding
 export const onboardingPath = () => "/onboarding" as const;
