@@ -66,8 +66,11 @@ const breadcrumbs: Breadcrumb[] = [
 export default async function AccountPasswordPage() {
   return (
     <div className="flex flex-1 flex-col gap-y-8">
-      <Heading title="Password" description="Manage your password" />
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
+      <Heading
+        title="Password"
+        description="Manage your password"
+        tabs={<Breadcrumbs breadcrumbs={breadcrumbs} />}
+      />
 
       <AccountTabs />
 

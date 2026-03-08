@@ -65,8 +65,11 @@ const breadcrumbs: Breadcrumb[] = [
 export default async function AccountProfilePage() {
   return (
     <div className="flex flex-1 flex-col gap-y-8">
-      <Heading title="Profile" description="Manage your profile"></Heading>
-      <Breadcrumbs breadcrumbs={breadcrumbs} />
+      <Heading
+        title="Profile"
+        description="Manage your profile"
+        tabs={<Breadcrumbs breadcrumbs={breadcrumbs} />}
+      />
       <AccountTabs />
 
       <div className="flex flex-1 items-center justify-center">
