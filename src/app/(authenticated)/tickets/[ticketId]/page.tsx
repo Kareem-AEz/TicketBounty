@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import React from "react";
-import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
+import { Breadcrumb } from "@/components/breadcrumbs";
+import Breadcrumbs from "@/components/breadcrumbs";
 import { Separator } from "@/components/ui/separator";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import Comments from "@/features/comment/components/comments";

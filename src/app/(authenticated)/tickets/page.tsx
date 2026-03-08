@@ -63,9 +63,8 @@ async function page({ searchParams }: TicketsPagePropsType) {
         <Heading
           title="My Tickets"
           description="All your tickets in one place"
+          tabs={<Breadcrumbs breadcrumbs={breadcrumbs} />}
         />
-
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
 
         <div className="flex w-full max-w-lg flex-1 flex-col items-center gap-y-10 self-center">
           <Card className="w-full">
