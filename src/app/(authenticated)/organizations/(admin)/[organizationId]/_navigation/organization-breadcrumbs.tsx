@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Breadcrumbs from "@/components/breadcrumbs";
 import {
   organizationInvitationsPath,
@@ -8,8 +8,15 @@ import {
   organizationsPath,
 } from "@/paths";
 
-const OrganizationBreadcrumbs = () => {
-  const { organizationId } = useParams<{ organizationId: string }>();
+type OrganizationBreadcrumbsProps = {
+  organizationId: string;
+  organizationName: string;
+};
+
+const OrganizationBreadcrumbs = ({
+  organizationId,
+  organizationName,
+}: OrganizationBreadcrumbsProps) => {
   const pathname = usePathname();
 
   const lastSegment = pathname.split("/").at(-1);
@@ -18,6 +25,14 @@ const OrganizationBreadcrumbs = () => {
     invitations: "Invitations",
   } as const;
   const title = titleMap[lastSegment as keyof typeof titleMap];
+  const label = (
+    <span>
+      <span className="text-primary font-mono text-xs tracking-widest">
+        [{organizationName}]
+      </span>{" "}
+      {title}
+    </span>
+  );
 
   return (
     <>
@@ -26,7 +41,7 @@ const OrganizationBreadcrumbs = () => {
           { label: "Home", href: organizationsPath() },
           { label: "Organizations", href: organizationsPath() },
           {
-            label: title,
+            label,
             dropdown: [
               {
                 label: "Memberships",

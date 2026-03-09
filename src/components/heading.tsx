@@ -13,7 +13,7 @@ function Heading({ title, description, action, tabs }: HeadingProps) {
     <>
       {tabs}
       <div className="flex items-center justify-between px-8">
-        <div className="">
+        <div className="select-none">
           <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
           {description && (
             <p className="text-muted-foreground mt-2 text-sm">{description}</p>

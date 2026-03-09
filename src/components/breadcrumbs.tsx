@@ -16,7 +16,7 @@ import {
 import { DropdownMenuItem } from "./ui/dropdown-menu";
 
 export type Breadcrumb = {
-  label: string;
+  label: React.ReactNode | string;
   href?: string;
   dropdown?: {
     label: string;
@@ -43,17 +43,25 @@ export default function Breadcrumbs({
           if (breadcrumb.dropdown) {
             item = (
               <DropdownMenu>
-                {/* Removed aria-current="page" here because a dropdown trigger isn't a page */}
-                <DropdownMenuTrigger className="flex items-center gap-2 select-none">
-                  {breadcrumb.label}
+                <DropdownMenuTrigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex items-center gap-2 outline-none select-none focus-visible:ring-[3px] focus-visible:outline-none">
+                  {typeof breadcrumb.label === "string" ? (
+                    <span className="text-primary font-mono text-sm tracking-wider uppercase">
+                      {breadcrumb.label}
+                    </span>
+                  ) : (
+                    breadcrumb.label
+                  )}
                   <LucideChevronDown className="size-4" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
+                <DropdownMenuContent align="center" className="w-full">
                   {breadcrumb.dropdown.map((dropdownItem) => (
-                    <DropdownMenuItem key={dropdownItem.label} asChild>
+                    <DropdownMenuItem
+                      key={dropdownItem.href.toString()}
+                      asChild
+                    >
                       <BreadcrumbLink
                         href={dropdownItem.href}
-                        className="cursor-pointer"
+                        className="text-muted-foreground cursor-pointer"
                       >
                         {dropdownItem.label}
                       </BreadcrumbLink>
@@ -81,7 +89,13 @@ export default function Breadcrumbs({
           }
 
           return (
-            <Fragment key={breadcrumb.label}>
+            <Fragment
+              key={
+                typeof breadcrumb.label === "string"
+                  ? breadcrumb.label
+                  : `breadcrumb-${index}`
+              }
+            >
               <BreadcrumbItem>{item}</BreadcrumbItem>
               {index < breadcrumbs.length - 1 && (
                 <BreadcrumbSeparator>
