@@ -4,9 +4,11 @@ import {
   Container,
   Head,
   Heading,
+  Hr,
   Html,
   Img,
   Link,
+  pixelBasedPreset,
   Preview,
   Section,
   Tailwind,
@@ -14,48 +16,57 @@ import {
 } from "@react-email/components";
 import { getBaseUrl } from "@/lib/url";
 
+/**
+ * WELCOME EMAIL TEMPLATE
+ * An elegant welcome email for new users.
+ * Showcases key features and provides a clear entry point.
+ */
 const WelcomeEmail = ({ toName }: { toName: string }) => {
   const currentYear = new Date().getFullYear();
   const dashboardUrl = `${getBaseUrl()}/tickets`;
 
-  // Color palette from design system (converted to hex for email client support)
+  // Color palette from design system
   const colors = {
-    primary: "#efb100", // oklch(0.795 0.184 86.047)
-    primaryForeground: "#1f1f1f", // oklch(0.421 0.095 57.708) - darker text on primary
-    foreground: "#232324", // oklch(0.141 0.005 285.823) - dark text
-    mutedForeground: "#8B8B8B", // oklch(0.552 0.016 285.938) - medium gray
-    border: "#EBEBEB", // oklch(0.92 0.004 286.32) - light gray
-    mutedForegroundLight: "#B1B1B1", // oklch(0.705 0.015 286.067) - medium-light gray
-    muted: "#F5F5F5", // oklch(0.967 0.001 286.375) - very light gray
+    primary: "#efb100", // TicketBounty Gold
+    primaryForeground: "#1f1f1f",
+    foreground: "#232324",
+    mutedForeground: "#4b5563", // gray-600
+    mutedForegroundLight: "#8B8B8B",
+    border: "#EBEBEB",
+    muted: "#F5F5F5",
   };
 
   return (
     <Html lang="en" dir="ltr">
       <Head />
       <Preview>Welcome to TicketBounty</Preview>
-      <Tailwind>
+      <Tailwind
+        config={{
+          presets: [pixelBasedPreset],
+        }}
+      >
         <Body
           className="py-[60px] font-sans"
           style={{ backgroundColor: colors.muted }}
         >
           <Container
-            className="mx-auto max-w-[500px] p-[48px]"
+            className="mx-auto max-w-[560px] border border-solid border-[#eeeeee]"
             style={{ backgroundColor: "#ffffff" }}
           >
-            {/* Logo Header - Minimal */}
-            <Section className="mb-[60px] text-center">
+            {/* Logo Header */}
+            <Section className="bg-[#1f1f1f] py-[32px] text-center">
               <Img
                 src="https://di867tnz6fwga.cloudfront.net/brand-kits/47a0c187-5197-4b08-834c-72207788f259/primary/7ad77690-0943-457e-a602-08cd51e8cafa.x-icon"
                 alt="TicketBounty"
-                width="48"
+                width="40"
                 className="mx-auto"
               />
             </Section>
 
-            {/* Main Heading - Large, Elegant */}
-            <Section className="mb-[40px] text-center">
+            <Section className="p-[48px] pt-[40px]">
+              {/* Main Heading */}
               <Heading
-                className="m-0 text-[36px] leading-[44px] font-light"
+                className="m-0 mb-[24px] text-center text-[28px] leading-[36px] font-semibold"
                 style={{
                   color: colors.foreground,
                   letterSpacing: "-0.5px",
@@ -63,171 +74,142 @@ const WelcomeEmail = ({ toName }: { toName: string }) => {
               >
                 Your Journey Begins
               </Heading>
-            </Section>
 
-            {/* Intro Paragraph - Clean */}
-            <Section className="mb-[48px] text-center">
-              <Text
-                className="m-0 text-[16px] leading-[26px] font-normal"
-                style={{ color: colors.mutedForeground }}
-              >
-                Hi {toName},
-              </Text>
-              <Text
-                className="m-0 mt-[16px] text-[16px] leading-[26px] font-normal"
-                style={{ color: colors.mutedForeground }}
-              >
-                Welcome to the digital wilderness of TicketBounty. Your account
-                has been woven into our universe, and your dashboard is ready to
-                transform your ideas into reality.
-              </Text>
-            </Section>
-
-            {/* Primary CTA - Apple Style */}
-            <Section className="mb-[48px] text-center">
-              <Button
-                href={dashboardUrl}
-                className="inline-block rounded-lg px-[48px] py-[14px] text-[16px] font-semibold"
-                style={{
-                  backgroundColor: colors.primary,
-                  color: colors.primaryForeground,
-                  textDecoration: "none",
-                  border: "none",
-                  borderRadius: "8px",
-                }}
-              >
-                Open Dashboard
-              </Button>
-            </Section>
-
-            {/* Spacer */}
-            <Section className="mb-[56px]">
-              <div
-                style={{
-                  height: "1px",
-                  backgroundColor: colors.border,
-                }}
-              />
-            </Section>
-
-            {/* Features Grid - Minimal & Elegant */}
-            <Section className="mb-[48px]">
-              <Heading
-                className="m-0 mb-[28px] text-center text-[14px] font-semibold"
-                style={{
-                  color: colors.foreground,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                What You Can Do
-              </Heading>
-
-              {/* Feature 1 */}
-              <Section className="mb-[24px]">
+              {/* Intro Narrative */}
+              <Section className="mb-[32px] text-center">
                 <Text
-                  className="m-0 mb-[8px] text-[15px] font-semibold"
-                  style={{ color: colors.foreground }}
-                >
-                  Organize with precision
-                </Text>
-                <Text
-                  className="m-0 text-[14px] leading-[22px]"
+                  className="m-0 text-[16px] leading-[26px]"
                   style={{ color: colors.mutedForeground }}
                 >
-                  Track tickets, manage workflows, and keep everything in focus.
+                  Hi {toName},
+                </Text>
+                <Text
+                  className="m-0 mt-[16px] text-[16px] leading-[26px]"
+                  style={{ color: colors.mutedForeground }}
+                >
+                  Welcome to the digital wilderness of TicketBounty. Your account
+                  has been woven into our universe, and your dashboard is ready
+                  to transform your ideas into reality.
                 </Text>
               </Section>
 
-              {/* Feature 2 */}
-              <Section className="mb-[24px]">
-                <Text
-                  className="m-0 mb-[8px] text-[15px] font-semibold"
-                  style={{ color: colors.foreground }}
+              {/* Primary CTA */}
+              <Section className="mb-[48px] text-center">
+                <Button
+                  href={dashboardUrl}
+                  className="inline-block bg-[#efb100] px-[48px] py-[16px] text-center text-[16px] font-bold text-[#1f1f1f]"
+                  style={{ textDecoration: "none", borderRadius: "8px" }}
                 >
-                  Collaborate effortlessly
-                </Text>
-                <Text
-                  className="m-0 text-[14px] leading-[22px]"
-                  style={{ color: colors.mutedForeground }}
-                >
-                  Comment, share updates, and keep your team synchronized.
-                </Text>
+                  Open Dashboard
+                </Button>
               </Section>
 
-              {/* Feature 3 */}
-              <Section>
+              <Hr style={{ borderColor: colors.border }} className="mb-[48px]" />
+
+              {/* Features Section */}
+              <Section className="mb-[48px]">
                 <Text
-                  className="m-0 mb-[8px] text-[15px] font-semibold"
+                  className="m-0 mb-[24px] text-center text-[14px] font-bold uppercase tracking-[0.5px]"
                   style={{ color: colors.foreground }}
                 >
-                  Move faster than ever
+                  What You Can Do
+                </Text>
+
+                <Section className="mb-[24px]">
+                  <Text
+                    className="m-0 mb-[8px] text-[15px] font-bold"
+                    style={{ color: colors.foreground }}
+                  >
+                    Organize with precision
+                  </Text>
+                  <Text
+                    className="m-0 text-[14px] leading-[22px]"
+                    style={{ color: colors.mutedForeground }}
+                  >
+                    Track tickets, manage workflows, and keep everything in
+                    focus.
+                  </Text>
+                </Section>
+
+                <Section className="mb-[24px]">
+                  <Text
+                    className="m-0 mb-[8px] text-[15px] font-bold"
+                    style={{ color: colors.foreground }}
+                  >
+                    Collaborate effortlessly
+                  </Text>
+                  <Text
+                    className="m-0 text-[14px] leading-[22px]"
+                    style={{ color: colors.mutedForeground }}
+                  >
+                    Comment, share updates, and keep your team synchronized.
+                  </Text>
+                </Section>
+
+                <Section>
+                  <Text
+                    className="m-0 mb-[8px] text-[15px] font-bold"
+                    style={{ color: colors.foreground }}
+                  >
+                    Move faster than ever
+                  </Text>
+                  <Text
+                    className="m-0 text-[14px] leading-[22px]"
+                    style={{ color: colors.mutedForeground }}
+                  >
+                    Built for speed and simplicity. No clutter, just clarity.
+                  </Text>
+                </Section>
+              </Section>
+
+              <Hr style={{ borderColor: colors.border }} className="mb-[48px]" />
+
+              {/* Footer */}
+              <Section className="bg-[#fcfcfc] p-[48px] py-[32px] text-center">
+                <Text
+                  className="m-0 mb-[16px] text-[13px] leading-[20px]"
+                  style={{ color: colors.mutedForegroundLight }}
+                >
+                  Need help? Visit our website or contact support. The digital
+                  wilderness is better explored together.
                 </Text>
                 <Text
-                  className="m-0 text-[14px] leading-[22px]"
-                  style={{ color: colors.mutedForeground }}
+                  className="m-0 text-[11px] leading-[16px]"
+                  style={{ color: colors.mutedForegroundLight }}
                 >
-                  Built for speed and simplicity. No clutter, just clarity.
+                  © {currentYear} TicketBounty · <strong>Kareem Ahmed</strong>
+                  <br />
+                  <Link
+                    href="https://github.com/Kareem-AEz"
+                    style={{
+                      color: colors.mutedForegroundLight,
+                      textDecoration: "underline",
+                    }}
+                  >
+                    GitHub
+                  </Link>{" "}
+                  ·{" "}
+                  <Link
+                    href="https://x.com/KareemAhmedEz"
+                    style={{
+                      color: colors.mutedForegroundLight,
+                      textDecoration: "underline",
+                    }}
+                  >
+                    X (Twitter)
+                  </Link>{" "}
+                  ·{" "}
+                  <Link
+                    href={getBaseUrl()}
+                    style={{
+                      color: colors.mutedForegroundLight,
+                      textDecoration: "underline",
+                    }}
+                  >
+                    Website
+                  </Link>
                 </Text>
               </Section>
-            </Section>
-
-            {/* Spacer */}
-            <Section className="mb-[48px]">
-              <div
-                style={{
-                  height: "1px",
-                  backgroundColor: colors.border,
-                }}
-              />
-            </Section>
-
-            {/* Get Started Section - Minimal */}
-            <Section className="mb-[56px] text-center">
-              <Text
-                className="m-0 mb-[20px] text-[14px] leading-[22px]"
-                style={{ color: colors.mutedForeground }}
-              >
-                Start by completing your profile, then create your first ticket.
-              </Text>
-              <Link
-                href={dashboardUrl}
-                style={{
-                  color: colors.primary,
-                  textDecoration: "none",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
-              >
-                Get started →
-              </Link>
-            </Section>
-
-            {/* Footer - Clean & Minimal */}
-            <Section className="text-center">
-              <Text
-                className="m-0 mb-[16px] text-[13px] leading-[20px]"
-                style={{ color: colors.mutedForegroundLight }}
-              >
-                Need help? Visit{" "}
-                <Link
-                  href={getBaseUrl()}
-                  style={{
-                    color: colors.mutedForeground,
-                    textDecoration: "none",
-                  }}
-                >
-                  ticket-bounty-pi.vercel.app
-                </Link>{" "}
-                or contact support.
-              </Text>
-              <Text
-                className="m-0 text-[12px]"
-                style={{ color: colors.mutedForegroundLight }}
-              >
-                © {currentYear} Ticket Bounty. Built with clarity by Kareem
-                Ahmed.
-              </Text>
             </Section>
           </Container>
         </Body>
@@ -237,7 +219,7 @@ const WelcomeEmail = ({ toName }: { toName: string }) => {
 };
 
 WelcomeEmail.PreviewProps = {
-  toName: "John Doe",
+  toName: "Explorer",
 };
 
 export default WelcomeEmail;
