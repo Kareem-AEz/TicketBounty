@@ -125,7 +125,7 @@ const EmailVerification = ({
               {/* Next Steps */}
               <Section className="mb-[48px]">
                 <Text
-                  className="m-0 mb-[16px] text-[14px] font-bold uppercase tracking-[0.5px]"
+                  className="m-0 mb-[16px] text-[14px] font-bold tracking-[0.5px] uppercase"
                   style={{ color: colors.foreground }}
                 >
                   Next Steps
@@ -141,7 +141,7 @@ const EmailVerification = ({
                     className="m-0 mb-[8px] text-[14px] leading-[22px]"
                     style={{ color: colors.mutedForeground }}
                   >
-                    • Enter the 8-digit code shown above
+                    • Enter the 8-character code shown above
                   </Text>
                   <Text
                     className="m-0 text-[14px] leading-[22px]"
@@ -152,55 +152,54 @@ const EmailVerification = ({
                 </Section>
               </Section>
 
-              <Hr style={{ borderColor: colors.border }} className="mb-[48px]" />
+              <Hr style={{ borderColor: colors.border }} />
+            </Section>
 
-              {/* Footer */}
-              <Section className="bg-[#fcfcfc] p-[48px] py-[32px] text-center">
-                <Text
-                  className="m-0 mb-[16px] text-[12px] leading-[18px]"
-                  style={{ color: colors.mutedForegroundLight }}
+            {/* Footer */}
+            <Section className="bg-[#fcfcfc] p-[48px] py-[32px] text-center">
+              <Text
+                className="m-0 mb-[16px] text-[12px] leading-[18px]"
+                style={{ color: colors.mutedForegroundLight }}
+              >
+                If you didn&apos;t request this, you can safely disregard this
+                email. The digital wilderness can be mysterious sometimes.
+              </Text>
+              <Text
+                className="m-0 text-[11px] leading-[16px]"
+                style={{ color: colors.mutedForegroundLight }}
+              >
+                © {currentYear} TicketBounty · <strong>Kareem Ahmed</strong>
+                <br />
+                <Link
+                  href="https://github.com/Kareem-AEz"
+                  style={{
+                    color: colors.mutedForegroundLight,
+                    textDecoration: "underline",
+                  }}
                 >
-                  If you didn&apos;t request this, you can safely disregard
-                  this email. The digital wilderness can be mysterious
-                  sometimes.
-                </Text>
-                <Text
-                  className="m-0 text-[11px] leading-[16px]"
-                  style={{ color: colors.mutedForegroundLight }}
+                  GitHub
+                </Link>{" "}
+                ·{" "}
+                <Link
+                  href="https://x.com/KareemAhmedEz"
+                  style={{
+                    color: colors.mutedForegroundLight,
+                    textDecoration: "underline",
+                  }}
                 >
-                  © {currentYear} TicketBounty · <strong>Kareem Ahmed</strong>
-                  <br />
-                  <Link
-                    href="https://github.com/Kareem-AEz"
-                    style={{
-                      color: colors.mutedForegroundLight,
-                      textDecoration: "underline",
-                    }}
-                  >
-                    GitHub
-                  </Link>{" "}
-                  ·{" "}
-                  <Link
-                    href="https://x.com/KareemAhmedEz"
-                    style={{
-                      color: colors.mutedForegroundLight,
-                      textDecoration: "underline",
-                    }}
-                  >
-                    X (Twitter)
-                  </Link>{" "}
-                  ·{" "}
-                  <Link
-                    href={getBaseUrl()}
-                    style={{
-                      color: colors.mutedForegroundLight,
-                      textDecoration: "underline",
-                    }}
-                  >
-                    Website
-                  </Link>
-                </Text>
-              </Section>
+                  X (Twitter)
+                </Link>{" "}
+                ·{" "}
+                <Link
+                  href={getBaseUrl()}
+                  style={{
+                    color: colors.mutedForegroundLight,
+                    textDecoration: "underline",
+                  }}
+                >
+                  Website
+                </Link>
+              </Text>
             </Section>
           </Container>
         </Body>
@@ -211,7 +210,7 @@ const EmailVerification = ({
 
 EmailVerification.PreviewProps = {
   userName: "Adventurer",
-  verificationCode: "847392",
+  verificationCode: "BOUNTYXX",
 };
 
 export default EmailVerification;
