@@ -42,6 +42,7 @@ model Invitations {
   tokenHash String   @unique
   createdAt DateTime @default(now()) @db.Timestamptz
   updatedAt DateTime @updatedAt @db.Timestamptz
+  expiresAt DateTime @db.Timestamptz
 
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
