@@ -16,7 +16,7 @@ import {
 import { DropdownMenuItem } from "./ui/dropdown-menu";
 
 export type Breadcrumb = {
-  label: React.ReactNode | string;
+  label: React.ReactNode;
   href?: string;
   dropdown?: {
     label: string;

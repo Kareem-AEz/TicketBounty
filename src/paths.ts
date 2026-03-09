@@ -29,3 +29,7 @@ export const organizationInvitationsPath = (organizationId: string) =>
 export const onboardingPath = () => "/onboarding" as const;
 export const selectActiveOrganizationPath = () =>
   "/onboarding/select-active-organization" as const;
+
+// Invitations
+export const invitationPath = (token: string) =>
+  `/invitations/${token}` as const;

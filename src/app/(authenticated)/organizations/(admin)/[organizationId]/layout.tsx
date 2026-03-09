@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import Heading from "@/components/heading";
 import Spinner from "@/components/spinner";
+import OrganizationInvitationButton from "@/features/invitation/components/organization-invitation-button";
 import { getOrganization } from "@/features/organizations/queries/get-organization";
 import OrganizationBreadcrumbs from "./_navigation/organization-breadcrumbs";
 
@@ -18,12 +19,15 @@ export default async function OrganizationLayout({
     <div className="flex flex-1 flex-col gap-y-8">
       <Heading
         title={organization?.name ?? "Organization"}
-        description={`Manage ${organization?.name} organization`}
+        description={`Manage ${organization?.name ?? "Organization"} organization`}
         tabs={
           <OrganizationBreadcrumbs
             organizationId={organizationId}
-            organizationName={organization?.name ?? ""}
+            organizationName={organization?.name ?? "Organization"}
           />
+        }
+        action={
+          <OrganizationInvitationButton organizationId={organizationId} />
         }
       />
       <Suspense fallback={<Spinner />}>{children}</Suspense>

@@ -13,9 +13,9 @@
  */
 
 import { useTheme } from "next-themes";
-import React from "react";
-import { useCallback } from "react";
-import { toast, ToasterProps } from "sonner";
+import React, { useCallback, useMemo } from "react";
+import { ExternalToast, toast } from "sonner";
+
 /**
  * Global state for true Singleton behavior.
  * This ensures we track exactly ONE active toast at a time across the app,
@@ -31,26 +31,29 @@ export function usePatchedToast() {
     ? "oklch(70.4% 0.191 22.216/0.5)"
     : "oklch(0.577 0.245 27.325 / 0.5)";
 
-  const showToast = useCallback(
+  const createToast = useCallback(
     (
+      method: "default" | "success" | "error" | "info" | "warning" | "loading",
       message: string | React.ReactNode,
-      params: {
-        key?: string;
-        toastOptions?: ToasterProps["toastOptions"];
-      } = {},
+      data: ExternalToast & { key?: string; toastOptions?: ExternalToast } = {},
     ) => {
+      const { key, toastOptions, ...rest } = data;
+      const options = { ...toastOptions, ...rest };
+
       // 1. Generate a stable, unique key based on message content or a custom key.
-      const uniqueKey = `${params.key ?? ""}-${message}`;
+      const uniqueKey = `${key ?? ""}-${message}`;
       const toastKey = `toast-key-${btoa(uniqueKey).replace(/[+/=]/g, (m) => ({ "+": "-", "/": "_", "=": "" })[m] ?? "")}`;
+
+      const toastFn = method === "default" ? toast : toast[method];
 
       // 2. [SMART RESET] If the toast is already active, we don't just animate it;
       // we pass the existing 'id' back to Sonner to force an internal timer reset.
       if (activeToastKey === toastKey && lastToastId !== undefined) {
-        toast(message, {
+        toastFn(message, {
           id: lastToastId,
-          className: `${toastKey} tid-${lastToastId}`,
+          className: `${toastKey} tid-${lastToastId} ${options.className || ""}`,
           position: "bottom-right",
-          ...params.toastOptions,
+          ...options,
         });
 
         // 3. [POLISH] Custom shake animation with OKLCH border-glow.
@@ -87,7 +90,7 @@ export function usePatchedToast() {
           }
         }, 0);
 
-        return;
+        return lastToastId;
       }
 
       // 4. [CONTEXT SWITCHING] If a new toast is called (A -> B), we generate a fresh ID.
@@ -95,31 +98,71 @@ export function usePatchedToast() {
       // instead of trying to animate a buried or inactive toast.
       const id = Math.random().toString(36).slice(2, 9);
 
-      toast(message, {
+      toastFn(message, {
         id,
-        className: `${toastKey} tid-${id}`,
+        className: `${toastKey} tid-${id} ${options.className || ""}`,
         position: "bottom-right",
-        onAutoClose() {
+        onAutoClose(t) {
           if (lastToastId === id) {
             activeToastKey = "";
             lastToastId = undefined;
           }
+          options.onAutoClose?.(t);
         },
-        onDismiss() {
+        onDismiss(t) {
           if (lastToastId === id) {
             activeToastKey = "";
             lastToastId = undefined;
           }
+          options.onDismiss?.(t);
         },
-        ...params.toastOptions,
+        ...options,
       });
 
       // Update singleton state
       activeToastKey = toastKey;
       lastToastId = id;
+      return id;
     },
     [borderColor],
   );
 
-  return { toast: showToast };
+  const toastObject = useMemo(() => {
+    const baseToast = (
+      message: string | React.ReactNode,
+      data?: ExternalToast & { key?: string; toastOptions?: ExternalToast },
+    ) => createToast("default", message, data);
+
+    return Object.assign(baseToast, {
+      success: (
+        message: string | React.ReactNode,
+        data?: ExternalToast & { key?: string; toastOptions?: ExternalToast },
+      ) => createToast("success", message, data),
+      error: (
+        message: string | React.ReactNode,
+        data?: ExternalToast & { key?: string; toastOptions?: ExternalToast },
+      ) => createToast("error", message, data),
+      info: (
+        message: string | React.ReactNode,
+        data?: ExternalToast & { key?: string; toastOptions?: ExternalToast },
+      ) => createToast("info", message, data),
+      warning: (
+        message: string | React.ReactNode,
+        data?: ExternalToast & { key?: string; toastOptions?: ExternalToast },
+      ) => createToast("warning", message, data),
+      loading: (
+        message: string | React.ReactNode,
+        data?: ExternalToast & { key?: string; toastOptions?: ExternalToast },
+      ) => createToast("loading", message, data),
+      message: (
+        message: string | React.ReactNode,
+        data?: ExternalToast & { key?: string; toastOptions?: ExternalToast },
+      ) => createToast("default", message, data),
+      promise: toast.promise,
+      custom: toast.custom,
+      dismiss: toast.dismiss,
+    });
+  }, [createToast]);
+
+  return { toast: toastObject };
 }
