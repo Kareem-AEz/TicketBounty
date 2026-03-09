@@ -1,5 +1,6 @@
 "use server";
 
+import console from "console";
 import { revalidatePath } from "next/cache";
 import { z } from "zod/v4";
 import {
@@ -8,6 +9,7 @@ import {
 } from "@/components/form/utils/to-action-state";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import { MembershipRole } from "@/generated/enums";
+import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
 import { organizationInvitationsPath } from "@/paths";
 import { generateInvitationLink } from "../utils/generate-invitation-link";
@@ -45,44 +47,57 @@ export const inviteUser = async ({
       // Some may argue this is a little "clever" (could split queries for clarity or if you need atomicity per check),
       // but for transactional context and minimizing latency, it's an efficient and appropriate use of Promise.all.
 
-      const [user, isUserAlreadyInvited, invitedByUser] = await Promise.all([
-        tx.user.findUnique({
-          where: { email },
-          include: {
-            memberships: {
-              where: {
-                organizationId,
-              },
-              select: {
-                organizationId: true,
-              },
-            },
-          },
-        }),
-        tx.invitations.findFirst({
-          where: {
-            email,
-            organizationId,
-          },
-        }),
-        tx.user.findUnique({
-          where: {
-            id: authUser?.id,
-          },
-          select: {
-            id: true,
-            memberships: {
-              where: {
-                organizationId,
-              },
-              select: {
-                organizationId: true,
-                membershipRole: true,
+      const [user, isUserAlreadyInvited, invitedByUser, organization] =
+        await Promise.all([
+          tx.user.findUnique({
+            where: { email },
+            include: {
+              memberships: {
+                where: {
+                  organizationId,
+                },
+                select: {
+                  organizationId: true,
+                },
               },
             },
-          },
-        }),
-      ]);
+          }),
+          tx.invitations.findFirst({
+            where: {
+              email,
+              organizationId,
+            },
+          }),
+          tx.user.findUnique({
+            where: {
+              id: authUser?.id,
+            },
+            select: {
+              id: true,
+              memberships: {
+                where: {
+                  organizationId,
+                },
+                select: {
+                  organizationId: true,
+                  membershipRole: true,
+                },
+              },
+            },
+          }),
+          tx.organization.findUnique({
+            where: {
+              id: organizationId,
+            },
+            select: {
+              name: true,
+            },
+          }),
+        ]);
+
+      if (!organization) {
+        throw new Error("Organization not found");
+      }
 
       const isUserAMemberOfTheOrganization = user?.memberships?.some(
         (membership) => membership.organizationId === organizationId,
@@ -111,7 +126,15 @@ export const inviteUser = async ({
         invitedByUserId: authUser.id,
       });
 
-      console.log("invitationLink", invitationLink);
+      await inngest.send({
+        name: "app/invitation.send-link",
+        data: {
+          invitationLink,
+          organizationName: organization.name,
+          inviterName: authUser.username,
+          toEmail: validatedFields.data.email,
+        },
+      });
 
       return toSuccessActionState({
         status: "SUCCESS",

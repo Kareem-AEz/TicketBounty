@@ -1,6 +1,8 @@
 import "dotenv/config";
 import argon2 from "@node-rs/argon2";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { addDays } from "date-fns";
+import { INVITATION_EXPIRATION_TIME_DAYS } from "@/features/invitation/constants";
 import { Invitations, PrismaClient, User } from "@/generated/client";
 
 const adapter = new PrismaPg({
@@ -33,12 +35,14 @@ const invitations: Omit<Invitations, "organizationId" | "invitedByUserId">[] = [
     tokenHash: crypto.randomUUID(),
     createdAt: new Date(),
     updatedAt: new Date(),
+    expiresAt: addDays(new Date(), INVITATION_EXPIRATION_TIME_DAYS),
   },
   {
     email: "test2@example.com",
     tokenHash: crypto.randomUUID(),
     createdAt: new Date(),
     updatedAt: new Date(),
+    expiresAt: addDays(new Date(), INVITATION_EXPIRATION_TIME_DAYS),
   },
 ];
 

@@ -18,6 +18,7 @@
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
     "email": "email dev --dir src/emails",
+    "inngest:dev": "npx inngest-cli dev",
     "commit": "tsx scripts/ai-commit.ts"
   },
   "dependencies": {
