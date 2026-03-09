@@ -1,6 +1,5 @@
 "use server";
 
-import { subDays } from "date-fns";
 import { revalidatePath } from "next/cache";
 import { z } from "zod/v4";
 import {
@@ -11,7 +10,6 @@ import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect"
 import { MembershipRole } from "@/generated/enums";
 import prisma from "@/lib/prisma";
 import { organizationInvitationsPath } from "@/paths";
-import { INVITATION_EXPIRATION_TIME_DAYS } from "../constants";
 import { generateInvitationLink } from "../utils/generate-invitation-link";
 
 const schema = z.object({
@@ -37,7 +35,7 @@ export const inviteUser = async ({
       return toErrorActionState(new Error("Unauthorized"));
     }
 
-    await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       // This triple query fetches:
       // 1. The user by email, including their memberships for this org.
       // 2. If there is an existing invitation for the same email/org.
@@ -97,14 +95,9 @@ export const inviteUser = async ({
       // The condition checks if the user has already been invited *and*
       // the invitation is not expired (i.e., invitation is still valid).
       // This is correct: it prevents re-inviting users with an active (non-expired) invitation.
-      if (
-        isUserAlreadyInvited &&
-        isUserAlreadyInvited.expiresAt >
-          subDays(new Date(), INVITATION_EXPIRATION_TIME_DAYS)
-      ) {
+      if (isUserAlreadyInvited && isUserAlreadyInvited.expiresAt > new Date()) {
         throw new Error("User already invited");
       }
-
       const isInvitedByUserAnAdmin =
         invitedByUser?.memberships[0]?.membershipRole === MembershipRole.ADMIN;
       if (!isInvitedByUserAnAdmin) {
@@ -112,6 +105,7 @@ export const inviteUser = async ({
       }
 
       const invitationLink = await generateInvitationLink({
+        tx,
         organizationId,
         email,
         invitedByUserId: authUser.id,
@@ -119,7 +113,6 @@ export const inviteUser = async ({
 
       console.log("invitationLink", invitationLink);
 
-      revalidatePath(organizationInvitationsPath(organizationId));
       return toSuccessActionState({
         status: "SUCCESS",
         message: "Invitation sent successfully",
@@ -128,6 +121,9 @@ export const inviteUser = async ({
         },
       });
     });
+
+    revalidatePath(organizationInvitationsPath(organizationId));
+    return result;
   } catch (error) {
     console.error(error);
     const errorFormData = new FormData();

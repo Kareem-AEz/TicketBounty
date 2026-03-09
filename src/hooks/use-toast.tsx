@@ -50,10 +50,10 @@ export function usePatchedToast() {
       // we pass the existing 'id' back to Sonner to force an internal timer reset.
       if (activeToastKey === toastKey && lastToastId !== undefined) {
         toastFn(message, {
+          ...options,
           id: lastToastId,
           className: `${toastKey} tid-${lastToastId} ${options.className || ""}`,
           position: "bottom-right",
-          ...options,
         });
 
         // 3. [POLISH] Custom shake animation with OKLCH border-glow.

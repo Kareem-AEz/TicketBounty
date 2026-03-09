@@ -96,7 +96,7 @@ export default function OrganizationInvitationButton({
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <FieldContent>
                 <Input
-                  type="name"
+                  type="text"
                   name="email"
                   id="email"
                   defaultValue={_actionState.payload?.get("email") as string}

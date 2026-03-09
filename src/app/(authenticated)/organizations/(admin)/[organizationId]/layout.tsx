@@ -19,7 +19,11 @@ export default async function OrganizationLayout({
     <div className="flex flex-1 flex-col gap-y-8">
       <Heading
         title={organization?.name ?? "Organization"}
-        description={`Manage ${organization?.name ?? "Organization"} organization`}
+        description={
+          organization?.name
+            ? `Manage ${organization.name} organization`
+            : "Manage organization"
+        }
         tabs={
           <OrganizationBreadcrumbs
             organizationId={organizationId}
