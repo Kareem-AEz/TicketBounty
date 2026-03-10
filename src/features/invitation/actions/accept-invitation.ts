@@ -8,7 +8,6 @@ import {
 import { MembershipRole } from "@/generated/enums";
 import prisma from "@/lib/prisma";
 import { hashToken } from "@/utils/crypto";
-import { validateTokenId } from "../utils/validate-token-id";
 
 /**
  * Server action to accept an invitation to join an organization.
@@ -42,21 +41,19 @@ export const acceptInvitation = async (
   _actionState: ActionState,
 ) => {
   try {
-    // Validate token format before database queries
-    validateTokenId(tokenId);
+    const tokenHash = hashToken(tokenId);
+    const now = new Date();
 
     return await prisma.$transaction(async (tx) => {
-      // Hash the token for secure database lookup
-      const tokenHash = hashToken(tokenId);
-
-      // Step 1: Retrieve the invitation record using the hashed token
+      // Step 1: Retrieve the invitation record
       const invitation = await tx.invitations.findUnique({
         where: { tokenHash },
       });
 
       // Step 2: Validate invitation exists and hasn't expired
-      if (!invitation || invitation.expiresAt < new Date())
+      if (!invitation || invitation.expiresAt < now) {
         throw new Error("Revoked or expired invitation");
+      }
 
       // Step 3: Look up the user by their email from the invitation
       const user = await tx.user.findUnique({
@@ -64,35 +61,30 @@ export const acceptInvitation = async (
       });
 
       if (user) {
-        // User already exists: create membership and clean up invitation
-        await tx.invitations.delete({
-          where: { tokenHash },
-        });
-
-        // Check for existing membership to avoid duplicate
-        const existingMembership = await tx.membership.findUnique({
-          where: {
-            userId_organizationId: {
-              userId: user.id,
-              organizationId: invitation.organizationId,
+        // User exists: clean up invitation and create membership in parallel
+        await Promise.all([
+          tx.invitations.delete({ where: { tokenHash } }),
+          tx.membership.upsert({
+            where: {
+              userId_organizationId: {
+                userId: user.id,
+                organizationId: invitation.organizationId,
+              },
             },
-          },
-        });
-
-        if (!existingMembership) {
-          await tx.membership.create({
-            data: {
+            update: { isActive: false }, // Ensure it's set to false if it already existed
+            create: {
               userId: user.id,
               organizationId: invitation.organizationId,
               isActive: false,
               membershipRole: MembershipRole.MEMBER,
             },
-          });
-        }
+          }),
+        ]);
       } else {
         // User doesn't exist yet: invitation stays for signup flow
         // TODO: Consider implementing pre-signup invitation flow for new users
       }
+
       return toSuccessActionState({
         status: "SUCCESS",
         message: "Invitation accepted",
