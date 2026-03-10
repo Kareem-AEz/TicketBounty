@@ -44,7 +44,7 @@ export default async function OrganizationsList({
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" asChild>
             <Link href={createOrganizationPath()}>Create Organization</Link>
           </Button>
         </EmptyContent>
