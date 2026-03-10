@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import React, { useActionState, useState } from "react";
 import zxcvbn from "zxcvbn";
 import { FieldError } from "@/components/form/field-error";
@@ -11,9 +12,14 @@ import PasswordStrengthMeter, {
   StrengthLevel,
 } from "@/features/password/components/password-strength-meter";
 import { mapScoreToStrength } from "@/features/password/utils/map-score-to-strength";
+import { cn } from "@/lib/utils";
 import { signUp } from "../actions/sign-up";
 
 export default function SignUpForm() {
+  const searchParams = useSearchParams();
+  const invitationToken = searchParams.get("invitationToken");
+  const emailParam = searchParams.get("email");
+
   const [actionState, action] = useActionState(signUp, EMPTY_ACTION_STATE);
   const [passwordStrength, setPasswordStrength] = useState<StrengthLevel>(0);
 
@@ -30,6 +36,10 @@ export default function SignUpForm() {
 
   return (
     <Form action={action} actionState={actionState}>
+      {invitationToken && (
+        <input type="hidden" name="invitationToken" value={invitationToken} />
+      )}
+
       <Input
         name="username"
         placeholder="Username"
@@ -39,9 +49,15 @@ export default function SignUpForm() {
 
       <Input
         name="email"
+        className={cn(
+          emailParam && "pointer-events-none cursor-not-allowed opacity-50",
+        )}
         placeholder="Email"
         autoComplete="email"
-        defaultValue={actionState.payload?.get("email") as string}
+        readOnly={!!emailParam}
+        defaultValue={
+          (actionState.payload?.get("email") as string) || emailParam || ""
+        }
       />
       <FieldError actionState={actionState} name="email" />
 

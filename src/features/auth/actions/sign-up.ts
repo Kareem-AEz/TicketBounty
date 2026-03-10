@@ -6,8 +6,10 @@ import { redirect } from "next/navigation";
 import { z } from "zod/v4";
 import {
   ActionState,
+  EMPTY_ACTION_STATE,
   toErrorActionState,
 } from "@/components/form/utils/to-action-state";
+import { acceptInvitation } from "@/features/invitation/actions/accept-invitation";
 import { Prisma } from "@/generated/client";
 import { inngest } from "@/lib/inngest";
 import { lucia } from "@/lib/lucia";
@@ -34,6 +36,7 @@ const signUpSchema = z
     passwordConfirmation: z
       .string()
       .min(8, { message: "Password must be at least 8 characters" }),
+    invitationToken: z.string().optional(),
   })
   .superRefine(({ password, passwordConfirmation }, ctx) => {
     if (password !== passwordConfirmation) {
@@ -49,7 +52,7 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
   try {
     const validatedFields = signUpSchema.parse(Object.fromEntries(formData));
 
-    const { username, email, password } = validatedFields;
+    const { username, email, password, invitationToken } = validatedFields;
 
     const passwordHash = await argon2.hash(password);
 
@@ -94,6 +97,18 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
         },
       }),
     ]);
+
+    // If there's an invitation token, try to accept it
+    if (invitationToken) {
+      try {
+        await acceptInvitation(invitationToken, EMPTY_ACTION_STATE);
+      } catch (error) {
+        // We swallow the error here because the user is already signed up
+        // and we don't want to break the signup flow if the invitation
+        // acceptance fails (e.g. expired token)
+        console.error("Failed to accept invitation during signup:", error);
+      }
+    }
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
