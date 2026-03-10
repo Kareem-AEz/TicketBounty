@@ -50,6 +50,7 @@ model Invitations {
   invitedByUserId String?
   invitedByUser   User?   @relation(fields: [invitedByUserId], references: [id], onDelete: SetNull)
 
+  @@id(name: "invitationId", [email, organizationId])
   @@index([email])
   @@index([organizationId])
   @@index([invitedByUserId])
