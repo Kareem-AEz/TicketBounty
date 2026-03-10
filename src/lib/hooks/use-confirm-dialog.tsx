@@ -1,6 +1,7 @@
 "use client";
 import {
   cloneElement,
+  startTransition,
   useActionState,
   useEffect,
   useMemo,
@@ -8,7 +9,6 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { useActionFeedback } from "@/components/form/hooks/useActionFeedback";
 import {
   ActionState,
   EMPTY_ACTION_STATE,
@@ -37,6 +37,7 @@ type ConfirmDialogueProps = {
   onSuccess?: (data: ActionState) => void;
   onError?: (error: ActionState) => void;
   onPendingChange?: (isPending: boolean) => void;
+  onClick?: () => void;
 };
 
 export const useConfirmDialog = ({
@@ -52,17 +53,32 @@ export const useConfirmDialog = ({
   onSuccess,
   onError,
   onPendingChange,
+  onClick,
 }: ConfirmDialogueProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const promiseRef = useRef<Promise<ActionState | undefined> | null>(null);
+  const toastIdRef = useRef<string | number | undefined>(undefined);
 
-  // Wrapper action that stores the promise for toast.promise
   const wrappedAction = async (state: ActionState, formData: FormData) => {
-    const promise = action(formData);
-    promiseRef.current = promise;
-    const result = await promise;
-
-    return result ?? state;
+    const toastId = toast.loading(loadingLabel);
+    try {
+      const result = await action(formData);
+      
+      if (result?.status === "SUCCESS") {
+        toast.success(result.message || "Success!", { id: toastId });
+        onSuccess?.(result);
+        setIsOpen(false);
+      } else if (result?.status === "ERROR") {
+        toast.error(result.message || "Something went wrong!", { id: toastId });
+        onError?.(result);
+      } else {
+        toast.dismiss(toastId);
+      }
+      
+      return result ?? state;
+    } catch (error) {
+      toast.error("Something went wrong!", { id: toastId });
+      return state;
+    }
   };
 
   const [actionState, formAction, isPending] = useActionState(
@@ -85,45 +101,20 @@ export const useConfirmDialog = ({
     onPendingChange?.(isPending);
   }, [isPending, onPendingChange]);
 
-  // Track when action starts and use toast.promise
-  useEffect(() => {
-    if (isPending && promiseRef.current) {
-      const promise = promiseRef.current.then((result) => {
-        if (result?.status === "ERROR") {
-          throw result;
-        }
-        return result;
-      });
-
-      toast.promise(promise, {
-        loading: loadingLabel,
-        success: (data) => {
-          return data?.message || "Success!";
-        },
-        error: (error) => {
-          return error?.message || "Something went wrong!";
-        },
-      });
-
-      // Clear the ref after using it
-      promiseRef.current = null;
-    }
-  }, [isPending, loadingLabel]);
-
-  useActionFeedback(actionState ?? EMPTY_ACTION_STATE, {
-    onSuccess: ({ actionState }) => {
-      onSuccess?.(actionState);
-      setIsOpen(false);
-    },
-    onError: ({ actionState }) => {
-      onError?.(actionState);
-    },
-  });
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    startTransition(() => {
+      if (autoClose) setIsOpen(false);
+      onClick?.();
+      formAction(formData);
+    });
+  };
 
   const dialog = (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent>
-        <form action={formAction} className="contents">
+        <form onSubmit={handleSubmit} className="contents">
           <AlertDialogHeader>
             <AlertDialogTitle>{title}</AlertDialogTitle>
             <AlertDialogDescription>{description}</AlertDialogDescription>
