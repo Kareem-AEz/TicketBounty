@@ -69,19 +69,30 @@ export const acceptInvitation = async (
           where: { tokenHash },
         });
 
-        await tx.membership.create({
-          data: {
-            userId: user.id,
-            organizationId: invitation.organizationId,
-            isActive: false,
-            membershipRole: MembershipRole.MEMBER,
+        // Check for existing membership to avoid duplicate
+        const existingMembership = await tx.membership.findUnique({
+          where: {
+            userId_organizationId: {
+              userId: user.id,
+              organizationId: invitation.organizationId,
+            },
           },
         });
+
+        if (!existingMembership) {
+          await tx.membership.create({
+            data: {
+              userId: user.id,
+              organizationId: invitation.organizationId,
+              isActive: false,
+              membershipRole: MembershipRole.MEMBER,
+            },
+          });
+        }
       } else {
         // User doesn't exist yet: invitation stays for signup flow
         // TODO: Consider implementing pre-signup invitation flow for new users
       }
-
       return toSuccessActionState({
         status: "SUCCESS",
         message: "Invitation accepted",
