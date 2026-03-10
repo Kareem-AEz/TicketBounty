@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
 import type { Prisma } from "@/generated/client";
 import { getBaseUrl } from "@/lib/url";
-import { invitationPath } from "@/paths";
+import { emailInvitationPath } from "@/paths";
 import { generateRandomToken, hashToken } from "@/utils/crypto";
 import { INVITATION_EXPIRATION_TIME_DAYS } from "../constants";
 
@@ -44,7 +44,7 @@ export const generateInvitationLink = async ({
     },
   });
 
-  const invitationLink = getBaseUrl() + invitationPath(token);
+  const invitationLink = getBaseUrl() + emailInvitationPath(token);
 
   return invitationLink;
 };

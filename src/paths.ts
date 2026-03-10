@@ -31,5 +31,5 @@ export const selectActiveOrganizationPath = () =>
   "/onboarding/select-active-organization" as const;
 
 // Invitations
-export const invitationPath = (token: string) =>
-  `/invitations/${token}` as const;
+export const emailInvitationPath = (token: string) =>
+  `/email-invitation/${token}` as const;
