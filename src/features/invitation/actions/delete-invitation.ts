@@ -25,17 +25,16 @@ export const deleteInvitation = async ({
         new Error("You are not authorized to delete this invitation"),
       );
     }
-    const result = await prisma.$transaction(async (tx) => {
-      await tx.invitations.delete({
-        where: { tokenHash, organizationId: organizationId },
-      });
-      revalidatePath(organizationInvitationsPath(organizationId));
-      return toSuccessActionState({
-        status: "SUCCESS",
-        message: "Invitation deleted",
-      });
+    await prisma.invitations.delete({
+      where: { tokenHash, organizationId: organizationId },
     });
-    return result;
+
+    revalidatePath(organizationInvitationsPath(organizationId));
+
+    return toSuccessActionState({
+      status: "SUCCESS",
+      message: "Invitation deleted",
+    });
   } catch (error) {
     return toErrorActionState(error);
   }
