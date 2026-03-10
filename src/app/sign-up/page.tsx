@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import React from "react";
+import React, { Suspense } from "react";
 import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
 import { CardCompact } from "@/components/card-compact";
+import Spinner from "@/components/spinner";
 import { Separator } from "@/components/ui/separator";
 import SignUpForm from "@/features/auth/components/sign-up-form";
 import { getCanonicalUrl } from "@/lib/structured-data";
@@ -73,7 +74,17 @@ export default function page() {
           title="Sign Up"
           description="Create an account to get started"
           className="animate-fade-from-top w-full max-w-md"
-          content={<SignUpForm />}
+          content={
+            <Suspense
+              fallback={
+                <div className="text-muted-foreground flex min-h-[300px] animate-pulse items-center justify-center">
+                  <Spinner size="lg" />
+                </div>
+              }
+            >
+              <SignUpForm />
+            </Suspense>
+          }
           footer={
             <span className="text-sm">
               Have an account?{" "}
