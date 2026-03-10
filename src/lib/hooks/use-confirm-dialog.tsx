@@ -128,7 +128,7 @@ export const useConfirmDialog = ({
             <Button
               type="submit"
               disabled={isPending}
-              onClick={() => {
+              onClick={() => {    
                 if (autoClose) setIsOpen(false);
               }}
             >
