@@ -1,9 +1,13 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
 import {
   toErrorActionState,
   toSuccessActionState,
 } from "@/components/form/utils/to-action-state";
 import { isUserAdmin } from "@/features/memberships/utils/is-user-admin";
 import prisma from "@/lib/prisma";
+import { organizationInvitationsPath } from "@/paths";
 
 type DeleteInvitationProps = {
   tokenHash: string;
@@ -21,15 +25,17 @@ export const deleteInvitation = async ({
         new Error("You are not authorized to delete this invitation"),
       );
     }
-    await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       await tx.invitations.delete({
         where: { tokenHash, organizationId: organizationId },
       });
+      revalidatePath(organizationInvitationsPath(organizationId));
       return toSuccessActionState({
         status: "SUCCESS",
         message: "Invitation deleted",
       });
     });
+    return result;
   } catch (error) {
     return toErrorActionState(error);
   }

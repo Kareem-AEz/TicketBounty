@@ -1,7 +1,10 @@
+"use client";
+
 import { format } from "date-fns";
-import { AlertCircle, LucideTrash2 } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+import { useOptimistic } from "react";
+import { ActionState } from "@/components/form/utils/to-action-state";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -10,16 +13,36 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getInvitationsByOrganization } from "../queries/get-invitations-by-organization";
+import { Prisma } from "@/generated/client";
+import DeleteInvitationButton from "./delete-invitation-button";
+
+type Invitation = Prisma.InvitationsGetPayload<{
+  include: {
+    invitedByUser: {
+      select: {
+        email: true;
+        username: true;
+      };
+    };
+  };
+}>;
 
 type InvitationListProps = {
+  invitations: ActionState<Invitation[]>;
   organizationId: string;
 };
 
-export default async function InvitationList({
+export default function InvitationList({
+  invitations,
   organizationId,
 }: InvitationListProps) {
-  const invitations = await getInvitationsByOrganization(organizationId);
+  const [optimisticInvitations, setOptimisticInvitations] = useOptimistic(
+    invitations.data ?? [],
+    (state: Invitation[], removedInvitation: Invitation) =>
+      state.filter(
+        (invitation) => invitation.tokenHash !== removedInvitation.tokenHash,
+      ),
+  );
 
   if (invitations.status === "ERROR") {
     return (
@@ -45,12 +68,7 @@ export default async function InvitationList({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {invitations.data?.map((invitation) => {
-            const deleteButton = () => (
-              <Button variant="destructive" size="icon">
-                <LucideTrash2 className="size-4" />
-              </Button>
-            );
+          {optimisticInvitations.map((invitation) => {
             return (
               <TableRow
                 key={invitation.email}
@@ -63,7 +81,15 @@ export default async function InvitationList({
                 <TableCell>
                   {invitation.invitedByUser?.email ?? "Deleted User"}
                 </TableCell>
-                <TableCell>{deleteButton()}</TableCell>
+                <TableCell>
+                  <DeleteInvitationButton
+                    tokenHash={invitation.tokenHash}
+                    organizationId={organizationId}
+                    onSuccess={() => {
+                      setOptimisticInvitations(invitation);
+                    }}
+                  />
+                </TableCell>
               </TableRow>
             );
           })}

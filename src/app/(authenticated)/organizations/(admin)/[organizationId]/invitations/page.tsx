@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Spinner from "@/components/spinner";
 import InvitationList from "@/features/invitation/components/invitation-list";
+import { getInvitationsByOrganization } from "@/features/invitation/queries/get-invitations-by-organization";
 
 export default async function OrganizationPage({
   params,
@@ -8,6 +9,7 @@ export default async function OrganizationPage({
   params: Promise<{ organizationId: string }>;
 }) {
   const { organizationId } = await params;
+  const invitations = await getInvitationsByOrganization(organizationId);
 
   return (
     <Suspense
@@ -17,7 +19,10 @@ export default async function OrganizationPage({
         </div>
       }
     >
-      <InvitationList organizationId={organizationId} />
+      <InvitationList
+        invitations={invitations}
+        organizationId={organizationId}
+      />
     </Suspense>
   );
 }
