@@ -19,7 +19,7 @@
     "db:generate": "prisma generate",
     "email": "email dev --dir src/emails",
     "inngest:dev": "npx inngest-cli dev",
-    "commit": "tsx packages/ai-commit/bin/ai-commit.ts"
+    "commit": "tsx packages/convit/bin/convit.ts"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.33",
