@@ -1,0 +1,33 @@
+{
+  "rules": {
+    "maxSubjectLength": 50,
+    "maxBulletLength": 72,
+    "minBullets": 1
+  },
+  "scopePatterns": [
+    { "pattern": "src/features/([^/]+)/.*", "scope": "$1", "weight": 10 },
+    { "pattern": "src/app/\\(([^\\)]+)\\)/.*", "scope": "$1", "weight": 8 },
+    { "pattern": "src/app/([^/]+)/.*", "scope": "$1", "weight": 8 },
+    { "pattern": "package\\.json|package-lock\\.json", "scope": "deps", "weight": 7 },
+    { "pattern": "\\.gitignore|\\.cursorignore|\\.geminiignore", "scope": "git", "weight": 7 },
+    { "pattern": "README\\.md|PROJECT\\.md|LICENSE", "scope": "docs", "weight": 7 },
+    { "pattern": "\\.env.*", "scope": "env", "weight": 7 },
+    { "pattern": "\\.convitrc\\.json", "scope": "convit", "weight": 7 },
+    { "pattern": "next\\.config\\.ts|tsconfig\\.json|eslint\\.config\\.mjs|postcss\\.config\\.mjs|components\\.json", "scope": "config", "weight": 7 },
+    { "pattern": "src/actions/.*", "scope": "actions", "weight": 5 },
+    { "pattern": "src/components/ui/.*", "scope": "ui", "weight": 5 },
+    { "pattern": "src/components/([^/]+)/.*", "scope": "$1", "weight": 5 },
+    { "pattern": "src/lib/.*", "scope": "lib", "weight": 5 },
+    { "pattern": "src/hooks/.*", "scope": "hooks", "weight": 5 },
+    { "pattern": "src/utils/.*", "scope": "utils", "weight": 5 },
+    { "pattern": "prisma/.*", "scope": "db", "weight": 5 },
+    { "pattern": "\\.agents/.*", "scope": "agents", "weight": 3 },
+    { "pattern": "\\.cursor/.*", "scope": "cursor", "weight": 3 },
+    { "pattern": "\\.github/.*", "scope": "github", "weight": 3 },
+    { "pattern": "docs/.*|specs/.*", "scope": "docs", "weight": 3 }
+  ],
+  "exclude": [
+    ".next/",
+    "src/generated/"
+  ]
+}
