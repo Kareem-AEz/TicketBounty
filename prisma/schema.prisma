@@ -155,7 +155,8 @@ model Ticket {
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
 
-  comments TicketComment[]
+  comments    TicketComment[]
+  attachments Attachment[]
 
   // Core indexes
   @@index([userId])
@@ -177,6 +178,16 @@ enum TicketStatus {
   OPEN
   IN_PROGRESS
   DONE
+}
+
+model Attachment {
+  id   String @id @default(cuid())
+  name String
+
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
 }
 
 model TicketComment {
