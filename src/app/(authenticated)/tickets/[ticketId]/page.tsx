@@ -4,7 +4,9 @@ import React from "react";
 import { Breadcrumb } from "@/components/breadcrumbs";
 import Breadcrumbs from "@/components/breadcrumbs";
 import { Separator } from "@/components/ui/separator";
+import Attachments from "@/features/attachments/components/attachments";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
+import { isOwner } from "@/features/auth/utils/is-owner";
 import Comments from "@/features/comment/components/comments";
 import { getComments } from "@/features/comment/queries/get-comments";
 import TicketItem from "@/features/ticket/components/ticket-item";
@@ -113,6 +115,13 @@ async function page({ params }: TicketPageProps) {
       <Separator className="mb-8" />
       <div className="flex w-full justify-center">
         <TicketItem ticket={ticket} isDetail user={user} />
+      </div>
+
+      <div className="flex w-full max-w-xl justify-center self-center">
+        <Attachments
+          ticketId={ticketId}
+          isOwner={isOwner(user?.id ?? "", ticket.userId ?? undefined)}
+        />
       </div>
 
       <Separator className="mx-auto max-w-3xl mask-r-from-90% mask-r-to-100% mask-l-from-90% mask-l-to-100%" />
