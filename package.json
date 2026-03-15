@@ -51,6 +51,7 @@
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "dotenv": "^17.3.1",
+    "file-type": "^21.3.2",
     "inngest": "^3.52.6",
     "input-otp": "^1.4.2",
     "lucia": "^3.2.2",
