@@ -373,14 +373,6 @@ html {
     @apply outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px];
   }
 
-  /* Disable hover effects on touch devices */
-  @media (hover: none) {
-    button[data-slot="button"]:hover,
-    a[data-slot="button"]:hover {
-      background-color: inherit !important;
-      color: inherit !important;
-    }
-  }
 }
 
 /* Accessibility: Respect user's motion preferences */
