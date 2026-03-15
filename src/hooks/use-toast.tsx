@@ -42,7 +42,16 @@ export function usePatchedToast() {
 
       // 1. Generate a stable, unique key based on message content or a custom key.
       const uniqueKey = `${key ?? ""}-${message}`;
-      const toastKey = `toast-key-${btoa(uniqueKey).replace(/[+/=]/g, (m) => ({ "+": "-", "/": "_", "=": "" })[m] ?? "")}`;
+
+      // [UNICODE SAFE HASH] Using a simple hash function instead of btoa()
+      // to avoid 'InvalidCharacterError' when message contains Unicode (e.g., emojis).
+      let hash = 0;
+      for (let i = 0; i < uniqueKey.length; i++) {
+        const char = uniqueKey.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash |= 0; // Convert to 32bit integer
+      }
+      const toastKey = `toast-key-${Math.abs(hash).toString(36)}`;
 
       const toastFn = method === "default" ? toast : toast[method];
 
