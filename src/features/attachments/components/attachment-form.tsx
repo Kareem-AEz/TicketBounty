@@ -3,13 +3,13 @@
 import { Plus, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { FieldError } from "@/components/form/field-error";
 import { useActionFeedback } from "@/components/form/hooks/useActionFeedback";
 import { EMPTY_ACTION_STATE } from "@/components/form/utils/to-action-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { usePatchedToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { createAttachment } from "../actions/create-attachment";
 import {
@@ -24,6 +24,7 @@ type AttachmentFormProps = {
 };
 
 export default function AttachmentForm({ ticketId }: AttachmentFormProps) {
+  const { toast } = usePatchedToast();
   const {
     state: {
       attachments,
@@ -48,6 +49,8 @@ export default function AttachmentForm({ ticketId }: AttachmentFormProps) {
     initialActionState: EMPTY_ACTION_STATE,
   });
 
+  const isEmptyAttachments = attachments.length === 0;
+
   const [imageLoadedMap, setImageLoadedMap] = useState<Record<string, boolean>>(
     {},
   );
@@ -61,8 +64,8 @@ export default function AttachmentForm({ ticketId }: AttachmentFormProps) {
       toast.success("Attachments uploaded successfully");
       setAttachments([]);
     },
-    onError: () => {
-      toast.error("Failed to upload attachments");
+    onError: ({ actionState }) => {
+      toast.error(actionState.message || "Failed to upload attachments");
     },
   });
   return (
@@ -138,7 +141,7 @@ export default function AttachmentForm({ ticketId }: AttachmentFormProps) {
               type="submit"
               className="w-full cursor-pointer"
               size="lg"
-              disabled={isPending}
+              disabled={isPending || isEmptyAttachments}
             >
               <Plus className="size-4" />
               Add attachments
