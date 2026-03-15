@@ -4,6 +4,7 @@ import {
   MAX_ATTACHMENT_COUNT,
   MAX_ATTACHMENT_SIZE,
 } from "../constants";
+import { hashFile } from "./hash-file";
 
 type ProcessAttachmentsProps = {
   existingAttachments?: File[];
@@ -13,6 +14,7 @@ type ProcessAttachmentsProps = {
 export type ProcessedAttachment = {
   file: File;
   buffer: Buffer;
+  hash: string;
   mimeType: string;
 };
 
@@ -29,6 +31,7 @@ export const processAttachments = async ({
     const buffer = Buffer.from(ArrayBuffer);
     const type = await fileTypeFromBuffer(buffer);
     const mimeType = type?.mime ?? undefined;
+    const hash = await hashFile(buffer);
 
     // -- FILE  TYPE MATCH CHECK --
     if (mimeType !== attachment.type) {
@@ -85,6 +88,7 @@ export const processAttachments = async ({
       file: attachment,
       buffer,
       mimeType,
+      hash,
     });
   }
 

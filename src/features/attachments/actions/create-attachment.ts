@@ -31,6 +31,17 @@ export async function createAttachment(
     const { errors, toAdd } = await processAttachments({
       newAttachments: files,
     });
+    // console.log(
+    //   JSON.stringify(
+    //     toAdd.map((a) => ({
+    //       hash: a.hash,
+    //       name: a.file.name,
+    //       mimeType: a.mimeType,
+    //     })),
+    //     null,
+    //     2,
+    //   ),
+    // );
 
     if (errors.length > 0) throw new Error("Invalid attachments");
 
