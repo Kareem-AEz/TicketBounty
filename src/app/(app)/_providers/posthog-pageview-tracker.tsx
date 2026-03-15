@@ -10,6 +10,11 @@ function PostHogPageViewTrackerInternal() {
   const posthog = usePostHog();
 
   useEffect(() => {
+    // Opt out of capturing on localhost
+    if (window.location.hostname === "localhost") {
+      posthog.opt_out_capturing();
+    }
+
     // Track pageview whenever pathname or search params change
     if (pathname && posthog) {
       let url = window.origin + pathname;
@@ -20,11 +25,6 @@ function PostHogPageViewTrackerInternal() {
       posthog.capture("$pageview", {
         $current_url: url,
       });
-
-      // Opt out of capturing on localhost
-      if (window.location.hostname === "localhost") {
-        posthog.opt_out_capturing();
-      }
     }
   }, [pathname, searchParams, posthog]);
 

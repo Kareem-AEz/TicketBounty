@@ -3,7 +3,7 @@ import Link from "next/link";
 import Breadcrumbs, { Breadcrumb } from "@/components/breadcrumbs";
 import { CardCompact } from "@/components/card-compact";
 import { Separator } from "@/components/ui/separator";
-import ForgotPasswordForm from "@/features/password/components/forgot-password-formt";
+import ForgotPasswordForm from "@/features/password/components/forgot-password-form";
 import { homePath, signInPath } from "@/paths";
 
 export const metadata: Metadata = {

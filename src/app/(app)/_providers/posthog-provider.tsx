@@ -2,17 +2,23 @@
 
 import posthog from "posthog-js";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
+  const [isInitialized, setIsInitialized] = useState(false);
+
   useEffect(() => {
-    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+    const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+    if (!key) {
+      console.warn("NEXT_PUBLIC_POSTHOG_KEY is not set");
+      return;
+    }
+    posthog.init(key, {
       api_host: "/ingest",
       ui_host: "https://eu.posthog.com",
       person_profiles: "identified_only",
       capture_pageview: false, // We handle this manually in the tracker
       capture_exceptions: true,
-      // debug: process.env.NODE_ENV === "development",
       disable_session_recording: true,
 
       // GDPR Compliance:
@@ -22,7 +28,14 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       // If you want strict GDPR, use 'memory' persistence by default:
       // persistence: "memory",
     });
+
+    const initialize = () => setIsInitialized(true);
+    initialize();
   }, []);
+
+  if (!isInitialized) {
+    return <>{children}</>;
+  }
 
   return <PHProvider client={posthog}>{children}</PHProvider>;
 }
