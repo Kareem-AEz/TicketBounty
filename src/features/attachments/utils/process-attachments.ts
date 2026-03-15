@@ -10,11 +10,17 @@ type ProcessAttachmentsProps = {
   newAttachments: File[];
 };
 
+export type ProcessedAttachment = {
+  file: File;
+  buffer: Buffer;
+  mimeType: string;
+};
+
 export const processAttachments = async ({
   existingAttachments = [],
   newAttachments,
 }: ProcessAttachmentsProps) => {
-  const toAdd: File[] = [];
+  const toAdd: ProcessedAttachment[] = [];
   const errors: { message: string; attachment: File }[] = [];
 
   // -- PROCESS ATTACHMENTS --
@@ -22,9 +28,10 @@ export const processAttachments = async ({
     const ArrayBuffer = await attachment.arrayBuffer();
     const buffer = Buffer.from(ArrayBuffer);
     const type = await fileTypeFromBuffer(buffer);
+    const mimeType = type?.mime ?? undefined;
 
     // -- FILE  TYPE MATCH CHECK --
-    if (type?.mime !== attachment.type) {
+    if (mimeType !== attachment.type) {
       errors.push({
         message: `File ${attachment.name} type mismatch`,
         attachment,
@@ -41,7 +48,7 @@ export const processAttachments = async ({
       break;
     }
     // -- ACCEPTED ATTACHMENT TYPES CHECK --
-    if (!ACCEPTED_ATTACHMENT_TYPES.includes(type?.mime ?? "")) {
+    if (!ACCEPTED_ATTACHMENT_TYPES.includes(mimeType ?? "")) {
       errors.push({
         message: `File ${attachment.name} is not a supported type`,
         attachment,
@@ -61,7 +68,7 @@ export const processAttachments = async ({
     // -- DUPLICATE CHECK --
     if (
       existingAttachments.some((a) => a.name === attachment.name) ||
-      toAdd.some((a) => a.name === attachment.name)
+      toAdd.some((a) => a.file?.name === attachment.name)
     ) {
       errors.push({
         message: `File ${attachment.name} already exists`,
@@ -70,7 +77,11 @@ export const processAttachments = async ({
       continue;
     }
 
-    toAdd.push(attachment);
+    toAdd.push({
+      file: attachment,
+      buffer,
+      mimeType,
+    });
   }
 
   return { toAdd, errors };

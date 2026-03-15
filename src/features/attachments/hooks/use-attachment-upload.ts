@@ -69,7 +69,7 @@ export const useAttachmentUpload = ({
     );
   };
 
-  const handleAddAttachments = ({
+  const handleAddAttachments = async ({
     newAttachments,
     currentAttachments,
   }: {
@@ -84,7 +84,7 @@ export const useAttachmentUpload = ({
       return;
     }
 
-    const { toAdd, errors } = processAttachments({
+    const { toAdd, errors } = await processAttachments({
       newAttachments,
       existingAttachments: currentAttachments.map((a) => a.file),
     });
@@ -98,7 +98,10 @@ export const useAttachmentUpload = ({
 
     setAttachments((currentAttachments) => [
       ...currentAttachments,
-      ...toAdd.map((f) => ({ file: f, url: URL.createObjectURL(f) })),
+      ...toAdd.map((f) => ({
+        file: f.file,
+        url: URL.createObjectURL(f.file),
+      })),
     ]);
     toast.success(`${toAdd.length} attachments added`, {
       key: `attachments-added-${Date.now()}`,

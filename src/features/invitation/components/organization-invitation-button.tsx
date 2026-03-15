@@ -53,7 +53,6 @@ export default function OrganizationInvitationButton({
   useEffect(() => {
     if (isPending && promiseRef.current) {
       const promise = promiseRef.current.then((result) => {
-        console.log(result);
         if (result?.status === "ERROR") {
           throw result;
         }
