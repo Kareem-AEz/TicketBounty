@@ -1,5 +1,4 @@
 "use server";
-
 import {
   ActionState,
   toErrorActionState,
@@ -15,7 +14,6 @@ export async function createAttachment(
   _actionState: ActionState,
   formData: FormData,
 ) {
-  x;
   const { id: userId } = await getAuthOrRedirect();
   try {
     const ticket = await prisma.ticket.findUnique({
@@ -36,10 +34,16 @@ export async function createAttachment(
       );
     }
     const files = attachments.filter((att) => att instanceof File);
-    const { errors } = processAttachments({
+    const { errors, toAdd } = await processAttachments({
       newAttachments: files,
     });
     if (errors.length > 0) throw new Error("Invalid attachments");
+
+    for (const attachment of toAdd) {
+      const { file, buffer, mimeType } = attachment;
+
+      console.log(file.name, buffer.toString("hex").slice(0, 10), mimeType);
+    }
     return toSuccessActionState({
       status: "SUCCESS",
       message: "Attachment created",
