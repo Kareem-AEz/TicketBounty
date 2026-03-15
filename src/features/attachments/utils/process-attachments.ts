@@ -1,4 +1,8 @@
-import { ACCEPTED_ATTACHMENT_TYPES, MAX_ATTACHMENT_SIZE } from "../constants";
+import {
+  ACCEPTED_ATTACHMENT_TYPES,
+  MAX_ATTACHMENT_COUNT,
+  MAX_ATTACHMENT_SIZE,
+} from "../constants";
 
 type ProcessAttachmentsProps = {
   existingAttachments?: File[];
@@ -36,6 +40,14 @@ export const processAttachments = ({
         attachment,
       });
       continue;
+    }
+
+    if (toAdd.length >= MAX_ATTACHMENT_COUNT) {
+      errors.push({
+        message: `Maximum number of attachments (${MAX_ATTACHMENT_COUNT}) reached`,
+        attachment,
+      });
+      break;
     }
 
     toAdd.push(attachment);
