@@ -33,7 +33,6 @@ export const useAttachmentUpload = ({
   );
 
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const isMaxAttachmentsReached = attachments.length >= MAX_ATTACHMENT_COUNT;
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -76,7 +75,10 @@ export const useAttachmentUpload = ({
     newAttachments: File[];
     currentAttachments: Attachment[];
   }) => {
-    if (newAttachments.length > 0 && isMaxAttachmentsReached) {
+    if (
+      newAttachments.length > 0 &&
+      currentAttachments.length >= MAX_ATTACHMENT_COUNT
+    ) {
       toast.error(
         `The maximum number of attachments (${MAX_ATTACHMENT_COUNT}) has been reached`,
       );
@@ -190,7 +192,7 @@ export const useAttachmentUpload = ({
   return {
     state: {
       attachments,
-      isMaxAttachmentsReached,
+      isMaxAttachmentsReached: attachments.length >= MAX_ATTACHMENT_COUNT,
       isDragging,
       activeDeleteIndex,
       actionState,

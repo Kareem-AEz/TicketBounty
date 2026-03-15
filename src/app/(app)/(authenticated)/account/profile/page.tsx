@@ -11,13 +11,7 @@ import { homePath } from "@/paths";
 export const metadata: Metadata = {
   title: "Profile",
   description: "Manage your profile",
-  keywords: [
-    "profile",
-    "account",
-    "management",
-    "Ticket Bounty",
-    "Ticket Bounty",
-  ],
+  keywords: ["profile", "account", "management", "Ticket Bounty"],
   openGraph: {
     title: "Profile - Ticket Bounty",
     description: "Manage your profile",

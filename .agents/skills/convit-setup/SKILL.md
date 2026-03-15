@@ -288,7 +288,7 @@ CONVIT_MODEL="gpt-4o-mini"
 {
   "scopePatterns": [
     { "pattern": "src/features/([^/]+)/.*", "scope": "$1", "weight": 10 },
-    { "pattern": "components/ui/.*", "scope": "ui", "weight": 5 },
+    { "pattern": "src/components/ui/.*", "scope": "ui", "weight": 5 },
     { "pattern": "src/([^/]+)/.*", "scope": "$1", "weight": 6 }
   ],
   "exclude": [".next/"]

@@ -13,7 +13,7 @@ const ALL_FUNCTIONS = [
   ...INVITATION_EVENTS_FUNCTIONS,
 ];
 
-// Create an API that serves zero functions
+// Create an API that serves all Inngest functions
 export const { GET, POST, PUT } = serve({
   client: inngest,
   functions: ALL_FUNCTIONS,

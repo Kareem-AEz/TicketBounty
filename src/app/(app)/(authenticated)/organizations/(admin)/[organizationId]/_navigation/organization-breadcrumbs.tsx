@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Breadcrumbs from "@/components/breadcrumbs";
 import {
+  homePath,
   organizationInvitationsPath,
   organizationMembershipsPath,
   organizationsPath,
@@ -38,7 +39,7 @@ const OrganizationBreadcrumbs = ({
     <>
       <Breadcrumbs
         breadcrumbs={[
-          { label: "Home", href: organizationsPath() },
+          { label: "Home", href: homePath() },
           { label: "Organizations", href: organizationsPath() },
           {
             label,

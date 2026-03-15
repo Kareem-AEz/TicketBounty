@@ -40,7 +40,11 @@ export const processAttachments = async ({
     }
 
     // -- MAX ATTACHMENT COUNT CHECK --
-    if (toAdd.length >= MAX_ATTACHMENT_COUNT) {
+    if (
+      toAdd.length >= MAX_ATTACHMENT_COUNT ||
+      existingAttachments.length >= MAX_ATTACHMENT_COUNT ||
+      existingAttachments.length + toAdd.length >= MAX_ATTACHMENT_COUNT
+    ) {
       errors.push({
         message: `Maximum number of attachments (${MAX_ATTACHMENT_COUNT}) reached`,
         attachment,

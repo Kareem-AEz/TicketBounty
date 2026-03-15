@@ -36,7 +36,7 @@ export default async function EmailInvitationPage({
                 You need to be signed up to accept this invitation.
               </p>
               <Link
-                href={`/sign-up?invitationToken=${tokenId}&email=${invitation.email}`}
+                href={`/sign-up?invitationToken=${encodeURIComponent(tokenId)}&email=${encodeURIComponent(invitation.email)}`}
                 className={buttonVariants()}
               >
                 Sign up to accept

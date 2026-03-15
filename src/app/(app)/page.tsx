@@ -27,6 +27,7 @@ type HomePagePropsType = {
 
 async function HomePage({ searchParams }: HomePagePropsType) {
   const { user } = await getAuth();
+  const parsedSearchParams = ticketSearchParamsCache.parse(await searchParams);
 
   return (
     <>
@@ -48,7 +49,7 @@ async function HomePage({ searchParams }: HomePagePropsType) {
               <TicketsList
                 user={user ?? undefined}
                 isAllTickets
-                searchParams={ticketSearchParamsCache.parse(await searchParams)}
+                searchParams={parsedSearchParams}
               />
             </Suspense>
           </ErrorBoundary>

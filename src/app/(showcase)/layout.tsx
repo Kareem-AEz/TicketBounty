@@ -81,7 +81,7 @@ export default function RootLayout({
         />
         <Script
           src="/cdn/seline"
-          data-token="d56466f0c386f3b"
+          data-token={process.env.NEXT_PUBLIC_SELINE_TOKEN}
           strategy="afterInteractive"
         />
         <NextTopLoader color="var(--primary)" showSpinner={false} height={2} />
