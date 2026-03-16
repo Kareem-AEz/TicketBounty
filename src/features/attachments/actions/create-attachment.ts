@@ -90,6 +90,7 @@ export async function createAttachment(
           ticketId,
           attachmentName: name,
           attachmentId: id,
+          attachmentHash: original.hash,
         });
 
         try {
