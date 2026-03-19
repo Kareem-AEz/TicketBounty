@@ -55,24 +55,24 @@ Deep dive into event-driven messaging patterns:
 
 ---
 
-## 🎯 Quick Start
-
 ### Step 1: Define Your Event
 
 ```typescript
 // src/lib/inngest.ts
-type Events = {
-  "app/feature.action": {
-    data: {
-      userId: string;
-      // your fields
-    };
-  };
-};
+import { Inngest, eventType, staticSchema } from "inngest";
+
+export const featureActionEvent = eventType("app/feature.action", {
+  schema: staticSchema<{
+    userId: string;
+    // your fields
+  }>(),
+});
 
 export const inngest = new Inngest({
   id: "app-name",
-  schemas: new EventSchemas().fromRecord<Events>(),
+  checkpointing: {
+    maxRuntime: "300s",
+  },
 });
 ```
 
@@ -81,8 +81,7 @@ export const inngest = new Inngest({
 ```typescript
 // src/features/feature/events/event-action.ts
 export const eventAction = inngest.createFunction(
-  { id: "feature-action" },
-  { event: "app/feature.action" },
+  { id: "feature-action", triggers: [{ event: featureActionEvent }] },
   async ({ event, step }) => {
     const result = await step.run("do-something", async () => {
       return await doSomething(event.data);
@@ -109,10 +108,7 @@ export const { GET, POST, PUT } = serve({
 
 ```typescript
 // In your API route or server action
-await inngest.send({
-  name: "app/feature.action",
-  data: { userId: "123" },
-});
+await inngest.send(featureActionEvent.create({ data: { userId: "123" } }));
 ```
 
 ---
@@ -151,17 +147,20 @@ await inngest.send({
 // 1. Emit event on signup
 app.post("/api/signup", async (req, res) => {
   const user = await db.users.create(req.body);
-  await inngest.send({
-    name: "app/auth.sign-up-welcome-email-function",
-    data: { userId: user.id, email: user.email },
-  });
+  await inngest.send(
+    authSignUpWelcomeEmailFunctionEvent.create({
+      data: { userId: user.id, email: user.email },
+    }),
+  );
   res.json({ success: true });
 });
 
 // 2. Workflow handles it
 export const eventSignUpWelcome = inngest.createFunction(
-  { id: "sign-up-welcome-email" },
-  { event: "app/auth.sign-up-welcome-email-function" },
+  {
+    id: "sign-up-welcome-email",
+    triggers: [{ event: authSignUpWelcomeEmailFunctionEvent }],
+  },
   async ({ event, step }) => {
     await step.run("send-email", async () => {
       return await mailer.sendWelcome(event.data);
@@ -174,8 +173,7 @@ export const eventSignUpWelcome = inngest.createFunction(
 
 ```typescript
 export const dailyDigest = inngest.createFunction(
-  { id: "daily-digest" },
-  { cron: "0 0 * * *" }, // Midnight every day
+  { id: "daily-digest", triggers: [{ cron: "0 0 * * *" }] }, // Midnight every day
   async ({ step }) => {
     const data = await step.run("gather-data", async () => {
       return await gatherDigestData();
@@ -192,8 +190,7 @@ export const dailyDigest = inngest.createFunction(
 
 ```typescript
 export const multiEventWorkflow = inngest.createFunction(
-  { id: "multi-event" },
-  { event: "app/process.started" },
+  { id: "multi-event", triggers: [{ event: processStartedEvent }] },
   async ({ event, step }) => {
     // Wait for payment to complete
     const payment = await step.waitForEvent("wait-payment", {

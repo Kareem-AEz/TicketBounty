@@ -53,10 +53,11 @@ app.post("/api/signup", async (req, res) => {
 app.post("/api/signup", async (req, res) => {
   const user = await createUser(req.body);
 
-  await inngest.send({
-    name: "app/auth.sign-up-welcome-email-function",
-    data: { userId: user.id, email: user.email },
-  });
+  await inngest.send(
+    authSignUpWelcomeEmailFunctionEvent.create({
+      data: { userId: user.id, email: user.email },
+    }),
+  );
 
   res.json({ success: true }); // Returns immediately
 });
@@ -154,39 +155,41 @@ api.v1.auth.signup                  // Over-nested
 
 Always define event types in the Inngest client:
 
-```typescript
+````typescript
 // src/lib/inngest.ts
-export type Events = {
-  "app/auth.sign-up-welcome-email-function": {
-    data: {
-      userId: string;
-      email: string;
-      name: string;
-    };
-  };
-  "app/password.password-reset-function": {
-    data: {
-      userId: string;
-      token: string;
-      email: string;
-    };
-  };
-  "app/admin-digest.ready": {
-    data: {
-      totalTickets: { total: number; totalSince: number };
-      totalUsers: { total: number; totalSince: number };
-      totalComments: { total: number; totalSince: number };
-    };
-  };
-};
+import { Inngest, eventType, staticSchema } from "inngest";
+
+export const authSignUpWelcomeEmailFunctionEvent = eventType("app/auth.sign-up-welcome-email-function", {
+  schema: staticSchema<{
+    userId: string;
+    email: string;
+    name: string;
+  }>()
+});
+
+export const passwordPasswordResetFunctionEvent = eventType("app/password.password-reset-function", {
+  schema: staticSchema<{
+    userId: string;
+    token: string;
+    email: string;
+  }>()
+});
+
+export const adminDigestReadyEvent = eventType("app/admin-digest.ready", {
+  schema: staticSchema<{
+    totalTickets: { total: number; totalSince: number };
+    totalUsers: { total: number; totalSince: number };
+    totalComments: { total: number; totalSince: number };
+  }>()
+});
 
 export const inngest = new Inngest({
   id: "ticket-bounty",
-  schemas: new EventSchemas().fromRecord<Events>(),
+  checkpointing: {
+    maxRuntime: "300s"
+  }
 });
-```
 
----
 
 ## Workflow Patterns
 
@@ -215,8 +218,7 @@ export const eventSignUpWelcomeEmail = inngest.createFunction(
     //   key: "event.data.userId",
     //   limit: 5 // prevent email storms
     // }
-  },
-  { event: "app/auth.sign-up-welcome-email-function" },
+  , triggers: [{ event: authSignUpWelcomeEmailFunctionEvent }] },
   async ({ event, step }) => {
     const { userId, email, name } = event.data;
 
@@ -235,7 +237,7 @@ export const eventSignUpWelcomeEmail = inngest.createFunction(
     };
   },
 );
-```
+````
 
 ### Pattern 2: Multi-Step Orchestration Workflow
 
@@ -244,8 +246,7 @@ export const eventSignUpWelcomeEmail = inngest.createFunction(
 ```typescript
 // src/features/ticket/events/event-process-ticket.ts
 export const processTicketWorkflow = inngest.createFunction(
-  { id: "process-ticket" },
-  { event: "app/ticket.created" },
+  { id: "process-ticket", triggers: [{ event: ticketCreatedEvent }] },
   async ({ event, step }) => {
     const { ticketId, userId } = event.data;
 
@@ -296,8 +297,7 @@ export const processTicketWorkflow = inngest.createFunction(
 export const eventPrepareAdminDigest = inngest.createFunction(
   {
     id: "prepare-admin-digest",
-  },
-  { cron: "0 0 * * *" }, // Every day at midnight
+  , triggers: [{ cron: "0 0 * * *" }] }, // Every day at midnight
   async ({ step }) => {
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
@@ -327,14 +327,11 @@ export const eventPrepareAdminDigest = inngest.createFunction(
     ]);
 
     // Trigger downstream workflows
-    await step.sendEvent("emit-digest-ready", {
-      name: "app/admin-digest.ready",
-      data: {
+    await step.sendEvent("emit-digest-ready", adminDigestReadyEvent.create({ data: {
         totalTickets,
         totalUsers,
         totalComments,
-      },
-    });
+      } }));
   },
 );
 ```
@@ -344,8 +341,7 @@ export const eventPrepareAdminDigest = inngest.createFunction(
 export const eventSendAdminDigestEmail = inngest.createFunction(
   {
     id: "send-admin-digest-email",
-  },
-  { event: "app/admin-digest.ready" },
+  , triggers: [{ event: adminDigestReadyEvent }] },
   async ({ event, step }) => {
     const { totalTickets, totalUsers, totalComments } = event.data;
 
@@ -365,8 +361,7 @@ export const eventSendAdminDigestEmail = inngest.createFunction(
 export const eventSendAdminDigestDiscord = inngest.createFunction(
   {
     id: "send-admin-digest-discord",
-  },
-  { event: "app/admin-digest.ready" },
+  , triggers: [{ event: adminDigestReadyEvent }] },
   async ({ event, step }) => {
     const { totalTickets, totalUsers, totalComments } = event.data;
 
@@ -389,8 +384,10 @@ export const eventSendAdminDigestDiscord = inngest.createFunction(
 
 ```typescript
 export const onboardUserWorkflow = inngest.createFunction(
-  { id: "onboard-user" },
-  { event: "app/auth.sign-up-welcome-email-function" },
+  {
+    id: "onboard-user",
+    triggers: [{ event: authSignUpWelcomeEmailFunctionEvent }],
+  },
   async ({ event, step }) => {
     const { userId, email } = event.data;
 
@@ -434,8 +431,7 @@ Always wrap operations in steps and handle errors explicitly:
 
 ```typescript
 export const reliableWorkflow = inngest.createFunction(
-  { id: "reliable-workflow" },
-  { event: "app/payment.created" },
+  { id: "reliable-workflow", triggers: [{ event: paymentCreatedEvent }] },
   async ({ event, step }) => {
     try {
       const result = await step.run("process-payment", async () => {
@@ -468,8 +464,10 @@ Set up a centralized handler for all function failures:
 ```typescript
 // src/lib/inngest.ts
 export const handleAnyFunctionFailure = inngest.createFunction(
-  { id: "handle-any-fn-failure" },
-  { event: "inngest/function.failed" },
+  {
+    id: "handle-any-fn-failure",
+    triggers: [{ event: inngestFunctionFailedEvent }],
+  },
   async ({ event, step }) => {
     await step.run("log-failure", async () => {
       logger.error(
@@ -495,8 +493,7 @@ Design functions to be idempotent (safe to retry):
 
 ```typescript
 export const safePaymentWorkflow = inngest.createFunction(
-  { id: "safe-payment" },
-  { event: "app/payment.created" },
+  { id: "safe-payment", triggers: [{ event: paymentCreatedEvent }] },
   async ({ event, step }) => {
     const paymentId = event.data.paymentId;
 
@@ -536,8 +533,7 @@ export const emailWorkflow = inngest.createFunction(
       key: "event.data.userId", // Group by user
       limit: 5, // Max 5 emails per user simultaneously
     },
-  },
-  { event: "app/notification.email" },
+  , triggers: [{ event: notificationEmailEvent }] },
   async ({ event, step }) => {
     return await step.run("send-email", async () => {
       return await sendEmail(event.data.email);
@@ -552,8 +548,7 @@ For high-volume events, batch processing:
 
 ```typescript
 export const batchedDigestWorkflow = inngest.createFunction(
-  { id: "batched-digest" },
-  { cron: "0 * * * *" }, // Every hour
+  { id: "batched-digest", triggers: [{ cron: "0 * * * *" }] }, // Every hour
   async ({ step }) => {
     const pending = await step.run("fetch-pending", async () => {
       return await prisma.notification.findMany({
@@ -575,8 +570,7 @@ Execute independent operations concurrently:
 
 ```typescript
 export const parallelWorkflow = inngest.createFunction(
-  { id: "parallel-workflow" },
-  { event: "app/order.created" },
+  { id: "parallel-workflow", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     // Run all these in parallel
     const [inventory, payment, shipping] = await Promise.all([
@@ -604,8 +598,7 @@ Strategically delay operations:
 
 ```typescript
 export const delayedNotificationWorkflow = inngest.createFunction(
-  { id: "delayed-notification" },
-  { event: "app/payment.pending" },
+  { id: "delayed-notification", triggers: [{ event: paymentPendingEvent }] },
   async ({ event, step }) => {
     // Wait 24 hours before reminding
     await step.sleep("remind-later", "24h");
@@ -630,8 +623,7 @@ export const eventSignUpWelcomeEmail = inngest.createFunction(
   {
     id: "sign-up-welcome-email", // Machine-readable
     name: "Send Welcome Email on Sign Up", // Human-readable (optional)
-  },
-  { event: "app/auth.sign-up-welcome-email-function" },
+  , triggers: [{ event: authSignUpWelcomeEmailFunctionEvent }] },
   async ({ event, step }) => {
     // ...
   },
@@ -644,8 +636,7 @@ Use clear, specific step names:
 
 ```typescript
 export const debuggableWorkflow = inngest.createFunction(
-  { id: "order-processing" },
-  { event: "app/order.created" },
+  { id: "order-processing", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     // ✅ GOOD: Specific, actionable
     const inventory = await step.run(
@@ -677,8 +668,7 @@ Integrate structured logging for observability:
 import logger from "@/lib/logger";
 
 export const observableWorkflow = inngest.createFunction(
-  { id: "observable-workflow" },
-  { event: "app/signup.completed" },
+  { id: "observable-workflow", triggers: [{ event: signupCompletedEvent }] },
   async ({ event, step }) => {
     const userId = event.data.userId;
 
@@ -726,8 +716,7 @@ export const observableWorkflow = inngest.createFunction(
 ```typescript
 // ❌ BAD: No steps = no retries, no observability
 export const badWorkflow = inngest.createFunction(
-  { id: "bad-workflow" },
-  { event: "app/test" },
+  { id: "bad-workflow", triggers: [{ event: testEvent }] },
   async ({ event }) => {
     const data = await fetchData(); // Direct call, not wrapped
     return data;
@@ -736,8 +725,7 @@ export const badWorkflow = inngest.createFunction(
 
 // ✅ GOOD: Wrapped in steps
 export const goodWorkflow = inngest.createFunction(
-  { id: "good-workflow" },
-  { event: "app/test" },
+  { id: "good-workflow", triggers: [{ event: testEvent }] },
   async ({ event, step }) => {
     const data = await step.run("fetch-data", async () => {
       return await fetchData();
@@ -762,7 +750,7 @@ app.post("/signup", async (req, res) => {
 // ✅ GOOD: Fire and forget
 app.post("/signup", async (req, res) => {
   const user = await createUser(req.body);
-  inngest.send({ name: "app/auth.sign-up", data: { userId: user.id } });
+  inngest.send(authSignUpEvent.create({ data: { userId: user.id } }));
   res.json({ success: true });
 });
 ```
@@ -792,20 +780,15 @@ const event = await step.waitForEvent("wait", {
 ```typescript
 // ❌ BAD: Too much responsibility
 // app/user.created does too much: email, SMS, Slack, webhook
-await inngest.send({
-  name: "app/user.created",
-  data: { userId },
-});
+await inngest.send(userCreatedEvent.create({ data: { userId } }));
 
 // ✅ GOOD: Domain-specific events
-await inngest.send({
-  name: "app/auth.sign-up-welcome-email-function",
-  data: { userId, email },
-});
-await inngest.send({
-  name: "app/admin.user-created-notification",
-  data: { userId },
-});
+await inngest.send(
+  authSignUpWelcomeEmailFunctionEvent.create({ data: { userId, email } }),
+);
+await inngest.send(
+  adminUserCreatedNotificationEvent.create({ data: { userId } }),
+);
 ```
 
 ### ❌ **Pitfall 5: Not Defining Event Types**
@@ -814,27 +797,28 @@ await inngest.send({
 
 ```typescript
 // ❌ BAD: No type safety
-inngest.send({
-  name: "app/payment.completed",
-  data: {
-    /* anything goes */
-  },
-});
+inngest.send(
+  paymentCompletedEvent.create({
+    data: {
+      /* anything goes */
+    },
+  }),
+);
 
 // ✅ GOOD: Strongly typed
-type Events = {
-  "app/payment.completed": {
-    data: {
-      paymentId: string;
-      amount: number;
-      currency: string;
-    };
-  };
-};
+import { Inngest, eventType, staticSchema } from "inngest";
+
+export const paymentCompletedEvent = eventType("app/payment.completed", {
+  schema: staticSchema<{
+    paymentId: string;
+    amount: number;
+    currency: string;
+  }>(),
+});
 
 export const inngest = new Inngest({
   id: "app",
-  schemas: new EventSchemas().fromRecord<Events>(),
+  checkpointing: { maxRuntime: "300s" },
 });
 ```
 

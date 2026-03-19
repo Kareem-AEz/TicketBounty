@@ -30,11 +30,32 @@ Specific recommendations, patterns, and refactoring suggestions for your "The Ro
 
 ```typescript
 // src/lib/inngest.ts
-type Events = {
-  "app/password.password-reset-function": PasswordResetFunctionData;
-  "app/auth.sign-up-welcome-email-function": SignUpWelcomeEmailFunctionData;
-  "app/admin-digest.ready": AdminDigestReadyEventData;
-};
+import { Inngest, eventType, staticSchema } from "inngest";
+
+export const passwordResetFunctionEvent = eventType(
+  "app/password.password-reset-function",
+  {
+    schema: staticSchema<PasswordResetFunctionData>(),
+  },
+);
+
+export const authSignUpWelcomeEmailFunctionEvent = eventType(
+  "app/auth.sign-up-welcome-email-function",
+  {
+    schema: staticSchema<SignUpWelcomeEmailFunctionData>(),
+  },
+);
+
+export const adminDigestReadyEvent = eventType("app/admin-digest.ready", {
+  schema: staticSchema<AdminDigestReadyEventData>(),
+});
+
+export const inngest = new Inngest({
+  id: "ticket-bounty",
+  checkpointing: {
+    maxRuntime: "300s",
+  },
+});
 ```
 
 **Recommendation**: Continue this pattern. Add new events here as features expand.
@@ -93,8 +114,7 @@ export const eventTicketCreated = inngest.createFunction(
       key: "event.data.userId",
       limit: 5, // Prevent user from spamming
     },
-  },
-  { event: "app/ticket.created" },
+  , triggers: [{ event: ticketCreatedEvent }] },
   async ({ event, step }) => {
     const { ticketId, userId, title } = event.data;
 
@@ -109,10 +129,7 @@ export const eventTicketCreated = inngest.createFunction(
 
     // Notify admins for high-priority
     if (event.data.priority === "urgent") {
-      await step.sendEvent("notify-urgent", {
-        name: "app/admin.urgent-ticket-created",
-        data: { ticketId, userId },
-      });
+      await step.sendEvent("notify-urgent", adminUrgentTicketCreatedEvent.create({ data: { ticketId, userId } }));
     }
 
     // Track analytics
@@ -126,8 +143,7 @@ export const eventTicketCreated = inngest.createFunction(
 );
 
 export const eventUrgentTicket = inngest.createFunction(
-  { id: "urgent-ticket-notification" },
-  { event: "app/admin.urgent-ticket-created" },
+  { id: "urgent-ticket-notification" , triggers: [{ event: adminUrgentTicketCreatedEvent }] },
   async ({ event, step }) => {
     await step.run("notify-admins", async () => {
       return await notifyAdminsViaSlack({
@@ -174,8 +190,7 @@ export type CommentPostedEventData = {
 };
 
 export const eventCommentPosted = inngest.createFunction(
-  { id: "comment-posted" },
-  { event: "app/comment.posted" },
+  { id: "comment-posted", triggers: [{ event: commentPostedEvent }] },
   async ({ event, step }) => {
     // Get ticket and watchers
     const ticket = await step.run("fetch-ticket", async () => {
@@ -230,8 +245,10 @@ export const eventCommentPosted = inngest.createFunction(
 ```typescript
 // src/features/accounts/events/event-password-changed.ts
 export const eventPasswordChanged = inngest.createFunction(
-  { id: "password-changed" },
-  { event: "app/account.password-changed" },
+  {
+    id: "password-changed",
+    triggers: [{ event: accountPasswordChangedEvent }],
+  },
   async ({ event, step }) => {
     await step.run("send-confirmation", async () => {
       return await sendEmail({
@@ -261,61 +278,67 @@ export const eventPasswordChanged = inngest.createFunction(
 
 ```typescript
 // src/lib/inngest.ts
-type Events = {
-  // Auth events
-  "app/auth.sign-up-welcome-email-function": {
-    /* ... */
-  };
-  "app/auth.email-verified": {
-    /* ... */
-  };
+import { eventType, staticSchema } from "inngest";
 
-  // Password events
-  "app/password.password-reset-function": {
-    /* ... */
-  };
-  "app/password.password-changed": {
-    /* ... */
-  };
+// Auth events
+export const authSignUpWelcomeEmailFunctionEvent = eventType(
+  "app/auth.sign-up-welcome-email-function",
+  { schema: staticSchema<any>() },
+);
+export const authEmailVerifiedEvent = eventType("app/auth.email-verified", {
+  schema: staticSchema<any>(),
+});
 
-  // Account events
-  "app/account.profile-updated": {
-    /* ... */
-  };
-  "app/account.settings-changed": {
-    /* ... */
-  };
+// Password events
+export const passwordPasswordResetFunctionEvent = eventType(
+  "app/password.password-reset-function",
+  { schema: staticSchema<any>() },
+);
+export const passwordPasswordChangedEvent = eventType(
+  "app/password.password-changed",
+  { schema: staticSchema<any>() },
+);
 
-  // Ticket events
-  "app/ticket.created": {
-    /* ... */
-  };
-  "app/ticket.updated": {
-    /* ... */
-  };
-  "app/ticket.assigned": {
-    /* ... */
-  };
-  "app/admin.urgent-ticket-created": {
-    /* ... */
-  };
+// Account events
+export const accountProfileUpdatedEvent = eventType(
+  "app/account.profile-updated",
+  { schema: staticSchema<any>() },
+);
+export const accountSettingsChangedEvent = eventType(
+  "app/account.settings-changed",
+  { schema: staticSchema<any>() },
+);
 
-  // Comment events
-  "app/comment.posted": {
-    /* ... */
-  };
-  "app/comment.updated": {
-    /* ... */
-  };
+// Ticket events
+export const ticketCreatedEvent = eventType("app/ticket.created", {
+  schema: staticSchema<any>(),
+});
+export const ticketUpdatedEvent = eventType("app/ticket.updated", {
+  schema: staticSchema<any>(),
+});
+export const ticketAssignedEvent = eventType("app/ticket.assigned", {
+  schema: staticSchema<any>(),
+});
+export const adminUrgentTicketCreatedEvent = eventType(
+  "app/admin.urgent-ticket-created",
+  { schema: staticSchema<any>() },
+);
 
-  // Admin events
-  "app/admin-digest.ready": {
-    /* ... */
-  };
-  "app/admin.daily-metrics": {
-    /* ... */
-  };
-};
+// Comment events
+export const commentPostedEvent = eventType("app/comment.posted", {
+  schema: staticSchema<any>(),
+});
+export const commentUpdatedEvent = eventType("app/comment.updated", {
+  schema: staticSchema<any>(),
+});
+
+// Admin events
+export const adminDigestReadyEvent = eventType("app/admin-digest.ready", {
+  schema: staticSchema<any>(),
+});
+export const adminDailyMetricsEvent = eventType("app/admin.daily-metrics", {
+  schema: staticSchema<any>(),
+});
 ```
 
 ---
@@ -381,16 +404,17 @@ export async function createTicket(data: CreateTicketInput) {
   });
 
   // Emit event for background processing
-  await inngest.send({
-    name: "app/ticket.created",
-    data: {
-      ticketId: ticket.id,
-      userId: ticket.userId,
-      title: ticket.title,
-      description: ticket.description,
-      priority: ticket.priority,
-    },
-  });
+  await inngest.send(
+    ticketCreatedEvent.create({
+      data: {
+        ticketId: ticket.id,
+        userId: ticket.userId,
+        title: ticket.title,
+        description: ticket.description,
+        priority: ticket.priority,
+      },
+    }),
+  );
 
   return ticket;
 }
@@ -409,15 +433,16 @@ export async function addComment(ticketId: string, content: string) {
     },
   });
 
-  await inngest.send({
-    name: "app/comment.posted",
-    data: {
-      commentId: comment.id,
-      ticketId,
-      authorId: userId,
-      content,
-    },
-  });
+  await inngest.send(
+    commentPostedEvent.create({
+      data: {
+        commentId: comment.id,
+        ticketId,
+        authorId: userId,
+        content,
+      },
+    }),
+  );
 
   return comment;
 }
@@ -433,14 +458,15 @@ export async function updatePassword(newPassword: string) {
     data: { password: hashedPassword },
   });
 
-  await inngest.send({
-    name: "app/account.password-changed",
-    data: {
-      userId,
-      email: user.email,
-      timestamp: new Date(),
-    },
-  });
+  await inngest.send(
+    accountPasswordChangedEvent.create({
+      data: {
+        userId,
+        email: user.email,
+        timestamp: new Date(),
+      },
+    }),
+  );
 }
 ```
 
@@ -482,8 +508,7 @@ Instead of sending individual emails, batch them:
 
 ```typescript
 export const batchDigestNotifications = inngest.createFunction(
-  { id: "batch-digest-notifications" },
-  { cron: "0 8 * * *" }, // 8am daily
+  { id: "batch-digest-notifications", triggers: [{ cron: "0 8 * * *" }] }, // 8am daily
   async ({ step }) => {
     const pending = await step.run("fetch-pending", async () => {
       return await prisma.notification.findMany({
@@ -525,16 +550,17 @@ npm run dev
 ```typescript
 // Add to a test page or API route
 export async function testWorkflow() {
-  await inngest.send({
-    name: "app/ticket.created",
-    data: {
-      ticketId: "test-123",
-      userId: "user-456",
-      title: "Test Ticket",
-      description: "Testing workflow",
-      priority: "high",
-    },
-  });
+  await inngest.send(
+    ticketCreatedEvent.create({
+      data: {
+        ticketId: "test-123",
+        userId: "user-456",
+        title: "Test Ticket",
+        description: "Testing workflow",
+        priority: "high",
+      },
+    }),
+  );
 
   return { success: true };
 }
@@ -559,8 +585,7 @@ Track in Inngest Cloud dashboard:
 import logger from "@/lib/logger";
 
 export const eventTicketCreated = inngest.createFunction(
-  { id: "ticket-created" },
-  { event: "app/ticket.created" },
+  { id: "ticket-created", triggers: [{ event: ticketCreatedEvent }] },
   async ({ event, step }) => {
     logger.info(
       { ticketId: event.data.ticketId, userId: event.data.userId },

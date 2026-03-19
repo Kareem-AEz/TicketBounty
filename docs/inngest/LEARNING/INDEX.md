@@ -214,12 +214,17 @@ API Handler → inngest.send() → Inngest Queue → Workflow Functions
 
 ```typescript
 // 1. Define event type
-type Events = { "app/feature.action": { data: {...} } };
+import { eventType, staticSchema } from "inngest";
+
+export const featureActionEvent = eventType("app/feature.action", {
+  schema: staticSchema<{
+    // your fields
+  }>()
+});
 
 // 2. Create workflow
 export const workflow = inngest.createFunction(
-  { id: "feature-action" },
-  { event: "app/feature.action" },
+  { id: "feature-action" , triggers: [{ event: featureActionEvent }] },
   async ({ event, step }) => {
     const result = await step.run("do-it", async () => {
       return await doSomething(event.data);
@@ -235,10 +240,7 @@ export const { GET, POST } = serve({
 });
 
 // 4. Emit event
-await inngest.send({
-  name: "app/feature.action",
-  data: {...}
-});
+await inngest.send(featureActionEvent.create({ data: {...} }));
 ```
 
 ### 10 Best Practices

@@ -35,8 +35,10 @@ type SendWelcomeEmailCommand = {
 
 // Workflow
 export const sendWelcomeEmailHandler = inngest.createFunction(
-  { id: "send-welcome-email" },
-  { event: "app/auth.sign-up-welcome-email-function" },
+  {
+    id: "send-welcome-email",
+    triggers: [{ event: authSignUpWelcomeEmailFunctionEvent }],
+  },
   async ({ event, step }) => {
     await step.run("send", async () => {
       return await mailer.sendWelcome(event.data);
@@ -66,24 +68,21 @@ type UserSignedUpEvent = {
 
 // Multiple independent handlers can listen
 export const sendWelcomeEmail = inngest.createFunction(
-  { id: "send-welcome" },
-  { event: "app/user.signed-up" },
+  { id: "send-welcome", triggers: [{ event: userSignedUpEvent }] },
   async ({ event, step }) => {
     // Handler 1: Send email
   },
 );
 
 export const recordSignup = inngest.createFunction(
-  { id: "record-signup" },
-  { event: "app/user.signed-up" },
+  { id: "record-signup", triggers: [{ event: userSignedUpEvent }] },
   async ({ event, step }) => {
     // Handler 2: Track analytics
   },
 );
 
 export const notifyAdmins = inngest.createFunction(
-  { id: "notify-admins" },
-  { event: "app/user.signed-up" },
+  { id: "notify-admins", triggers: [{ event: userSignedUpEvent }] },
   async ({ event, step }) => {
     // Handler 3: Alert team
   },
@@ -109,8 +108,7 @@ type OrderSaga = {
 };
 
 export const processOrderSaga = inngest.createFunction(
-  { id: "process-order-saga" },
-  { event: "app/order.created" },
+  { id: "process-order-saga", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     const { orderId, userId, items, totalAmount } = event.data;
 
@@ -186,8 +184,7 @@ type PaymentReceivedEvent = {
 
 // Fan out to multiple handlers
 export const updateInvoice = inngest.createFunction(
-  { id: "update-invoice" },
-  { event: "app/payment.received" },
+  { id: "update-invoice", triggers: [{ event: paymentReceivedEvent }] },
   async ({ event, step }) => {
     await step.run("mark-paid", async () => {
       return await db.invoices.markPaid(event.data.paymentId);
@@ -196,8 +193,7 @@ export const updateInvoice = inngest.createFunction(
 );
 
 export const sendReceipt = inngest.createFunction(
-  { id: "send-receipt" },
-  { event: "app/payment.received" },
+  { id: "send-receipt", triggers: [{ event: paymentReceivedEvent }] },
   async ({ event, step }) => {
     await step.run("send-email", async () => {
       return await mailer.sendReceipt(event.data.customerId);
@@ -206,8 +202,7 @@ export const sendReceipt = inngest.createFunction(
 );
 
 export const recordRevenue = inngest.createFunction(
-  { id: "record-revenue" },
-  { event: "app/payment.received" },
+  { id: "record-revenue", triggers: [{ event: paymentReceivedEvent }] },
   async ({ event, step }) => {
     await step.run("accounting", async () => {
       return await accounting.recordPayment(event.data);
@@ -216,8 +211,7 @@ export const recordRevenue = inngest.createFunction(
 );
 
 export const updateMetrics = inngest.createFunction(
-  { id: "update-metrics" },
-  { event: "app/payment.received" },
+  { id: "update-metrics", triggers: [{ event: paymentReceivedEvent }] },
   async ({ event, step }) => {
     await step.run("metrics", async () => {
       return await analytics.recordPayment(event.data.amount);
@@ -241,13 +235,14 @@ type OrderComponentReady = {
 };
 
 export const aggregateOrderComponents = inngest.createFunction(
-  { id: "aggregate-order" },
-  // Listen for any component ready event
-  [
-    { event: "app/order.payment-processed" },
-    { event: "app/order.inventory-reserved" },
-    { event: "app/order.address-validated" },
-  ],
+  {
+    id: "aggregate-order",
+    triggers: [
+      { event: orderPaymentProcessedEvent },
+      { event: orderInventoryReservedEvent },
+      { event: orderAddressValidatedEvent },
+    ],
+  },
   async ({ event, step }) => {
     const orderId = event.data.orderId;
 
@@ -262,10 +257,10 @@ export const aggregateOrderComponents = inngest.createFunction(
         return await shipping.createShipment(orderId);
       });
 
-      await step.sendEvent("order-ready", {
-        name: "app/order.ready-to-ship",
-        data: { orderId },
-      });
+      await step.sendEvent(
+        "order-ready",
+        orderReadyToShipEvent.create({ data: { orderId } }),
+      );
     }
   },
 );
@@ -282,35 +277,39 @@ Events trigger other events in a chain without central orchestration.
 ```typescript
 // Chain: User signup → Welcome email → Onboarding guide
 export const onSignUp = inngest.createFunction(
-  { id: "on-signup" },
-  { event: "app/user.created" },
+  { id: "on-signup", triggers: [{ event: userCreatedEvent }] },
   async ({ event, step }) => {
-    await step.sendEvent("trigger-welcome", {
-      name: "app/email.welcome-requested",
-      data: { userId: event.data.userId },
-    });
+    await step.sendEvent(
+      "trigger-welcome",
+      emailWelcomeRequestedEvent.create({
+        data: { userId: event.data.userId },
+      }),
+    );
   },
 );
 
 export const sendWelcome = inngest.createFunction(
-  { id: "send-welcome-email" },
-  { event: "app/email.welcome-requested" },
+  {
+    id: "send-welcome-email",
+    triggers: [{ event: emailWelcomeRequestedEvent }],
+  },
   async ({ event, step }) => {
     await step.run("send", async () => {
       await mailer.sendWelcome(event.data.userId);
     });
 
     // Trigger next in chain
-    await step.sendEvent("next-step", {
-      name: "app/onboarding.welcome-sent",
-      data: { userId: event.data.userId },
-    });
+    await step.sendEvent(
+      "next-step",
+      onboardingWelcomeSentEvent.create({
+        data: { userId: event.data.userId },
+      }),
+    );
   },
 );
 
 export const startOnboarding = inngest.createFunction(
-  { id: "start-onboarding" },
-  { event: "app/onboarding.welcome-sent" },
+  { id: "start-onboarding", triggers: [{ event: onboardingWelcomeSentEvent }] },
   async ({ event, step }) => {
     await step.run("send-guide", async () => {
       await mailer.sendOnboardingGuide(event.data.userId);
@@ -331,10 +330,7 @@ Emit an event and don't wait for response.
 
 ```typescript
 // In your API route
-await inngest.send({
-  name: "app/email.send-welcome",
-  data: { userId, email },
-});
+await inngest.send(emailSendWelcomeEvent.create({ data: { userId, email } }));
 
 res.json({ success: true }); // Return immediately
 ```
@@ -350,14 +346,13 @@ Emit an event and wait for a specific response event.
 
 ```typescript
 export const processReportRequest = inngest.createFunction(
-  { id: "process-report" },
-  { event: "app/report.requested" },
+  { id: "process-report", triggers: [{ event: reportRequestedEvent }] },
   async ({ event, step }) => {
     // Emit generation request
-    await step.sendEvent("start-generation", {
-      name: "app/report.generate",
-      data: { reportId: event.data.reportId },
-    });
+    await step.sendEvent(
+      "start-generation",
+      reportGenerateEvent.create({ data: { reportId: event.data.reportId } }),
+    );
 
     // Wait for result (max 30 minutes)
     const result = await step.waitForEvent("wait-for-result", {
@@ -392,8 +387,7 @@ Accumulate events and process in bulk.
 ```typescript
 // Trigger once per hour
 export const batchNotifications = inngest.createFunction(
-  { id: "batch-notifications" },
-  { cron: "0 * * * *" },
+  { id: "batch-notifications", triggers: [{ cron: "0 * * * *" }] },
   async ({ step }) => {
     // Get all pending notifications
     const pending = await step.run("fetch-pending", async () => {
@@ -461,30 +455,29 @@ export const handleUserEvents = inngest.createFunction(
 
 ```typescript
 export const smartOrderProcessing = inngest.createFunction(
-  { id: "smart-order-processing" },
-  { event: "app/order.created" },
+  { id: "smart-order-processing", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     const { items, totalAmount, customer } = event.data;
 
     // Route based on conditions
     if (totalAmount > 10000) {
       // High-value orders need special handling
-      await step.sendEvent("high-value", {
-        name: "app/order.high-value-approval",
-        data: event.data,
-      });
+      await step.sendEvent(
+        "high-value",
+        orderHighValueApprovalEvent.create({ data: event.data }),
+      );
     } else if (customer.isFirstTime) {
       // First-time buyers need verification
-      await step.sendEvent("verify", {
-        name: "app/order.verify-new-customer",
-        data: event.data,
-      });
+      await step.sendEvent(
+        "verify",
+        orderVerifyNewCustomerEvent.create({ data: event.data }),
+      );
     } else {
       // Standard processing
-      await step.sendEvent("standard", {
-        name: "app/order.process-standard",
-        data: event.data,
-      });
+      await step.sendEvent(
+        "standard",
+        orderProcessStandardEvent.create({ data: event.data }),
+      );
     }
   },
 );
@@ -504,8 +497,7 @@ export const sendNotification = inngest.createFunction(
       key: "event.data.userId",
       limit: 3, // Max 3 notifications per user at once
     },
-  },
-  { event: "app/notification.send" },
+  , triggers: [{ event: notificationSendEvent }] },
   async ({ event, step }) => {
     // Won't be flooded with messages for same user
   },
@@ -542,8 +534,7 @@ const result = await step.run("process", async () => {
 
 ```typescript
 export const rateLimitedRequests = inngest.createFunction(
-  { id: "rate-limited-api" },
-  { event: "app/api.external-call" },
+  { id: "rate-limited-api", triggers: [{ event: apiExternalCallEvent }] },
   async ({ event, step }) => {
     // Add delay to respect rate limits
     await step.sleep("rate-limit", "1s"); // 1 per second
@@ -559,8 +550,7 @@ export const rateLimitedRequests = inngest.createFunction(
 
 ```typescript
 export const reliableProcessor = inngest.createFunction(
-  { id: "reliable-processor" },
-  { event: "app/data.process" },
+  { id: "reliable-processor", triggers: [{ event: dataProcessEvent }] },
   async ({ event, step }) => {
     try {
       return await step.run("process", async () => {
@@ -582,8 +572,7 @@ export const reliableProcessor = inngest.createFunction(
 
 // Process dead letter queue (manual review)
 export const processDLQ = inngest.createFunction(
-  { id: "process-dlq" },
-  { cron: "0 9 * * MON" }, // Monday 9am
+  { id: "process-dlq", triggers: [{ cron: "0 9 * * MON" }] }, // Monday 9am
   async ({ step }) => {
     const deadLetters = await step.run("fetch-dlq", async () => {
       return await dlq.getUnprocessed();
@@ -609,38 +598,37 @@ app.post("/api/signup", async (req, res) => {
   const user = await db.users.create(req.body);
 
   // Emit event for background processing
-  await inngest.send({
-    name: "app/user.created",
-    data: {
-      userId: user.id,
-      email: user.email,
-      name: user.name,
-    },
-  });
+  await inngest.send(
+    userCreatedEvent.create({
+      data: {
+        userId: user.id,
+        email: user.email,
+        name: user.name,
+      },
+    }),
+  );
 
   res.json({ userId: user.id });
 });
 
 // 2. Multiple handlers react to user.created
 export const sendWelcome = inngest.createFunction(
-  { id: "send-welcome" },
-  { event: "app/user.created" },
+  { id: "send-welcome", triggers: [{ event: userCreatedEvent }] },
   async ({ event, step }) => {
     await step.run("send-email", async () => {
       return await mailer.sendWelcome(event.data);
     });
 
     // Trigger next step
-    await step.sendEvent("next", {
-      name: "app/onboarding.started",
-      data: { userId: event.data.userId },
-    });
+    await step.sendEvent(
+      "next",
+      onboardingStartedEvent.create({ data: { userId: event.data.userId } }),
+    );
   },
 );
 
 export const setupDefaults = inngest.createFunction(
-  { id: "setup-defaults" },
-  { event: "app/user.created" },
+  { id: "setup-defaults", triggers: [{ event: userCreatedEvent }] },
   async ({ event, step }) => {
     await step.run("create-defaults", async () => {
       return await db.userSettings.create({
@@ -653,8 +641,7 @@ export const setupDefaults = inngest.createFunction(
 );
 
 export const recordSignup = inngest.createFunction(
-  { id: "record-signup" },
-  { event: "app/user.created" },
+  { id: "record-signup", triggers: [{ event: userCreatedEvent }] },
   async ({ event, step }) => {
     await step.run("analytics", async () => {
       return await analytics.track("user.signup", event.data);
@@ -667,8 +654,7 @@ export const recordSignup = inngest.createFunction(
 
 ```typescript
 export const processPayment = inngest.createFunction(
-  { id: "process-payment" },
-  { event: "app/payment.initiated" },
+  { id: "process-payment", triggers: [{ event: paymentInitiatedEvent }] },
   async ({ event, step }) => {
     const { paymentId, customerId, amount } = event.data;
     let chargeId: string | null = null;
@@ -695,10 +681,12 @@ export const processPayment = inngest.createFunction(
       });
 
       // Step 3: Trigger downstream events
-      await step.sendEvent("success", {
-        name: "app/payment.succeeded",
-        data: { paymentId, chargeId: charge.id },
-      });
+      await step.sendEvent(
+        "success",
+        paymentSucceededEvent.create({
+          data: { paymentId, chargeId: charge.id },
+        }),
+      );
 
       return { status: "success" };
     } catch (error) {
@@ -709,10 +697,12 @@ export const processPayment = inngest.createFunction(
         });
       }
 
-      await step.sendEvent("failure", {
-        name: "app/payment.failed",
-        data: { paymentId, error: String(error) },
-      });
+      await step.sendEvent(
+        "failure",
+        paymentFailedEvent.create({
+          data: { paymentId, error: String(error) },
+        }),
+      );
 
       throw error;
     }
@@ -791,8 +781,7 @@ await step.run("refund", async () => {
 ```typescript
 // ❌ BAD: 10,000 emails sent simultaneously
 export const sendBatch = inngest.createFunction(
-  { id: "send-batch" },
-  { event: "app/batch.ready" },
+  { id: "send-batch" , triggers: [{ event: batchReadyEvent }] },
   async ({ event, step }) => {
     // Overwhelms SendGrid!
     await Promise.all(
@@ -805,14 +794,11 @@ export const sendBatch = inngest.createFunction(
 
 // ✅ GOOD: Separate function with concurrency control
 export const sendBatch = inngest.createFunction(
-  { id: "send-batch" },
-  { event: "app/batch.ready" },
+  { id: "send-batch" , triggers: [{ event: batchReadyEvent }] },
   async ({ event, step }) => {
     await step.run("emit-events", async () => {
       return await inngest.send(
-        event.data.emails.map((email) => ({
-          name: "app/email.send",
-          data: { email },
+        event.data.emails.map((email) => (emailSendEvent.create({ data: { email }),
         })),
       );
     });
@@ -823,8 +809,7 @@ export const sendEmail = inngest.createFunction(
   {
     id: "send-email",
     concurrency: { limit: 50 }, // Max 50 at once
-  },
-  { event: "app/email.send" },
+  , triggers: [{ event: emailSendEvent }] },
   async ({ event, step }) => {
     await step.run("send", () => sendgrid.send(event.data.email));
   },
@@ -836,11 +821,10 @@ export const sendEmail = inngest.createFunction(
 ```typescript
 // ❌ BAD: If any step fails, chain breaks silently
 export const step1 = inngest.createFunction(
-  { id: "step-1" },
-  { event: "app/process.start" },
+  { id: "step-1", triggers: [{ event: processStartEvent }] },
   async ({ event, step }) => {
     await step.run("do-work", () => doWork());
-    await step.sendEvent("next", { name: "app/process.step2" });
+    await step.sendEvent("next", processStep2Event.create());
   },
 );
 
@@ -848,12 +832,11 @@ export const step1 = inngest.createFunction(
 
 // ✅ GOOD: Add failure monitoring
 export const step1 = inngest.createFunction(
-  { id: "step-1" },
-  { event: "app/process.start" },
+  { id: "step-1", triggers: [{ event: processStartEvent }] },
   async ({ event, step }) => {
     try {
       await step.run("do-work", () => doWork());
-      await step.sendEvent("next", { name: "app/process.step2" });
+      await step.sendEvent("next", processStep2Event.create());
     } catch (error) {
       await step.run("alert", async () => {
         await slack.notify({ error, processId: event.data.id });
@@ -890,15 +873,13 @@ Based on typical production implementations:
 ```typescript
 // 💰 EXPENSIVE: 10,000 function invocations
 await inngest.send(
-  users.map((user) => ({ name: "app/email.send", data: { user } })),
+  users.map((user) => (emailSendEvent.create({ data: { user }) })),
 );
 
 // 💰 CHEAP: 100 function invocations (batches of 100)
 const batches = chunk(users, 100);
 await inngest.send(
-  batches.map((batch, i) => ({
-    name: "app/email.send-batch",
-    data: { batch, batchId: i },
+  batches.map((batch, i) => (emailSendBatchEvent.create({ data: { batch, batchId: i }),
   })),
 );
 ```
@@ -908,19 +889,17 @@ await inngest.send(
 ```typescript
 // 💰 EXPENSIVE: Chain runs 24/7
 export const pollData = inngest.createFunction(
-  { id: "poll" },
-  { event: "app/poll.trigger" },
+  { id: "poll", triggers: [{ event: pollTriggerEvent }] },
   async ({ step }) => {
     await step.run("fetch", () => fetchData());
     await step.sleep("wait", "1h");
-    await step.sendEvent("next", { name: "app/poll.trigger" }); // Loops!
+    await step.sendEvent("next", pollTriggerEvent.create()); // Loops!
   },
 );
 
 // 💰 CHEAP: Cron runs once per hour
 export const pollData = inngest.createFunction(
-  { id: "poll" },
-  { cron: "0 * * * *" }, // Every hour
+  { id: "poll", triggers: [{ cron: "0 * * * *" }] }, // Every hour
   async ({ step }) => {
     await step.run("fetch", () => fetchData());
   },
