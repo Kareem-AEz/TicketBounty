@@ -1,18 +1,20 @@
+import { eventType, staticSchema } from "inngest";
 import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
 import { sendEmailSignUpWelcome } from "../emails/send-email-sign-up-welcome";
 
-export type SignedUpWelcomeEmailEventData = {
-  data: {
-    userId: string;
-  };
-};
+export const signedUpWelcomeEmailEvent = eventType(
+  "app/auth.signed-up-welcome-email-function",
+  {
+    schema: staticSchema<{ userId: string }>(),
+  },
+);
 
 export const eventSignedUpWelcomeEmail = inngest.createFunction(
   {
     id: "user-signed-up-welcome-email",
+    triggers: [{ event: signedUpWelcomeEmailEvent.name }],
   },
-  { event: "app/auth.signed-up-welcome-email-function" },
   async ({ event, step }) => {
     // delay for 15 minutes
     await step.sleep("delay-15-minutes", "15 minutes");

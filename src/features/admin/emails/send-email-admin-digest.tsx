@@ -6,7 +6,7 @@ export const sendEmailAdminDigest = async ({
   totalTickets,
   totalUsers,
   totalComments,
-}: AdminDigestReadyEventData["data"]) => {
+}: AdminDigestReadyEventData) => {
   return await resend.emails.send({
     from: "Ticket Bounty <no-reply@app.nab3water.com>",
     to: "kemoahmedahmedkemo@gmail.com",

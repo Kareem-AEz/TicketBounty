@@ -1,19 +1,22 @@
+import { eventType } from "inngest";
+import { z } from "zod/v4";
 import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
 import { sendEmailPasswordReset } from "../emails/send-email-password-reset";
 import { generatePasswordResetLink } from "../utils/generate-password-reset-link";
 
-export type PasswordResetEventData = {
-  data: {
-    userId: string;
-  };
-};
+export const passwordResetEvent = eventType(
+  "app/password.password-reset-function",
+  {
+    schema: z.object({ userId: z.string() }),
+  },
+);
 
 export const eventPasswordReset = inngest.createFunction(
   {
     id: "password-reset",
+    triggers: [{ event: passwordResetEvent.name }],
   },
-  { event: "app/password.password-reset-function" },
   async ({ event, step }) => {
     const { userId } = event.data;
 

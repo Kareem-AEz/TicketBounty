@@ -1,11 +1,12 @@
 import { inngest } from "@/lib/inngest";
 import { sendEmailAdminDigest } from "../emails/send-email-admin-digest";
+import { adminDigestReadyEvent } from "./event-prepare-digest";
 
 export const eventSendAdminDigestToEmail = inngest.createFunction(
   {
     id: "send-admin-digest-to-email",
+    triggers: [{ event: adminDigestReadyEvent.name }],
   },
-  { event: "app/admin.digest-ready" },
   async ({ event, step }) => {
     const { totalTickets, totalUsers, totalComments } = event.data;
 

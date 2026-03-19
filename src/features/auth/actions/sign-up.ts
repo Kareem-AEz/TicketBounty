@@ -16,6 +16,8 @@ import { lucia } from "@/lib/lucia";
 import PostHogClient from "@/lib/posthog";
 import prisma from "@/lib/prisma";
 import { ticketsPath } from "@/paths";
+import { emailConfirmationEvent } from "../events/email-confirmation.event";
+import { signedUpWelcomeEmailEvent } from "../events/event-signed-up-welcome-email";
 
 const signUpSchema = z
   .object({
@@ -84,18 +86,16 @@ export const signUp = async (_actionState: ActionState, formData: FormData) => {
 
     await Promise.all([
       posthog.shutdown(),
-      inngest.send({
-        name: "app/auth.signed-up-welcome-email-function",
-        data: {
+      inngest.send(
+        signedUpWelcomeEmailEvent.create({
           userId: user.id,
-        },
-      }),
-      inngest.send({
-        name: "app/auth.send-email-verification-code-function",
-        data: {
+        }),
+      ),
+      inngest.send(
+        emailConfirmationEvent.create({
           userId: user.id,
-        },
-      }),
+        }),
+      ),
     ]);
 
     // If there's an invitation token, try to accept it

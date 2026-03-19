@@ -1,19 +1,21 @@
+import { eventType, staticSchema } from "inngest";
 import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
 import { sendEmailVerification } from "../emails/verification-email.email";
 import { generateEmailVerificationCode } from "../utils/generate-email-verification-code";
 
-export type EmailConfirmationEventData = {
-  data: {
-    userId: string;
-  };
-};
+export const emailConfirmationEvent = eventType(
+  "app/auth.send-email-verification-code-function",
+  {
+    schema: staticSchema<{ userId: string }>(),
+  },
+);
 
 export const eventEmailConfirmation = inngest.createFunction(
   {
     id: "send-email-verification-code",
+    triggers: [{ event: emailConfirmationEvent.name }],
   },
-  { event: "app/auth.send-email-verification-code-function" },
   async ({ event, step }) => {
     const { userId } = event.data;
     const user = await step.run("get-user", async () => {
