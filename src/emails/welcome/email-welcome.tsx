@@ -87,9 +87,9 @@ const WelcomeEmail = ({ toName }: { toName: string }) => {
                   className="m-0 mt-[16px] text-[16px] leading-[26px]"
                   style={{ color: colors.mutedForeground }}
                 >
-                  Welcome to the digital wilderness of TicketBounty. Your account
-                  has been woven into our universe, and your dashboard is ready
-                  to transform your ideas into reality.
+                  Welcome to the digital wilderness of TicketBounty. Your
+                  account has been woven into our universe, and your dashboard
+                  is ready to transform your ideas into reality.
                 </Text>
               </Section>
 
@@ -104,12 +104,15 @@ const WelcomeEmail = ({ toName }: { toName: string }) => {
                 </Button>
               </Section>
 
-              <Hr style={{ borderColor: colors.border }} className="mb-[48px]" />
+              <Hr
+                style={{ borderColor: colors.border }}
+                className="mb-[48px]"
+              />
 
               {/* Features Section */}
               <Section className="mb-[48px]">
                 <Text
-                  className="m-0 mb-[24px] text-center text-[14px] font-bold uppercase tracking-[0.5px]"
+                  className="m-0 mb-[24px] text-center text-[14px] font-bold tracking-[0.5px] uppercase"
                   style={{ color: colors.foreground }}
                 >
                   What You Can Do
@@ -162,7 +165,10 @@ const WelcomeEmail = ({ toName }: { toName: string }) => {
                 </Section>
               </Section>
 
-              <Hr style={{ borderColor: colors.border }} className="mb-[48px]" />
+              <Hr
+                style={{ borderColor: colors.border }}
+                className="mb-[48px]"
+              />
             </Section>
 
             {/* Footer */}

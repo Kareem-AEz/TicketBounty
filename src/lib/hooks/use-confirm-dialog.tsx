@@ -62,7 +62,7 @@ export const useConfirmDialog = ({
     const toastId = toast.loading(loadingLabel);
     try {
       const result = await action(formData);
-      
+
       if (result?.status === "SUCCESS") {
         toast.success(result.message || "Success!", { id: toastId });
         onSuccess?.(result);
@@ -73,7 +73,7 @@ export const useConfirmDialog = ({
       } else {
         toast.dismiss(toastId);
       }
-      
+
       return result ?? state;
     } catch (error) {
       toast.error("Something went wrong!", { id: toastId });
@@ -128,7 +128,7 @@ export const useConfirmDialog = ({
             <Button
               type="submit"
               disabled={isPending}
-              onClick={() => {    
+              onClick={() => {
                 if (autoClose) setIsOpen(false);
               }}
             >
