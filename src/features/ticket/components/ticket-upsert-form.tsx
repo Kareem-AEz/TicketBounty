@@ -64,7 +64,7 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
           id={`content-${ticket?.id}`}
           name="content"
           placeholder={copy.forms.content}
-          className="resize-none"
+          className="h-48 resize-y"
           defaultValue={
             (actionState?.payload?.get("content") as string) ?? ticket?.content
           }
