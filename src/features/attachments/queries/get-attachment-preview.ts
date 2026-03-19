@@ -1,6 +1,6 @@
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { generateS3Key } from "@/features/attachments/utils/generete-s3-key";
+import { generateS3Key } from "@/features/attachments/utils/generate-s3-key";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import { s3 } from "@/lib/aws";
 import prisma from "@/lib/prisma";

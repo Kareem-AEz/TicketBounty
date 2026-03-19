@@ -33,3 +33,9 @@ export const selectActiveOrganizationPath = () =>
 // Invitations
 export const emailInvitationPath = (token: string) =>
   `/email-invitation/${token}` as const;
+
+// Attachments
+export const attachmentPreviewPath = (attachmentId: string) =>
+  `/api/attachments/${attachmentId}/preview` as const;
+export const attachmentDownloadPath = (attachmentId: string) =>
+  `/api/attachments/${attachmentId}/download` as const;
