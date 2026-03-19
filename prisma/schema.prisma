@@ -184,6 +184,10 @@ model Attachment {
   id   String @id @default(cuid())
   name String
 
+  hash                  String
+  storageOrganizationId String
+  storageTicketId       String
+
   ticketId String
   ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 

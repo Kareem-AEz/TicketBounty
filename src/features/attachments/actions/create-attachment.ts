@@ -1,5 +1,6 @@
 "use server";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { revalidatePath } from "next/cache";
 import {
   ActionState,
   toErrorActionState,
@@ -9,6 +10,7 @@ import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect"
 import { isOwner } from "@/features/auth/utils/is-owner";
 import { s3 } from "@/lib/aws";
 import prisma from "@/lib/prisma";
+import { ticketPath } from "@/paths";
 import { generateS3Key } from "../utils/generete-s3-key";
 import { processAttachments } from "../utils/process-attachments";
 
@@ -31,28 +33,24 @@ export async function createAttachment(
     const { errors, toAdd } = await processAttachments({
       newAttachments: files,
     });
-    // console.log(
-    //   JSON.stringify(
-    //     toAdd.map((a) => ({
-    //       hash: a.hash,
-    //       name: a.file.name,
-    //       mimeType: a.mimeType,
-    //     })),
-    //     null,
-    //     2,
-    //   ),
-    // );
 
     if (errors.length > 0) throw new Error("Invalid attachments");
 
     // 2. DB Transaction (DB-bound) - Create records and return IDs
     const { createdAttachments, organizationId } = await prisma.$transaction(
       async (tx) => {
-        const ticket = await tx.ticket.findUnique({
-          where: {
-            id: ticketId,
-          },
-        });
+        const [ticket, attachments] = await Promise.all([
+          tx.ticket.findUnique({
+            where: {
+              id: ticketId,
+            },
+          }),
+          tx.attachment.findMany({
+            where: {
+              ticketId,
+            },
+          }),
+        ]);
 
         const organizationId = ticket?.organizationId;
 
@@ -62,11 +60,27 @@ export async function createAttachment(
         if (!isOwner(userId, ticket.userId ?? undefined))
           throw new Error("You are not the owner of this ticket");
 
+        const attachmentsData = toAdd.map((attachment) => ({
+          ticketId,
+          name: attachment.file.name,
+          hash: attachment.hash,
+          storageOrganizationId: organizationId,
+          storageTicketId: ticketId,
+        }));
+
+        const duplicateAttachments = attachments.filter((attachment) =>
+          attachmentsData.some((a) => a.hash === attachment.hash),
+        );
+
+        if (duplicateAttachments.length > 0)
+          throw new Error(
+            `Duplicate attachments found: ${duplicateAttachments.map((a) => a.name).join(", ")}`,
+          );
+
+        console.log(JSON.stringify(attachmentsData, null, 2));
+
         const createdAttachments = await tx.attachment.createManyAndReturn({
-          data: toAdd.map((attachment) => ({
-            ticketId,
-            name: attachment.file.name,
-          })),
+          data: attachmentsData,
         });
 
         return { createdAttachments, organizationId };
@@ -90,7 +104,6 @@ export async function createAttachment(
           ticketId,
           attachmentName: name,
           attachmentId: id,
-          attachmentHash: original.hash,
         });
 
         try {
@@ -111,6 +124,8 @@ export async function createAttachment(
         }
       }),
     );
+
+    revalidatePath(ticketPath(ticketId));
 
     return toSuccessActionState({
       status: "SUCCESS",
