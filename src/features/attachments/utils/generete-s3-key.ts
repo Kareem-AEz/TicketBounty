@@ -3,7 +3,6 @@ type GenerateS3KeyParams = {
   ticketId: string;
   attachmentName: string;
   attachmentId: string;
-  attachmentHash: string;
 };
 
 const sanitizeFilename = (name: string): string => {
@@ -17,8 +16,7 @@ export const generateS3Key = ({
   ticketId,
   attachmentName,
   attachmentId,
-  attachmentHash,
 }: GenerateS3KeyParams) => {
   const safeName = sanitizeFilename(attachmentName);
-  return `${organizationId}/${ticketId}/${attachmentId}-${attachmentHash}-${safeName}`;
+  return `${organizationId}/${ticketId}/${attachmentId}-${safeName}`;
 };
