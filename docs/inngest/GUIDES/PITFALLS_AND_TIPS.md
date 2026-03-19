@@ -27,8 +27,7 @@ A battle-tested guide to avoiding common mistakes and building reliable event-dr
 ```typescript
 // ❌ BAD: No automatic retries or observability
 export const badFunction = inngest.createFunction(
-  { id: "process-payment" },
-  { event: "app/payment.created" },
+  { id: "process-payment", triggers: [{ event: paymentCreatedEvent }] },
   async ({ event }) => {
     const charge = await stripe.charges.create({ amount: event.data.amount });
     await db.payments.create({ chargeId: charge.id });
@@ -50,8 +49,7 @@ export const badFunction = inngest.createFunction(
 ```typescript
 // ✅ GOOD: Each step is isolated and retryable
 export const goodFunction = inngest.createFunction(
-  { id: "process-payment" },
-  { event: "app/payment.created" },
+  { id: "process-payment", triggers: [{ event: paymentCreatedEvent }] },
   async ({ event, step }) => {
     const charge = await step.run("charge-card", async () => {
       return await stripe.charges.create({ amount: event.data.amount });
@@ -116,18 +114,16 @@ export async function POST(request: Request) {
   const user = await createUser(data);
 
   // Fire and forget - returns immediately
-  await inngest.send({
-    name: "app/user.created",
-    data: { userId: user.id, email: user.email },
-  });
+  await inngest.send(
+    userCreatedEvent.create({ data: { userId: user.id, email: user.email } }),
+  );
 
   return Response.json({ success: true }); // Returns in <200ms
 }
 
 // Background function handles all notifications
 export const onUserCreated = inngest.createFunction(
-  { id: "user-created-notifications" },
-  { event: "app/user.created" },
+  { id: "user-created-notifications", triggers: [{ event: userCreatedEvent }] },
   async ({ event, step }) => {
     await Promise.all([
       step.run("send-email", async () => sendWelcomeEmail(event.data.email)),
@@ -153,8 +149,7 @@ Based on typical implementations:
 ```typescript
 // ❌ BAD: Could wait forever, resources never released
 export const orderWorkflow = inngest.createFunction(
-  { id: "process-order" },
-  { event: "app/order.created" },
+  { id: "process-order", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     await step.run("send-invoice", async () => {
       return await sendInvoice(event.data.orderId);
@@ -185,8 +180,7 @@ export const orderWorkflow = inngest.createFunction(
 ```typescript
 // ✅ GOOD: Explicit timeout with fallback handling
 export const orderWorkflow = inngest.createFunction(
-  { id: "process-order" },
-  { event: "app/order.created" },
+  { id: "process-order", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     await step.run("send-invoice", async () => {
       return await sendInvoice(event.data.orderId);
@@ -236,8 +230,7 @@ export const orderWorkflow = inngest.createFunction(
 ```typescript
 // ❌ BAD: Retries can charge customer multiple times
 export const chargeCustomer = inngest.createFunction(
-  { id: "charge-customer" },
-  { event: "app/order.confirmed" },
+  { id: "charge-customer", triggers: [{ event: orderConfirmedEvent }] },
   async ({ event, step }) => {
     const charge = await step.run("charge", async () => {
       // No idempotency key!
@@ -265,8 +258,7 @@ export const chargeCustomer = inngest.createFunction(
 ```typescript
 // ✅ GOOD: Idempotent with database checks and Stripe idempotency keys
 export const chargeCustomer = inngest.createFunction(
-  { id: "charge-customer" },
-  { event: "app/order.confirmed" },
+  { id: "charge-customer", triggers: [{ event: orderConfirmedEvent }] },
   async ({ event, step }) => {
     const orderId = event.data.orderId;
 
@@ -316,8 +308,7 @@ export const chargeCustomer = inngest.createFunction(
 ```typescript
 // ❌ BAD: Can overwhelm your email service
 export const sendNotification = inngest.createFunction(
-  { id: "send-notification" },
-  { event: "app/notification.send" },
+  { id: "send-notification", triggers: [{ event: notificationSendEvent }] },
   async ({ event, step }) => {
     await step.run("send-email", async () => {
       return await sendgrid.send(event.data);
@@ -347,8 +338,7 @@ export const sendNotification = inngest.createFunction(
       key: "event.data.userId",
       limit: 5, // Max 5 emails per user at once
     },
-  },
-  { event: "app/notification.send" },
+  , triggers: [{ event: notificationSendEvent }] },
   async ({ event, step }) => {
     await step.run("send-email", async () => {
       return await sendgrid.send(event.data);
@@ -368,8 +358,7 @@ export const sendNotification = inngest.createFunction(
       key: "'global-email-queue'", // Single queue for all emails
       limit: 100, // Max 100 emails across all users
     },
-  },
-  { event: "app/notification.send" },
+  , triggers: [{ event: notificationSendEvent }] },
   async ({ event, step }) => {
     await step.run("send-email", async () => {
       return await sendgrid.send(event.data);
@@ -398,8 +387,7 @@ This pattern commonly leads to:
 ```typescript
 // ❌ BAD: Takes 15 seconds (5s + 5s + 5s)
 export const processOrder = inngest.createFunction(
-  { id: "process-order" },
-  { event: "app/order.created" },
+  { id: "process-order", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     const inventory = await step.run("check-inventory", async () => {
       return await checkInventory(event.data.items); // 5 seconds
@@ -429,8 +417,7 @@ export const processOrder = inngest.createFunction(
 ```typescript
 // ✅ GOOD: Takes 5 seconds (parallel execution)
 export const processOrder = inngest.createFunction(
-  { id: "process-order" },
-  { event: "app/order.created" },
+  { id: "process-order", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     // All run in parallel!
     const [inventory, shipping, tax] = await Promise.all([
@@ -461,8 +448,7 @@ export const processOrder = inngest.createFunction(
 ```typescript
 // ❌ BAD: Processes 10,000 notifications individually
 export const sendDailyDigest = inngest.createFunction(
-  { id: "send-daily-digest" },
-  { cron: "0 0 * * *" },
+  { id: "send-daily-digest", triggers: [{ cron: "0 0 * * *" }] },
   async ({ step }) => {
     const users = await step.run("fetch-users", async () => {
       return await db.users.findMany(); // 10,000 users
@@ -489,8 +475,7 @@ export const sendDailyDigest = inngest.createFunction(
 ```typescript
 // ✅ GOOD: Batch processing
 export const sendDailyDigest = inngest.createFunction(
-  { id: "send-daily-digest" },
-  { cron: "0 0 * * *" },
+  { id: "send-daily-digest", triggers: [{ cron: "0 0 * * *" }] },
   async ({ step }) => {
     const users = await step.run("fetch-users", async () => {
       return await db.users.findMany();
@@ -517,8 +502,7 @@ export const sendDailyDigest = inngest.createFunction(
 ```typescript
 // ✅ BEST: Emit events for separate processing
 export const prepareDigest = inngest.createFunction(
-  { id: "prepare-digest" },
-  { cron: "0 0 * * *" },
+  { id: "prepare-digest" , triggers: [{ cron: "0 0 * * *" }] },
   async ({ step }) => {
     const users = await step.run("fetch-users", async () => {
       return await db.users.findMany();
@@ -527,9 +511,7 @@ export const prepareDigest = inngest.createFunction(
     // Emit individual events (fan-out)
     await step.run("emit-events", async () => {
       return await inngest.send(
-        users.map((user) => ({
-          name: "app/digest.send",
-          data: { userId: user.id, email: user.email },
+        users.map((user) => (digestSendEvent.create({ data: { userId: user.id, email: user.email }),
         })),
       );
     });
@@ -541,8 +523,7 @@ export const sendDigest = inngest.createFunction(
   {
     id: "send-digest",
     concurrency: { limit: 50 }, // Max 50 at once
-  },
-  { event: "app/digest.send" },
+  , triggers: [{ event: digestSendEvent }] },
   async ({ event, step }) => {
     await step.run("send", async () => {
       return await sendEmail(event.data.email);
@@ -562,8 +543,7 @@ export const sendDigest = inngest.createFunction(
 ```typescript
 // ❌ BAD: One event does too much
 export const onUserCreated = inngest.createFunction(
-  { id: "user-created" },
-  { event: "app/user.created" },
+  { id: "user-created", triggers: [{ event: userCreatedEvent }] },
   async ({ event, step }) => {
     // Too many responsibilities in one function!
     await step.run("send-welcome-email", async () => {
@@ -606,8 +586,7 @@ export const onUserCreated = inngest.createFunction(
 ```typescript
 // ✅ GOOD: Separate functions for separate concerns
 export const sendWelcomeEmail = inngest.createFunction(
-  { id: "welcome-email" },
-  { event: "app/user.created" },
+  { id: "welcome-email", triggers: [{ event: userCreatedEvent }] },
   async ({ event, step }) => {
     await step.run("send-email", async () => {
       return await sendEmail(event.data);
@@ -616,8 +595,7 @@ export const sendWelcomeEmail = inngest.createFunction(
 );
 
 export const notifyTeam = inngest.createFunction(
-  { id: "notify-team" },
-  { event: "app/user.created" },
+  { id: "notify-team", triggers: [{ event: userCreatedEvent }] },
   async ({ event, step }) => {
     await step.run("send-slack", async () => {
       return await slack.notify(event.data);
@@ -626,8 +604,7 @@ export const notifyTeam = inngest.createFunction(
 );
 
 export const createStripeCustomer = inngest.createFunction(
-  { id: "create-stripe-customer" },
-  { event: "app/user.created" },
+  { id: "create-stripe-customer", triggers: [{ event: userCreatedEvent }] },
   async ({ event, step }) => {
     await step.run("create-customer", async () => {
       return await stripe.customers.create(event.data);
@@ -653,17 +630,21 @@ export const createStripeCustomer = inngest.createFunction(
 
 ```typescript
 // ❌ BAD: No type safety
-export const inngest = new Inngest({ id: "my-app" });
+export const inngest = new Inngest({
+  id: "my-app",
+  checkpointing: { maxRuntime: "300s" },
+});
 
 // Later... typos and wrong data structure
-await inngest.send({
-  name: "app/user.created",
-  data: {
-    userID: "123", // Should be userId (typo)
-    emial: "test@example.com", // Should be email (typo)
-    // Missing required fields
-  },
-});
+await inngest.send(
+  userCreatedEvent.create({
+    data: {
+      userID: "123", // Should be userId (typo)
+      emial: "test@example.com", // Should be email (typo)
+      // Missing required fields
+    },
+  }),
+);
 ```
 
 **Why It's Bad:**
@@ -677,43 +658,41 @@ await inngest.send({
 
 ```typescript
 // ✅ GOOD: Strongly typed events
-import { EventSchemas } from "inngest";
+import { Inngest, eventType, staticSchema } from "inngest";
 
-type Events = {
-  "app/user.created": {
-    data: {
-      userId: string;
-      email: string;
-      name: string;
-      createdAt: Date;
-    };
-  };
-  "app/order.created": {
-    data: {
-      orderId: string;
-      userId: string;
-      amount: number;
-      items: Array<{ productId: string; quantity: number }>;
-    };
-  };
-};
+export const userCreatedEvent = eventType("app/user.created", {
+  schema: staticSchema<{
+    userId: string;
+    email: string;
+    name: string;
+    createdAt: Date;
+  }>(),
+});
+
+export const orderCreatedEvent = eventType("app/order.created", {
+  schema: staticSchema<{
+    orderId: string;
+    userId: string;
+    amount: number;
+    items: Array<{ productId: string; quantity: number }>;
+  }>(),
+});
 
 export const inngest = new Inngest({
   id: "my-app",
-  schemas: new EventSchemas().fromRecord<Events>(),
+  checkpointing: { maxRuntime: "300s" },
 });
 
 // Now you get type checking!
-await inngest.send({
-  name: "app/user.created",
-  data: {
+await inngest.send(
+  userCreatedEvent.create({
     userId: "123", // ✓ Correct
     email: "test@example.com", // ✓ Correct
     name: "John",
     createdAt: new Date(),
     // TypeScript error if fields are missing!
-  },
-});
+  }),
+);
 ```
 
 ---
@@ -770,16 +749,17 @@ Action: imperative (send, process, notify)
 
 ```typescript
 // ❌ BAD: Sending sensitive data through events
-await inngest.send({
-  name: "app/user.created",
-  data: {
-    userId: "123",
-    email: "user@example.com",
-    password: "plaintextPassword123", // Never do this!
-    creditCard: "4242-4242-4242-4242", // Never do this!
-    ssn: "123-45-6789", // Never do this!
-  },
-});
+await inngest.send(
+  userCreatedEvent.create({
+    data: {
+      userId: "123",
+      email: "user@example.com",
+      password: "plaintextPassword123", // Never do this!
+      creditCard: "4242-4242-4242-4242", // Never do this!
+      ssn: "123-45-6789", // Never do this!
+    },
+  }),
+);
 ```
 
 **Why It's Bad:**
@@ -793,18 +773,18 @@ await inngest.send({
 
 ```typescript
 // ✅ GOOD: Only send IDs and public data
-await inngest.send({
-  name: "app/user.created",
-  data: {
-    userId: "123",
-    email: "user@example.com", // OK if needed
-    // Fetch sensitive data inside the function when needed
-  },
-});
+await inngest.send(
+  userCreatedEvent.create({
+    data: {
+      userId: "123",
+      email: "user@example.com", // OK if needed
+      // Fetch sensitive data inside the function when needed
+    },
+  }),
+);
 
 export const onUserCreated = inngest.createFunction(
-  { id: "user-created" },
-  { event: "app/user.created" },
+  { id: "user-created", triggers: [{ event: userCreatedEvent }] },
   async ({ event, step }) => {
     // Fetch sensitive data only when processing
     const user = await step.run("fetch-user", async () => {
@@ -835,8 +815,7 @@ export const onUserCreated = inngest.createFunction(
 ```typescript
 // ❌ BAD: Silent failures
 export const processPayment = inngest.createFunction(
-  { id: "process-payment" },
-  { event: "app/payment.requested" },
+  { id: "process-payment", triggers: [{ event: paymentRequestedEvent }] },
   async ({ event, step }) => {
     try {
       await step.run("charge", async () => {
@@ -864,8 +843,7 @@ export const processPayment = inngest.createFunction(
 import logger from "@/lib/logger";
 
 export const processPayment = inngest.createFunction(
-  { id: "process-payment" },
-  { event: "app/payment.requested" },
+  { id: "process-payment", triggers: [{ event: paymentRequestedEvent }] },
   async ({ event, step }) => {
     try {
       const charge = await step.run("charge", async () => {
@@ -898,8 +876,7 @@ export const processPayment = inngest.createFunction(
 
 // Global failure handler
 export const handleFailure = inngest.createFunction(
-  { id: "handle-failure" },
-  { event: "inngest/function.failed" },
+  { id: "handle-failure", triggers: [{ event: inngestFunctionFailedEvent }] },
   async ({ event, step }) => {
     await step.run("alert-team", async () => {
       // Send to Slack, PagerDuty, etc.
@@ -953,14 +930,15 @@ npm run dev
 // Create test endpoint for local development
 // app/api/test/trigger-event/route.ts
 export async function GET() {
-  await inngest.send({
-    name: "app/user.created",
-    data: {
-      userId: "test-123",
-      email: "test@example.com",
-      name: "Test User",
-    },
-  });
+  await inngest.send(
+    userCreatedEvent.create({
+      data: {
+        userId: "test-123",
+        email: "test@example.com",
+        name: "Test User",
+      },
+    }),
+  );
 
   return Response.json({ triggered: true });
 }
@@ -978,8 +956,7 @@ export async function GET() {
 ```typescript
 // ❌ BAD: Generic step names
 export const processOrder = inngest.createFunction(
-  { id: "process-order" },
-  { event: "app/order.created" },
+  { id: "process-order", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     const a = await step.run("step1", async () => {
       /*...*/
@@ -1005,8 +982,7 @@ export const processOrder = inngest.createFunction(
 ```typescript
 // ✅ GOOD: Descriptive, actionable step names
 export const processOrder = inngest.createFunction(
-  { id: "process-order" },
-  { event: "app/order.created" },
+  { id: "process-order", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     const inventory = await step.run(
       "check-inventory-availability",

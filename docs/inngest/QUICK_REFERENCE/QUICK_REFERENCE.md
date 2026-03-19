@@ -43,8 +43,7 @@ export const eventYourFeature = inngest.createFunction(
     //   key: "event.data.userId",
     //   limit: 5
     // }
-  },
-  { event: "app/feature.action" }, // Or: { cron: "0 0 * * *" }
+  , triggers: [{ event: featureActionEvent }] }, // Or: { cron: "0 0 * * *" }
   async ({ event, step }) => {
     // Wrap ALL operations in steps
     const result = await step.run("operation-name", async () => {
@@ -84,10 +83,9 @@ export const eventYourFeature = inngest.createFunction(
 ### Send an Event (Fire & Forget)
 
 ```typescript
-await inngest.send({
-  name: "app/auth.sign-up-welcome-email-function",
-  data: { userId, email, name },
-});
+await inngest.send(
+  authSignUpWelcomeEmailFunctionEvent.create({ data: { userId, email, name } }),
+);
 ```
 
 ### Wrap Operations in Steps
@@ -128,10 +126,12 @@ const [user, orders, settings] = await Promise.all([
 
 ```typescript
 // In first workflow
-await step.sendEvent("trigger-next", {
-  name: "app/admin-digest.ready",
-  data: { totalTickets, totalUsers, totalComments },
-});
+await step.sendEvent(
+  "trigger-next",
+  adminDigestReadyEvent.create({
+    data: { totalTickets, totalUsers, totalComments },
+  }),
+);
 
 // Second workflow listens
 {
@@ -178,8 +178,10 @@ const result = await step.run("risky-operation", async () => {
 ```typescript
 // Register in src/lib/inngest.ts
 export const handleAnyFunctionFailure = inngest.createFunction(
-  { id: "handle-any-fn-failure" },
-  { event: "inngest/function.failed" },
+  {
+    id: "handle-any-fn-failure",
+    triggers: [{ event: inngestFunctionFailedEvent }],
+  },
   async ({ event, step }) => {
     await step.run("log-failure", async () => {
       logger.error(

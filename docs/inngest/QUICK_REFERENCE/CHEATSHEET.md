@@ -12,20 +12,18 @@ One-page reference for the most common tasks and patterns.
 
 ```typescript
 // src/lib/inngest.ts
-import { EventSchemas, Inngest } from "inngest";
+import { Inngest, eventType, staticSchema } from "inngest";
 
-type Events = {
-  "app/feature.action": {
-    data: {
-      userId: string;
-      email?: string;
-    };
-  };
-};
+export const featureActionEvent = eventType("app/feature.action", {
+  schema: staticSchema<{
+    userId: string;
+    email?: string;
+  }>(),
+});
 
 export const inngest = new Inngest({
   id: "ticket-bounty",
-  schemas: new EventSchemas().fromRecord<Events>(),
+  checkpointing: { maxRuntime: "300s" },
 });
 ```
 
@@ -34,8 +32,7 @@ export const inngest = new Inngest({
 ```typescript
 // src/features/feature/events/event-action.ts
 export const eventAction = inngest.createFunction(
-  { id: "feature-action" },
-  { event: "app/feature.action" },
+  { id: "feature-action", triggers: [{ event: featureActionEvent }] },
   async ({ event, step }) => {
     const result = await step.run("do-something", async () => {
       return await someService.do(event.data);
@@ -66,10 +63,11 @@ export const { GET, POST, PUT } = serve({
 ### Send Event (Fire & Forget)
 
 ```typescript
-await inngest.send({
-  name: "app/feature.action",
-  data: { userId: "123", email: "user@example.com" },
-});
+await inngest.send(
+  featureActionEvent.create({
+    data: { userId: "123", email: "user@example.com" },
+  }),
+);
 // Returns immediately - no wait for processing
 ```
 
@@ -77,18 +75,18 @@ await inngest.send({
 
 ```typescript
 await inngest.send([
-  { name: "app/event.one", data: {...} },
-  { name: "app/event.two", data: {...} },
+  eventOneEvent.create({ data: {...} }),
+  eventTwoEvent.create({ data: {... }) },
 ]);
 ```
 
 ### Send Event from Workflow
 
 ```typescript
-await step.sendEvent("trigger-next", {
-  name: "app/next-step",
-  data: { userId: event.data.userId },
-});
+await step.sendEvent(
+  "trigger-next",
+  nextStepEvent.create({ data: { userId: event.data.userId } }),
+);
 ```
 
 ---
@@ -178,8 +176,10 @@ const [user, orders, settings] = await Promise.all([
 
 ```typescript
 export const handleAnyFunctionFailure = inngest.createFunction(
-  { id: "handle-any-fn-failure" },
-  { event: "inngest/function.failed" },
+  {
+    id: "handle-any-fn-failure",
+    triggers: [{ event: inngestFunctionFailedEvent }],
+  },
   async ({ event, step }) => {
     await step.run("log-failure", async () => {
       logger.error(
@@ -351,7 +351,7 @@ app.post("/signup", async (req, res) => {
 // GOOD - Fast
 app.post("/signup", async (req, res) => {
   const user = await createUser();
-  inngest.send({ name: "app/email.send", data: { userId: user.id } });
+  inngest.send(emailSendEvent.create({ data: { userId: user.id } }));
   res.json(user);
 });
 ```
@@ -379,14 +379,20 @@ const result = await step.waitForEvent("wait", {
 
 ```typescript
 // BAD - Anything goes
-inngest.send({ name: "app/event", data: {} });
+inngest.send(eventEvent.create({ data: {} }));
 
 // GOOD - Type safe
-type Events = {
-  "app/event": { data: { userId: string } };
-};
+import { eventType, staticSchema } from "inngest";
+
+export const eventExample = eventType("app/event", {
+  schema: staticSchema<{ userId: string }>(),
+});
+
 export const inngest = new Inngest({
-  schemas: new EventSchemas().fromRecord<Events>(),
+  id: "ticket-bounty",
+  checkpointing: {
+    maxRuntime: "300s",
+  },
 });
 ```
 
@@ -417,8 +423,7 @@ await step.run("charge", async () => {
 
 ```typescript
 export const simpleWorkflow = inngest.createFunction(
-  { id: "simple" },
-  { event: "app/feature.action" },
+  { id: "simple", triggers: [{ event: featureActionEvent }] },
   async ({ event, step }) => {
     await step.run("do-it", async () => {
       return await doSomething(event.data);
@@ -431,8 +436,7 @@ export const simpleWorkflow = inngest.createFunction(
 
 ```typescript
 export const multiStep = inngest.createFunction(
-  { id: "multi-step" },
-  { event: "app/process.start" },
+  { id: "multi-step", triggers: [{ event: processStartEvent }] },
   async ({ event, step }) => {
     // Step 1
     const a = await step.run("step-1", async () => await doA());
@@ -452,19 +456,18 @@ export const multiStep = inngest.createFunction(
 
 ```typescript
 export const conditional = inngest.createFunction(
-  { id: "conditional" },
-  { event: "app/order.created" },
+  { id: "conditional", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     if (event.data.amount > 1000) {
-      await step.sendEvent("high-value", {
-        name: "app/order.high-value",
-        data: event.data,
-      });
+      await step.sendEvent(
+        "high-value",
+        orderHighValueEvent.create({ data: event.data }),
+      );
     } else {
-      await step.sendEvent("standard", {
-        name: "app/order.standard",
-        data: event.data,
-      });
+      await step.sendEvent(
+        "standard",
+        orderStandardEvent.create({ data: event.data }),
+      );
     }
   },
 );
@@ -474,8 +477,7 @@ export const conditional = inngest.createFunction(
 
 ```typescript
 export const waitBased = inngest.createFunction(
-  { id: "wait-based" },
-  { event: "app/order.created" },
+  { id: "wait-based", triggers: [{ event: orderCreatedEvent }] },
   async ({ event, step }) => {
     // Send confirmation
     await step.run("send-email", async () => {
