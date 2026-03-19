@@ -181,8 +181,9 @@ enum TicketStatus {
 }
 
 model Attachment {
-  id   String @id @default(cuid())
-  name String
+  id       String @id @default(cuid())
+  name     String
+  mimeType String
 
   hash                  String
   storageOrganizationId String
