@@ -39,21 +39,20 @@ export const deleteAttachment = async ({
       );
     }
 
-    await Promise.all([
-      prisma.attachment.deleteMany({
-        where: { id: attachmentId },
-      }),
-      inngest.send(
-        deleteAttachmentEvent.create({
-          organizationId: attachment.storageOrganizationId,
-          ticketId: attachment.storageTicketId,
-          attachmentId: attachment.id,
-          attachmentName: attachment.name,
-        }),
-      ),
-    ]);
+    await prisma.attachment.deleteMany({
+      where: { id: attachmentId },
+    });
 
-    revalidatePath(ticketPath(attachment.ticket.id));
+    await inngest.send(
+      deleteAttachmentEvent.create({
+        organizationId: attachment.storageOrganizationId,
+        ticketId: attachment.storageTicketId,
+        attachmentId: attachment.id,
+        attachmentName: attachment.name,
+      }),
+
+      revalidatePath(ticketPath(attachment.ticket.id)),
+    );
 
     return toSuccessActionState({
       status: "SUCCESS",

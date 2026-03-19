@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Attachment } from "@/generated/client";
 import { cn } from "@/lib/utils";
+import { attachmentDownloadPath, attachmentPreviewPath } from "@/paths";
 import AttachmentDeleteButton from "./attachment-delete-button";
 
 type AttachmentItemProps = {
@@ -12,12 +13,12 @@ type AttachmentItemProps = {
 export default function AttachmentItem({ attachment }: AttachmentItemProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const isImage = attachment.mimeType.startsWith("image/");
-  const previewApiUrl = `/api/attachments/${attachment.id}/preview`;
-  const downloadApiUrl = `/api/attachments/${attachment.id}/download`;
+  const previewApiUrl = attachmentPreviewPath(attachment.id);
+  const downloadApiUrl = attachmentDownloadPath(attachment.id);
 
   return (
     <div
-      className="bg-card flex w-full items-center gap-x-3 rounded-lg p-3"
+      className="bg-card flex w-full items-center gap-x-4 rounded-lg p-3"
       style={{
         boxShadow: "0 0 0.5px 1px var(--border)",
       }}
@@ -27,7 +28,7 @@ export default function AttachmentItem({ attachment }: AttachmentItemProps) {
         rel="noopener noreferrer "
         target="_blank"
         download={attachment.name}
-        className="flex min-w-0 flex-1 items-center gap-x-2"
+        className="flex min-w-0 items-center gap-x-2"
       >
         <div
           className="bg-muted flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md"

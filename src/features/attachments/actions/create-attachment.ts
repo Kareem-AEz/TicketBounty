@@ -11,7 +11,7 @@ import { isOwner } from "@/features/auth/utils/is-owner";
 import { s3 } from "@/lib/aws";
 import prisma from "@/lib/prisma";
 import { ticketPath } from "@/paths";
-import { generateS3Key } from "../utils/generete-s3-key";
+import { generateS3Key } from "../utils/generate-s3-key";
 import { processAttachments } from "../utils/process-attachments";
 
 export async function createAttachment(
@@ -88,10 +88,13 @@ export async function createAttachment(
 
     // 3. S3 Uploads (I/O-bound) - Perform after transaction commits
 
+    const fileMap = new Map(toAdd.map((a) => [a.file.name, a]));
+    console.log(fileMap);
+
     await Promise.all(
       createdAttachments.map(async (attachment) => {
         const { id, name } = attachment;
-        const original = toAdd.find((a) => a.file.name === name);
+        const original = fileMap.get(name);
 
         if (!original) {
           // Should not happen if data integrity is maintained

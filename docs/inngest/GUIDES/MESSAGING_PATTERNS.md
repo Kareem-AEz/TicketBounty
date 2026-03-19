@@ -873,7 +873,7 @@ Based on typical production implementations:
 ```typescript
 // 💰 EXPENSIVE: 10,000 function invocations
 await inngest.send(
-  users.map((user) => (emailSendEvent.create({ data: { user }) })),
+  users.map((user) => (emailSendEvent.create({ data: { user } })),
 );
 
 // 💰 CHEAP: 100 function invocations (batches of 100)

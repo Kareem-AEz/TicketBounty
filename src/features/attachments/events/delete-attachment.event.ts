@@ -3,7 +3,7 @@ import { eventType } from "inngest";
 import { z } from "zod/v4";
 import { s3 } from "@/lib/aws";
 import { inngest } from "@/lib/inngest";
-import { generateS3Key } from "../utils/generete-s3-key";
+import { generateS3Key } from "../utils/generate-s3-key";
 
 export const deleteAttachmentEvent = eventType(
   "app/attachments.delete-attachment",
