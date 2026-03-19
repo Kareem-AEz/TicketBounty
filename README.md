@@ -43,23 +43,28 @@ Following our **Feature-First** philosophy, we encapsulate complexity within dom
 We only use tools that prioritize **Type Safety** and **Developer Velocity**.
 
 ### Framework & Language
+
 - **Next.js 16 (Beta):** Utilizing the latest App Router features and enhanced caching.
 - **React 19:** Powered by the **React Compiler** for automatic memoization and performance.
 - **TypeScript 5:** Strict mode for ironclad reliability.
 
 ### Data & State
+
 - **Prisma 7:** The next-gen ORM for type-safe database access.
 - **React Query (TanStack):** Managing server state with optimistic updates and caching.
 - **Nuqs:** Type-safe **URL as State** management for shareable filters and search.
 
 ### Storage & Media
+
 - **Cloudflare R2 / S3:** Global object storage via AWS SDK v3 for high-speed media delivery.
 
 ### Infrastructure & Async
+
 - **Inngest:** Durable execution engine for background jobs and event-driven logic.
 - **Resend & React Email:** Designing and sending transactional emails as React components.
 
 ### Observability & SEO
+
 - **PostHog:** Privacy-first product analytics and session replays.
 - **Vercel Speed Insights:** Real-time performance monitoring.
 - **Seline:** Lightweight, event-based telemetry.
@@ -70,21 +75,28 @@ We only use tools that prioritize **Type Safety** and **Developer Velocity**.
 ## 4. KEY CAPABILITIES
 
 ### 🎫 Smart Ticketing & Optimistic UI
+
 We don't wait for the server. When a user creates a ticket or updates a bounty, **React Query** updates the UI instantly. The server action runs in the background, with automatic rollback on failure.
 
 ### 🏢 Enterprise-Grade Multi-Tenancy
+
 Built-in support for **Organizations**.
+
 - **Contextual Isolation:** Users switch between organizations seamlessly.
 - **Membership & Roles:** Fine-grained access control managed through a custom membership layer.
 - **Invitation System:** Robust invite flows with expiring tokens and email delivery.
 
 ### 🔐 Zero-Trust Authentication
+
 A custom authentication system built with **Lucia Auth** and **Argon2**.
+
 - **Session Ownership:** We own the session table, allowing for precise control over user identity.
 - **Full Flow:** Email verification, password reset, and secure session management.
 
 ### 🤖 AI-Optimized Workflow
+
 Utilizing the **Vercel AI SDK** and custom tooling like `convit`.
+
 - **AI Commits:** Automated, high-quality commit messages generated based on code diffs.
 - **Structured LLM Outputs:** Integration with OpenAI-compatible APIs for future AI-driven feature enhancements.
 
@@ -114,6 +126,7 @@ src/
 ## 6. THE LABORATORY (Getting Started)
 
 ### Prerequisites
+
 - **Node.js 18+**
 - **PostgreSQL** (Local or Managed)
 - **R2/S3 Credentials** (Optional for local dev)
@@ -121,17 +134,20 @@ src/
 ### Setup
 
 1.  **Clone & Install**
+
     ```bash
     git clone <repo-url>
     npm install
     ```
 
 2.  **Environment Sync**
+
     ```bash
     cp .env.example .env.local
     ```
 
 3.  **Database Ignition**
+
     ```bash
     npx prisma generate
     npx prisma db push
@@ -145,12 +161,12 @@ src/
 
 ### Engineering Commands
 
-| Command             | Description                         |
-| :------------------ | :---------------------------------- |
-| `npm run commit`    | AI-powered high-fidelity commits    |
-| `npm run inngest:dev` | Local background job dashboard      |
-| `npm run db:studio` | GUI for database exploration        |
-| `npm run type:check` | Strict TypeScript validation        |
+| Command               | Description                      |
+| :-------------------- | :------------------------------- |
+| `npm run commit`      | AI-powered high-fidelity commits |
+| `npm run inngest:dev` | Local background job dashboard   |
+| `npm run db:studio`   | GUI for database exploration     |
+| `npm run type:check`  | Strict TypeScript validation     |
 
 ---
 

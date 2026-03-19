@@ -11,11 +11,11 @@ Controls commit message formatting and LLM behavior.
 
 ### `rules.maxSubjectLength`
 
-| | |
-|-|-|
-| **Type** | `number` |
-| **Default** | `50` |
-| **Range** | 40–72 recommended |
+|             |                   |
+| ----------- | ----------------- |
+| **Type**    | `number`          |
+| **Default** | `50`              |
+| **Range**   | 40–72 recommended |
 
 Maximum character count for the `type(scope): subject` line (the first line of
 the commit message). Validation fails if the generated subject exceeds this.
@@ -33,11 +33,11 @@ exact character count and the limit.
 
 ### `rules.maxBulletLength`
 
-| | |
-|-|-|
-| **Type** | `number` |
-| **Default** | `72` |
-| **Range** | 60–100 recommended |
+|             |                    |
+| ----------- | ------------------ |
+| **Type**    | `number`           |
+| **Default** | `72`               |
+| **Range**   | 60–100 recommended |
 
 Maximum character count per bullet point in the commit body.
 
@@ -50,11 +50,11 @@ Maximum character count per bullet point in the commit body.
 
 ### `rules.minBullets`
 
-| | |
-|-|-|
-| **Type** | `number` |
-| **Default** | `1` |
-| **Range** | 0–5 |
+|             |          |
+| ----------- | -------- |
+| **Type**    | `number` |
+| **Default** | `1`      |
+| **Range**   | 0–5      |
 
 Minimum number of bullet points the LLM must include in the commit body.
 
@@ -71,11 +71,11 @@ this minimum, it receives a `must_fix` hint with the exact count deficit.
 
 ### `rules.temperature`
 
-| | |
-|-|-|
-| **Type** | `number` |
-| **Default** | `0.2` |
-| **Range** | 0.0–1.0 |
+|             |          |
+| ----------- | -------- |
+| **Type**    | `number` |
+| **Default** | `0.2`    |
+| **Range**   | 0.0–1.0  |
 
 LLM sampling temperature passed to the model API.
 
@@ -95,10 +95,10 @@ temperature progression internally during the retry loop.
 
 ### `rules.timeout`
 
-| | |
-|-|-|
-| **Type** | `number` |
-| **Default** | `60000` |
+|                  |                  |
+| ---------------- | ---------------- |
+| **Type**         | `number`         |
+| **Default**      | `60000`          |
 | **Env override** | `CONVIT_TIMEOUT` |
 
 Request timeout in milliseconds for the LLM API call. If the model does not
@@ -122,9 +122,9 @@ and emits the winning scope.
 
 ```typescript
 {
-  pattern: string  // regex string — do NOT wrap in /slashes/
-  scope:   string  // emitted scope value, or "$1" to use first capture group
-  weight:  number  // vote weight — higher wins ties
+  pattern: string; // regex string — do NOT wrap in /slashes/
+  scope: string; // emitted scope value, or "$1" to use first capture group
+  weight: number; // vote weight — higher wins ties
 }
 ```
 
@@ -155,12 +155,12 @@ files wins.
 
 Recommended weight scale:
 
-| Weight | When to use |
-|--------|-------------|
-| `10` | Primary structural boundary (feature slices, packages, crates) |
-| `8` | Generic source directories (`src/`) |
-| `5` | Cross-cutting layers (UI components, DB schema) |
-| `3` | Auxiliary directories (scripts, tools) |
+| Weight | When to use                                                    |
+| ------ | -------------------------------------------------------------- |
+| `10`   | Primary structural boundary (feature slices, packages, crates) |
+| `8`    | Generic source directories (`src/`)                            |
+| `5`    | Cross-cutting layers (UI components, DB schema)                |
+| `3`    | Auxiliary directories (scripts, tools)                         |
 
 **User-defined patterns run before built-in defaults.** If your pattern
 matches, it takes precedence over the built-in `packages/` and `src/`
@@ -179,10 +179,10 @@ schema.*             →  db   weight 5
 
 ## `exclude`
 
-| | |
-|-|-|
-| **Type** | `string[]` |
-| **Default** | See below |
+|             |            |
+| ----------- | ---------- |
+| **Type**    | `string[]` |
+| **Default** | See below  |
 
 File paths or glob patterns to exclude from diff analysis entirely. Excluded
 files do not appear in the diff sent to the LLM and do not participate in
@@ -219,12 +219,12 @@ Cargo.lock          go.sum           Gemfile.lock
 
 These are never read from `.convitrc.json`. Set them in `.env`.
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `CONVIT_URL` | Yes | Base URL of the OpenAI-compatible API (`https://api.openai.com/v1`, LM Studio, etc.) |
-| `CONVIT_KEY` | Cloud only | API key. Not needed for local models (LM Studio, Ollama). |
-| `CONVIT_MODEL` | No | Model ID override. Auto-detected from LM Studio if omitted. |
-| `CONVIT_INPUT_COST` | No | Cost per 1M input tokens in USD. Enables cost display. |
-| `CONVIT_OUTPUT_COST` | No | Cost per 1M output tokens in USD. Enables cost display. |
+| Variable             | Required   | Description                                                                          |
+| -------------------- | ---------- | ------------------------------------------------------------------------------------ |
+| `CONVIT_URL`         | Yes        | Base URL of the OpenAI-compatible API (`https://api.openai.com/v1`, LM Studio, etc.) |
+| `CONVIT_KEY`         | Cloud only | API key. Not needed for local models (LM Studio, Ollama).                            |
+| `CONVIT_MODEL`       | No         | Model ID override. Auto-detected from LM Studio if omitted.                          |
+| `CONVIT_INPUT_COST`  | No         | Cost per 1M input tokens in USD. Enables cost display.                               |
+| `CONVIT_OUTPUT_COST` | No         | Cost per 1M output tokens in USD. Enables cost display.                              |
 
 **Precedence:** `--model` flag > env vars > `.convitrc` > defaults.

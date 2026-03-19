@@ -13,11 +13,13 @@ argument-hint: "[path to project root, or empty for current directory]"
 # convit Setup
 
 ## 🚨 Security Mandate (CRITICAL)
+
 - **Direct Environment Access Forbidden:** Never use `read_file`, `grep_search`, or any other tool to read `.env`, `.env.local`, or any file containing secrets.
 - **Environment Verification:** To check for required `CONVIT_*` variables, you MUST ONLY use the `ensure-convit-env.mjs` script (located in the skill's `scripts/` folder). This script safely checks variable names without exposing values.
 - **Zero-Credential Policy:** Never log, print, or commit any credentials or API keys.
 
 ## convit Setup Overview
+
 Generates a `.convitrc.json` tailored to the actual structure of the codebase.
 The config should capture Intent, not just file paths.
 
@@ -102,42 +104,43 @@ already excluded by default.
 
 Apply these weights when architecting scope patterns. Higher weight wins ties.
 
-| Weight | Boundary Type | Example Pattern |
-|--------|---------------|-----------------|
-| **10** | Deepest semantic boundary | `src/modules/([^/]+)/.*`, `packages/([^/]+)/.*`, `crates/([^/]+)/.*` |
-| **8** | Broad organizational folders | `src/([^/]+)/.*`, `lib/([^/]+)/.*` |
-| **7** | Universal Semantic Scopes | `package.json` → `deps`, `.gitignore` → `git`, `README.md` → `docs` |
-| **5** | Transversal layers | `ui/.*` → `ui`, `db/.*` → `db`, `prisma/.*` → `db` |
-| **5** | Documentation and Media | `assets/.*`, `docs/.*`, `images/.*` |
-| **3** | Tooling and Infrastructure | `.cursor/.*`, `.github/.*`, `scripts/.*`, `config/.*` → `config` |
+| Weight | Boundary Type                | Example Pattern                                                      |
+| ------ | ---------------------------- | -------------------------------------------------------------------- |
+| **10** | Deepest semantic boundary    | `src/modules/([^/]+)/.*`, `packages/([^/]+)/.*`, `crates/([^/]+)/.*` |
+| **8**  | Broad organizational folders | `src/([^/]+)/.*`, `lib/([^/]+)/.*`                                   |
+| **7**  | Universal Semantic Scopes    | `package.json` → `deps`, `.gitignore` → `git`, `README.md` → `docs`  |
+| **5**  | Transversal layers           | `ui/.*` → `ui`, `db/.*` → `db`, `prisma/.*` → `db`                   |
+| **5**  | Documentation and Media      | `assets/.*`, `docs/.*`, `images/.*`                                  |
+| **3**  | Tooling and Infrastructure   | `.cursor/.*`, `.github/.*`, `scripts/.*`, `config/.*` → `config`     |
 
-The primary boundary gets 10. Fallback patterns (catch-all under core) get 6–8. 
-Universal root files (package.json, gitignore, readme) get 7 to ensure they are 
-more specific than the root catch-all but subservient to deep domain logic. 
-Cross-cutting concerns (UI, DB, API) and auxiliary docs/media get 5. Tooling, 
+The primary boundary gets 10. Fallback patterns (catch-all under core) get 6–8.
+Universal root files (package.json, gitignore, readme) get 7 to ensure they are
+more specific than the root catch-all but subservient to deep domain logic.
+Cross-cutting concerns (UI, DB, API) and auxiliary docs/media get 5. Tooling,
 scripts, and config get 3.
 
-Transversal layers stay at 5 so the primary boundary (10) overrides when a file 
-lives in both. Example: `src/features/auth/ui/button.tsx` should scope to `auth`, 
+Transversal layers stay at 5 so the primary boundary (10) overrides when a file
+lives in both. Example: `src/features/auth/ui/button.tsx` should scope to `auth`,
 not `ui`. The domain wins.
 
 ---
 
 ## Phase 3 — Synthesis Logic
 
-Generate regex patterns using `([^/]+)` to dynamically capture directory names 
-as scopes. The `scope` field is `"$1"` when the pattern captures a segment, or 
+Generate regex patterns using `([^/]+)` to dynamically capture directory names
+as scopes. The `scope` field is `"$1"` when the pattern captures a segment, or
 a literal string (e.g. `"db"`, `"ui"`) when the layer is fixed.
 
 **Universal Semantic Patterns** should be proposed for common root files:
+
 - `package.json` and lockfiles → `deps`
 - `.gitignore`, `.cursorignore`, `.dockerignore` → `git`
 - `README.md`, `LICENSE`, `CONTRIBUTING.md` → `docs`
 - `.env.example`, `.env.local` → `env`
 - `.convitrc.json` → `convit`
 
-**User-specific patterns go at the top** of the `scopePatterns` array. They 
-override built-in defaults. If the user has custom domains or conventions, 
+**User-specific patterns go at the top** of the `scopePatterns` array. They
+override built-in defaults. If the user has custom domains or conventions,
 place those first.
 
 Always include a fallback pattern at the end unless the user opts out:
@@ -173,7 +176,7 @@ Group proposed scope patterns under three headers:
 > `{ "pattern": "ui/.*", "scope": "ui", "weight": 5 }`
 > Use this? (yes / adjust / skip)"
 
-**Auxiliary Support (Weight 3)"
+\*\*Auxiliary Support (Weight 3)"
 
 > "Proposed scope pattern:
 > `{ "pattern": ".cursor/.*", "scope": "cursor", "weight": 3 }`
@@ -215,15 +218,14 @@ non-default or user-confirmed values. Shape must match exactly:
   },
   "scopePatterns": [
     { "pattern": "src/features/([^/]+)/.*", "scope": "$1", "weight": 10 },
-    { "pattern": "src/([^/]+)/.*",          "scope": "$1", "weight": 6  }
+    { "pattern": "src/([^/]+)/.*", "scope": "$1", "weight": 6 }
   ],
-  "exclude": [
-    "src/generated/prisma"
-  ]
+  "exclude": ["src/generated/prisma"]
 }
 ```
 
 Rules:
+
 - `temperature` is always omitted unless the user explicitly requests it (0.2 is
   the default and rarely needs changing)
 - Empty arrays (`[]`) should be omitted entirely
@@ -237,7 +239,7 @@ setup script, or remind the user to add these to `.env` or `.env.local`:
 
 **Before running the script, tell the user explicitly:**
 
-> I will run the `ensure-convit-env.mjs` script. It reads your `.env` or `.env.local` to check which CONVIT_* var names exist (by name only). It does not read, store, or transmit any values — no keys, no URLs, no secrets. If vars are missing, it appends placeholder lines to the file. The script output may mention local vs cloud (inferred from URL pattern) but never prints the actual URL or any credentials. You can review the script source before I run it.
+> I will run the `ensure-convit-env.mjs` script. It reads your `.env` or `.env.local` to check which CONVIT\_\* var names exist (by name only). It does not read, store, or transmit any values — no keys, no URLs, no secrets. If vars are missing, it appends placeholder lines to the file. The script output may mention local vs cloud (inferred from URL pattern) but never prints the actual URL or any credentials. You can review the script source before I run it.
 
 Only run the script after the user has seen this disclosure and has not objected.
 
