@@ -1,20 +1,21 @@
+import { eventType, staticSchema } from "inngest";
 import { inngest } from "@/lib/inngest";
 import { sendInvitationEmail } from "../emails/invitation-email.send";
 
-export type SendInvitationLinkEventData = {
-  data: {
+export const sendInvitationLinkEvent = eventType("app/invitation.send-link", {
+  schema: staticSchema<{
     invitationLink: string;
     organizationName: string;
     inviterName: string;
     toEmail: string;
-  };
-};
+  }>(),
+});
 
 export const eventSendInvitationLink = inngest.createFunction(
   {
     id: "send-invitation-link",
+    triggers: [{ event: sendInvitationLinkEvent.name }],
   },
-  { event: "app/invitation.send-link" },
   async ({ event, step }) => {
     const { invitationLink, organizationName, inviterName, toEmail } =
       event.data;

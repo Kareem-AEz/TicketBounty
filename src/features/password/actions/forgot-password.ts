@@ -6,6 +6,7 @@ import {
   toErrorActionState,
   toSuccessActionState,
 } from "@/components/form/utils/to-action-state";
+import { passwordResetEvent } from "@/features/password/events/event-password-reset";
 import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
 
@@ -38,12 +39,11 @@ export const forgotPassword = async (
 
     const { id } = userFound;
 
-    await inngest.send({
-      name: "app/password.password-reset-function",
-      data: {
+    await inngest.send(
+      passwordResetEvent.create({
         userId: id,
-      },
-    });
+      }),
+    );
 
     return toSuccessActionState({
       status: "SUCCESS",

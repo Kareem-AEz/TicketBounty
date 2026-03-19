@@ -86,7 +86,7 @@ const AdminDigestEmail = ({
   totalTickets,
   totalUsers,
   totalComments,
-}: AdminDigestReadyEventData["data"]) => {
+}: AdminDigestReadyEventData) => {
   const currentYear = new Date().getFullYear();
   const dashboardUrl = `${getBaseUrl()}/tickets`;
   const colors = getColors();

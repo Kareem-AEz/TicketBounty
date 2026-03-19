@@ -8,6 +8,7 @@ import {
   toSuccessActionState,
 } from "@/components/form/utils/to-action-state";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
+import { sendInvitationLinkEvent } from "@/features/invitation/events/send-invitation-link.event";
 import { MembershipRole } from "@/generated/enums";
 import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
@@ -126,15 +127,14 @@ export const inviteUser = async ({
         invitedByUserId: authUser.id,
       });
 
-      await inngest.send({
-        name: "app/invitation.send-link",
-        data: {
+      await inngest.send(
+        sendInvitationLinkEvent.create({
           invitationLink,
           organizationName: organization.name,
           inviterName: authUser.username,
           toEmail: validatedFields.data.email,
-        },
-      });
+        }),
+      );
 
       return toSuccessActionState({
         status: "SUCCESS",
