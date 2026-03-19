@@ -96,12 +96,12 @@ export default function RootLayout({
         />
         <NextTopLoader color="var(--primary)" showSpinner={false} height={2} />
         <SpeedInsights />
-        <PostHogProvider>
-          <Suspense fallback={null}>
-            <PostHogPageViewTracker />
-          </Suspense>
-          <PostHogAuthWrapper>
-            <ThemeProvider>
+        <ThemeProvider>
+          <PostHogProvider>
+            <Suspense fallback={null}>
+              <PostHogPageViewTracker />
+            </Suspense>
+            <PostHogAuthWrapper>
               <ReactQueryProvider>
                 <TooltipProvider>
                   <ReactQueryDevtools />
@@ -127,9 +127,9 @@ export default function RootLayout({
                   <CurrentOrganizationLabel />
                 </TooltipProvider>
               </ReactQueryProvider>
-            </ThemeProvider>
-          </PostHogAuthWrapper>
-        </PostHogProvider>
+            </PostHogAuthWrapper>
+          </PostHogProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
