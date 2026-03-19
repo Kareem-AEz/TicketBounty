@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { generateBreadcrumbStructuredData } from "@/lib/structured-data";
 
 interface BreadcrumbStructuredDataProps {
@@ -10,7 +11,8 @@ export function BreadcrumbStructuredData({
   const structuredData = generateBreadcrumbStructuredData(items);
 
   return (
-    <script
+    <Script
+      id={`breadcrumb-structured-data-${items.length}`}
       type="application/ld+json"
       dangerouslySetInnerHTML={{
         __html: JSON.stringify(structuredData),

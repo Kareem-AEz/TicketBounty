@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { generateTicketStructuredData } from "@/lib/structured-data";
 
 interface TicketStructuredDataProps {
@@ -30,7 +31,8 @@ export function TicketStructuredData({
   });
 
   return (
-    <script
+    <Script
+      id={`ticket-structured-data-${url}`}
       type="application/ld+json"
       dangerouslySetInnerHTML={{
         __html: JSON.stringify(structuredData),
