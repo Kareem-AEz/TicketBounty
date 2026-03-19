@@ -19,6 +19,7 @@ import {
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
+import { toast } from "sonner";
 import DeleteButton from "@/components/delete-button";
 import { Button } from "@/components/ui/button";
 import {
@@ -74,6 +75,8 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
     enabled: isEditing,
     disableOnInput: false,
   });
+
+  if (ticket.deletedAt) return null;
 
   return (
     <MotionConfig
@@ -325,6 +328,12 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                                     isDetail,
                                   });
                                   if (result.status === "SUCCESS") {
+                                    toast.success(
+                                      result.message ||
+                                        "Ticket deleted successfully",
+                                    );
+                                    if (isDetail) redirect(ticketsPath());
+                                    console.log(isDetail);
                                     return {
                                       success: true,
                                       message: result.message,

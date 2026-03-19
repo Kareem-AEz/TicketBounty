@@ -63,7 +63,10 @@ export const getTickets = async (
     prisma.ticket.findMany({
       skip,
       take,
-      where,
+      where: {
+        ...where,
+        deletedAt: null,
+      },
       orderBy: searchParams
         ? { [searchParams.sortKey]: searchParams.sortOrder }
         : { createdAt: "desc" },

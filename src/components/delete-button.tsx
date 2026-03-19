@@ -13,6 +13,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { isRedirectError } from "@/features/auth/queries/use-auth-query";
 import DetailButton from "@/features/ticket/components/detail-button";
 import { usePatchedToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -57,6 +58,9 @@ function DeleteButton({
         toast(result.message || "Failed to delete");
       }
     } catch (error) {
+      if (isRedirectError(error)) {
+        return;
+      }
       toast(
         error instanceof Error ? error.message : "An unexpected error occurred",
       );

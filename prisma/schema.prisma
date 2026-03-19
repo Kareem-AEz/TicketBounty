@@ -139,9 +139,10 @@ enum MembershipRole {
 // ------------------------------
 
 model Ticket {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @db.Timestamptz
-  updatedAt DateTime @updatedAt @db.Timestamptz
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @db.Timestamptz
+  updatedAt DateTime  @updatedAt @db.Timestamptz
+  deletedAt DateTime? @db.Timestamptz
 
   title    String
   content  String       @db.Text

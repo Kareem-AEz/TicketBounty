@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import React from "react";
 import { Breadcrumb } from "@/components/breadcrumbs";
 import Breadcrumbs from "@/components/breadcrumbs";
@@ -101,11 +101,11 @@ async function page({ params }: TicketPageProps) {
     commentsPromise,
   ]);
 
-  if (!ticket) {
-    notFound();
+  if (ticket?.deletedAt) {
+    redirect(ticketsPath());
   }
 
-  if (!ticket.title) {
+  if (!ticket) {
     notFound();
   }
 

@@ -1,13 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import {
   toErrorActionState,
   toSuccessActionState,
 } from "@/components/form/utils/to-action-state";
+import { bulkDeleteAttachmentsEvent } from "@/features/attachments/events/bulk-delete-attachments.event";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import { isOwner } from "@/features/auth/utils/is-owner";
+import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
 import { homePath, ticketsPath } from "@/paths";
 import { getTicketPermission } from "../queries/get-ticket-permission";
@@ -47,18 +48,41 @@ export async function deleteTicket({
       );
     }
 
-    await prisma.ticket.delete({
-      where: {
-        id,
-      },
-    });
+    // -- THE PARALLEL UPDATE + QUERY (PROMISE.ALL) --
+    // Here, we update the ticket's deletedAt and fetch all of its attachments at the same time.
+    // This is safe: the update and the fetch don't depend on each other's result.
+    // We use Promise.all to run both queries concurrently for faster completion.
+    const [_updatedTicket, attachments] = await Promise.all([
+      prisma.ticket.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      }),
+      prisma.attachment.findMany({
+        where: {
+          ticketId: id,
+        },
+      }),
+    ]);
+
+    await inngest.send(
+      bulkDeleteAttachmentsEvent.create({
+        ticketId: id,
+        previousDeletedAt: ticket?.deletedAt,
+        attachments: attachments.map((attachment) => ({
+          attachmentId: attachment.id,
+          organizationId: attachment.storageOrganizationId,
+          ticketId: attachment.storageTicketId,
+          attachmentName: attachment.name,
+        })),
+      }),
+    );
   } catch (error) {
     return toErrorActionState(error);
   }
 
   revalidatePath(ticketsPath());
   revalidatePath(homePath());
-  if (isDetail) redirect(ticketsPath());
+  // if (isDetail) redirect(ticketsPath());
   return toSuccessActionState({
     status: "SUCCESS",
     message: "Ticket deleted",
