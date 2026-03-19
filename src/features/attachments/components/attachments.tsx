@@ -13,7 +13,6 @@ export default async function Attachments({
   isOwner,
 }: AttachmentsProps) {
   const attachments = await getAttachments(ticketId);
-  console.log(attachments);
   return (
     <div className="flex w-full flex-col gap-y-4">
       <div className="flex flex-col">

@@ -66,6 +66,7 @@ export async function createAttachment(
           hash: attachment.hash,
           storageOrganizationId: organizationId,
           storageTicketId: ticketId,
+          mimeType: attachment.mimeType,
         }));
 
         const duplicateAttachments = attachments.filter((attachment) =>
@@ -77,8 +78,6 @@ export async function createAttachment(
             `Duplicate attachments found: ${duplicateAttachments.map((a) => a.name).join(", ")}`,
           );
 
-        console.log(JSON.stringify(attachmentsData, null, 2));
-
         const createdAttachments = await tx.attachment.createManyAndReturn({
           data: attachmentsData,
         });
@@ -88,6 +87,7 @@ export async function createAttachment(
     );
 
     // 3. S3 Uploads (I/O-bound) - Perform after transaction commits
+
     await Promise.all(
       createdAttachments.map(async (attachment) => {
         const { id, name } = attachment;

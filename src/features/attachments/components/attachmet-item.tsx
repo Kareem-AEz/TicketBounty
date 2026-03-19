@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import { Attachment } from "@/generated/client";
+import { cn } from "@/lib/utils";
 import AttachmentDeleteButton from "./attachment-delete-button";
 
 type AttachmentItemProps = {
@@ -6,6 +10,11 @@ type AttachmentItemProps = {
 };
 
 export default function AttachmentItem({ attachment }: AttachmentItemProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const isImage = attachment.mimeType.startsWith("image/");
+  const previewApiUrl = `/api/attachments/${attachment.id}/preview`;
+  const downloadApiUrl = `/api/attachments/${attachment.id}/download`;
+
   return (
     <div
       className="bg-card flex w-full items-center gap-x-3 rounded-lg p-3"
@@ -13,14 +22,35 @@ export default function AttachmentItem({ attachment }: AttachmentItemProps) {
         boxShadow: "0 0 0.5px 1px var(--border)",
       }}
     >
-      <div className="flex min-w-0 items-center gap-x-2">
-        <div className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-md">
-          <FileIconSvg className="text-foreground/90 size-7 stroke-1" />
+      <a
+        href={downloadApiUrl}
+        rel="noopener noreferrer "
+        target="_blank"
+        download={attachment.name}
+        className="flex min-w-0 flex-1 items-center gap-x-2"
+      >
+        <div
+          className="bg-muted flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md"
+          aria-hidden="true"
+        >
+          {isImage ? (
+            <img
+              onLoad={() => setIsLoaded(true)}
+              src={previewApiUrl}
+              alt={attachment.name}
+              className={cn(
+                "size-full object-cover opacity-0 transition-opacity duration-[.8s]",
+                isLoaded && "opacity-100",
+              )}
+            />
+          ) : (
+            <FileIconSvg className="text-foreground/90 size-7 stroke-1" />
+          )}
         </div>
         <span className="text-foreground/90 truncate text-sm font-medium">
           {attachment.name}
         </span>
-      </div>
+      </a>
 
       <div className="ml-auto">
         <AttachmentDeleteButton attachmentId={attachment.id} />
