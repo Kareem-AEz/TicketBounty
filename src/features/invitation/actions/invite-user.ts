@@ -127,26 +127,30 @@ export const inviteUser = async ({
         invitedByUserId: authUser.id,
       });
 
-      await inngest.send(
-        sendInvitationLinkEvent.create({
-          invitationLink,
-          organizationName: organization.name,
-          inviterName: authUser.username,
-          toEmail: validatedFields.data.email,
-        }),
-      );
-
-      return toSuccessActionState({
-        status: "SUCCESS",
-        message: "Invitation sent successfully",
-        data: {
-          invitationLink,
-        },
-      });
+      return {
+        invitationLink,
+        organizationName: organization.name,
+      };
     });
 
+    await inngest.send(
+      sendInvitationLinkEvent.create({
+        invitationLink: result.invitationLink,
+        organizationName: result.organizationName,
+        inviterName: authUser.username,
+        toEmail: validatedFields.data.email,
+      }),
+    );
+
     revalidatePath(organizationInvitationsPath(organizationId));
-    return result;
+
+    return toSuccessActionState({
+      status: "SUCCESS",
+      message: "Invitation sent successfully",
+      data: {
+        invitationLink: result.invitationLink,
+      },
+    });
   } catch (error) {
     console.error(error);
     const errorFormData = new FormData();
