@@ -121,28 +121,9 @@ function TicketUpsertForm({ ticket, onClose }: TicketUpsertFormProps) {
 
         <div className="flex flex-1 flex-col gap-y-2">
           <SubmitButton
-            className="flex flex-1 items-center justify-center"
+            className="flex items-center justify-center"
             pendingLabel={copy.actions.saving}
-            data-umami-event={ticket ? "ticket-update" : "ticket-create"}
-            data-umami-event-status={ticket?.status ?? "OPEN"}
-            data-umami-event-has-bounty={
-              parseFloat(bounty || "0") > 0 ? "true" : "false"
-            }
-            data-umami-event-bounty-range={
-              parseFloat(bounty || "0") === 0
-                ? "none"
-                : parseFloat(bounty || "0") < 50
-                  ? "low"
-                  : parseFloat(bounty || "0") < 200
-                    ? "medium"
-                    : "high"
-            }
-            data-umami-event-has-deadline={
-              ticket?.deadline ||
-              (actionState?.payload?.get("deadline") as string)
-                ? "true"
-                : "false"
-            }
+            size="lg"
           >
             {copy.actions.save}
           </SubmitButton>
