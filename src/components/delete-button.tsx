@@ -59,7 +59,7 @@ function DeleteButton({
       }
     } catch (error) {
       if (isRedirectError(error)) {
-        return;
+        throw error;
       }
       toast(
         error instanceof Error ? error.message : "An unexpected error occurred",

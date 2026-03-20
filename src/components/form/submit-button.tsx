@@ -33,7 +33,7 @@ function SubmitButton({
   onFinish,
   pending,
   variant,
-  size,
+  size = "default",
   ...props
 }: SubmitButtonProps & React.ComponentProps<"button">) {
   const { pending: formPending } = useFormStatus();
