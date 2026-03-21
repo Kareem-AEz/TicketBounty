@@ -13,7 +13,7 @@ export const deleteAttachmentEvent = eventType(
       attachmentId: z.string(),
       entity: z.enum(AttachmentEntity),
       organizationId: z.string(),
-      ticketId: z.string(),
+      entityId: z.string(),
       attachmentName: z.string(),
     }),
   },
@@ -25,12 +25,12 @@ export const eventDeleteAttachment = inngest.createFunction(
     triggers: [deleteAttachmentEvent],
   },
   async ({ event, step }) => {
-    const { attachmentId, entity, organizationId, ticketId, attachmentName } =
+    const { attachmentId, entity, organizationId, entityId, attachmentName } =
       event.data;
     const key = generateS3Key({
       entity,
       organizationId,
-      ticketId,
+      entityId,
       attachmentName,
       attachmentId,
     });

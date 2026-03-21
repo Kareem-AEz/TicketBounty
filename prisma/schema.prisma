@@ -206,8 +206,9 @@ enum AttachmentEntity {
 }
 
 model TicketComment {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @db.Timestamptz
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @db.Timestamptz
+  deletedAt DateTime? @db.Timestamptz
 
   content String @db.Text
 

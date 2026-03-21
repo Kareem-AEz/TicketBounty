@@ -1,6 +1,7 @@
 import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { eventType } from "inngest";
 import { z } from "zod/v4";
+import { AttachmentEntity } from "@/generated/enums";
 import { s3 } from "@/lib/aws";
 import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
@@ -10,13 +11,14 @@ export const bulkDeleteAttachmentsEvent = eventType(
   "app/attachments.bulk-delete",
   {
     schema: z.object({
-      ticketId: z.string(),
+      entity: z.enum(AttachmentEntity),
+      entityId: z.string(),
       previousDeletedAt: z.date().nullable(),
       attachments: z.array(
         z.object({
           attachmentId: z.string(),
           organizationId: z.string(),
-          ticketId: z.string(),
+          entityId: z.string(),
           attachmentName: z.string(),
         }),
       ),
@@ -30,7 +32,7 @@ export const eventBulkDeleteAttachments = inngest.createFunction(
     triggers: [bulkDeleteAttachmentsEvent],
   },
   async ({ event, step }) => {
-    const { ticketId, attachments, previousDeletedAt } = event.data;
+    const { entity, entityId, attachments, previousDeletedAt } = event.data;
 
     try {
       // -- GENERATE S3 KEYS --
@@ -38,8 +40,9 @@ export const eventBulkDeleteAttachments = inngest.createFunction(
       // If the S3 keys cannot be generated, the attachments should not be deleted.
       const objectsToDelete = attachments.map((attachment) => ({
         Key: generateS3Key({
+          entity,
           organizationId: attachment.organizationId,
-          ticketId: attachment.ticketId,
+          entityId,
           attachmentName: attachment.attachmentName,
           attachmentId: attachment.attachmentId,
         }),
@@ -50,7 +53,7 @@ export const eventBulkDeleteAttachments = inngest.createFunction(
       // If the attachments cannot be deleted from S3, the ticket should not be deleted.
       await step.run("delete-attachments-from-s3", async () => {
         if (objectsToDelete.length === 0) return;
-        await s3.send(
+        const result = await s3.send(
           new DeleteObjectsCommand({
             Bucket: process.env.R2_BUCKET_NAME,
             Delete: {
@@ -59,27 +62,52 @@ export const eventBulkDeleteAttachments = inngest.createFunction(
             },
           }),
         );
+
+        return { success: true, data: result };
       });
 
       // -- DELETE TICKET FROM DB --
       // This is the final step that should only be executed if the attachments were successfully deleted from S3.
       // If the attachments cannot be deleted from S3, the ticket should not be deleted.
-      await step.run("delete-tickets-from-db", async () => {
-        await prisma.ticket.delete({
-          where: {
-            id: ticketId,
-          },
-        });
+      await step.run("delete-entities-from-db", async () => {
+        switch (entity) {
+          case AttachmentEntity.TICKET:
+            await prisma.ticket.delete({
+              where: { id: entityId },
+            });
+            break;
+          case AttachmentEntity.COMMENT:
+            await prisma.ticketComment.delete({
+              where: { id: entityId },
+            });
+            break;
+          default:
+            throw new Error("Invalid entity");
+        }
+
+        return { success: true, data: { entity, entityId } };
       });
     } catch (error) {
       // -- ROLLBACK TICKET UPDATE --
       // If any step fails, we need to rollback the ticket update.
       // This is a critical step that must be executed to ensure data integrity.
-      await step.run("rollback-ticket-update", async () => {
-        await prisma.ticket.update({
-          where: { id: ticketId },
-          data: { deletedAt: previousDeletedAt },
-        });
+      await step.run("rollback-entities-update", async () => {
+        switch (entity) {
+          case AttachmentEntity.TICKET:
+            await prisma.ticket.update({
+              where: { id: entityId },
+              data: { deletedAt: previousDeletedAt },
+            });
+            break;
+          case AttachmentEntity.COMMENT:
+            await prisma.ticketComment.update({
+              where: { id: entityId },
+              data: { deletedAt: previousDeletedAt },
+            });
+            break;
+          default:
+            throw new Error("Invalid entity");
+        }
       });
       throw error;
     }
