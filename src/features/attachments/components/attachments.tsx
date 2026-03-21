@@ -1,4 +1,5 @@
 import { CardCompact } from "@/components/card-compact";
+import { AttachmentEntity } from "@/generated/enums";
 import { getAttachments } from "../queries/get-attachments";
 import AttachmentForm from "./attachment-form";
 import AttachmentItem from "./attachmet-item";
@@ -6,13 +7,15 @@ import AttachmentItem from "./attachmet-item";
 type AttachmentsProps = {
   ticketId: string;
   isOwner: boolean;
+  entity: AttachmentEntity;
 };
 
 export default async function Attachments({
   ticketId,
   isOwner,
+  entity,
 }: AttachmentsProps) {
-  const attachments = await getAttachments(ticketId);
+  const attachments = await getAttachments(ticketId, entity);
   return (
     <div className="flex w-full flex-col gap-y-4">
       <div className="flex flex-col">
@@ -33,7 +36,7 @@ export default async function Attachments({
         content={
           <>
             {/* TODO: Add attachments list here */}
-            {isOwner && <AttachmentForm ticketId={ticketId} />}
+            {isOwner && <AttachmentForm entityId={ticketId} entity={entity} />}
           </>
         }
       />

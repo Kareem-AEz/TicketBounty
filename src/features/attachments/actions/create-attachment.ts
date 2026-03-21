@@ -8,14 +8,22 @@ import {
 } from "@/components/form/utils/to-action-state";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import { isOwner } from "@/features/auth/utils/is-owner";
+import { Ticket, TicketComment } from "@/generated/client";
+import { AttachmentEntity } from "@/generated/enums";
 import { s3 } from "@/lib/aws";
 import prisma from "@/lib/prisma";
 import { ticketPath } from "@/paths";
+import { MAX_ATTACHMENT_COUNT } from "../constants";
 import { generateS3Key } from "../utils/generate-s3-key";
 import { processAttachments } from "../utils/process-attachments";
 
+type CreateAttachmentArgs = {
+  entityId: string;
+  entity: AttachmentEntity;
+};
+
 export async function createAttachment(
-  ticketId: string,
+  { entityId, entity }: CreateAttachmentArgs,
   _actionState: ActionState,
   formData: FormData,
 ) {
@@ -37,37 +45,90 @@ export async function createAttachment(
     if (errors.length > 0) throw new Error("Invalid attachments");
 
     // 2. DB Transaction (DB-bound) - Create records and return IDs
-    const { createdAttachments, organizationId } = await prisma.$transaction(
-      async (tx) => {
-        const [ticket, attachments] = await Promise.all([
-          tx.ticket.findUnique({
-            where: {
-              id: ticketId,
-            },
-          }),
+    const { createdAttachments, organizationId, ticketId } =
+      await prisma.$transaction(async (tx) => {
+        const [subject, attachments] = await Promise.all([
+          entity === AttachmentEntity.TICKET
+            ? tx.ticket.findUnique({
+                where: {
+                  id: entityId,
+                },
+              })
+            : tx.ticketComment.findUnique({
+                where: {
+                  id: entityId,
+                },
+                include: {
+                  ticket: true,
+                },
+              }),
           tx.attachment.findMany({
             where: {
-              ticketId,
+              [entity === AttachmentEntity.TICKET ? "ticketId" : "commentId"]:
+                entityId,
             },
           }),
         ]);
 
-        const organizationId = ticket?.organizationId;
+        const entityName = AttachmentEntity[entity];
+        let organizationId: string | undefined;
+        let ticketId: string | undefined;
 
-        if (!ticket) throw new Error("Ticket not found");
-        if (!organizationId)
-          throw new Error("Ticket is not associated with an organization");
-        if (!isOwner(userId, ticket.userId ?? undefined))
-          throw new Error("You are not the owner of this ticket");
+        if (attachments.length >= MAX_ATTACHMENT_COUNT)
+          throw new Error(
+            `Maximum number of attachments (${MAX_ATTACHMENT_COUNT}) reached`,
+          );
 
-        const attachmentsData = toAdd.map((attachment) => ({
-          ticketId,
-          name: attachment.file.name,
-          hash: attachment.hash,
-          storageOrganizationId: organizationId,
-          storageTicketId: ticketId,
-          mimeType: attachment.mimeType,
-        }));
+        if (entityName === "TICKET") {
+          const ticket = subject as Ticket;
+
+          if (!ticket) throw new Error("Ticket not found");
+          if (!ticket.organizationId)
+            throw new Error("Ticket is not associated with an organization");
+          if (!isOwner(userId, ticket.userId ?? undefined))
+            throw new Error("You are not the owner of this ticket");
+
+          organizationId = ticket.organizationId;
+          ticketId = ticket.id;
+        } else if (entityName === "COMMENT") {
+          const comment = subject as TicketComment & { ticket: Ticket };
+
+          if (!comment) throw new Error("Comment not found");
+          if (!isOwner(userId, comment.userId ?? undefined))
+            throw new Error("You are not the owner of this comment");
+          if (!comment.ticket.organizationId)
+            throw new Error("Comment is not associated with an organization");
+
+          organizationId = comment.ticket.organizationId;
+          ticketId = comment.ticketId;
+        }
+
+        if (!organizationId || !ticketId)
+          throw new Error("Missing required subject data");
+
+        // -- DE-DUPLICATE ATTACHMENTS BY HASH --
+        // We want to ensure that within this upload batch (toAdd), no two attachments have the same hash.
+        // If a duplicate hash is found, we filter it out here (keeps only the first occurrence).
+        // This only blocks *new* duplicates within this upload, not existing ones in the DB (checked later).
+        const seenHashes = new Set<string>();
+        let attachmentsData = toAdd
+          .filter((attachment) => {
+            if (seenHashes.has(attachment.hash)) {
+              // Skip attachments with duplicate hash in this batch
+              return false;
+            }
+            seenHashes.add(attachment.hash);
+            return true;
+          })
+          .map((attachment) => ({
+            ticketId,
+            entity,
+            name: attachment.file.name,
+            hash: attachment.hash,
+            storageOrganizationId: organizationId,
+            storageTicketId: ticketId,
+            mimeType: attachment.mimeType,
+          }));
 
         const duplicateAttachments = attachments.filter((attachment) =>
           attachmentsData.some((a) => a.hash === attachment.hash),
@@ -78,13 +139,17 @@ export async function createAttachment(
             `Duplicate attachments found: ${duplicateAttachments.map((a) => a.name).join(", ")}`,
           );
 
+        const availableAttachments = MAX_ATTACHMENT_COUNT - attachments.length;
+
+        if (attachmentsData.length > availableAttachments)
+          attachmentsData = attachmentsData.slice(0, availableAttachments);
+
         const createdAttachments = await tx.attachment.createManyAndReturn({
           data: attachmentsData,
         });
 
-        return { createdAttachments, organizationId };
-      },
-    );
+        return { createdAttachments, organizationId, ticketId };
+      });
 
     // 3. S3 Uploads (I/O-bound) - Perform after transaction commits
 
@@ -103,6 +168,7 @@ export async function createAttachment(
         }
 
         const key = generateS3Key({
+          entity,
           organizationId,
           ticketId,
           attachmentName: name,

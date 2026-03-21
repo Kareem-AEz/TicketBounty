@@ -36,6 +36,7 @@ export async function GET(
     }
 
     const key = generateS3Key({
+      entity: attachment.entity,
       organizationId: attachment.storageOrganizationId,
       ticketId: attachment.storageTicketId,
       attachmentName: attachment.name,

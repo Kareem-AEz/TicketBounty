@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import AttachmentForm from "@/features/attachments/components/attachment-form";
+import { AttachmentEntity } from "@/generated/enums";
 
 export default function AttachmentFormPage() {
   return (
@@ -16,7 +17,7 @@ export default function AttachmentFormPage() {
           <CardDescription>Add attachments to your ticket</CardDescription>
         </CardHeader>
         <CardContent>
-          <AttachmentForm ticketId="123" />
+          <AttachmentForm entityId="123" entity={AttachmentEntity.TICKET} />
         </CardContent>
       </Card>
     </div>

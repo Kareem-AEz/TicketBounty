@@ -1,4 +1,7 @@
+import { AttachmentEntity } from "@/generated/enums";
+
 type GenerateS3KeyParams = {
+  entity: AttachmentEntity;
   organizationId: string;
   ticketId: string;
   attachmentName: string;
@@ -12,11 +15,14 @@ const sanitizeFilename = (name: string): string => {
 };
 
 export const generateS3Key = ({
+  entity,
   organizationId,
   ticketId,
   attachmentName,
   attachmentId,
 }: GenerateS3KeyParams) => {
   const safeName = sanitizeFilename(attachmentName);
-  return `${organizationId}/${ticketId}/${attachmentId}-${safeName}`;
+
+  const entityPath = AttachmentEntity[entity].toLowerCase();
+  return `${organizationId}/${entityPath}/${ticketId}/${attachmentId}-${safeName}`;
 };
