@@ -8,6 +8,7 @@ import {
 import { bulkDeleteAttachmentsEvent } from "@/features/attachments/events/bulk-delete-attachments.event";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import { isOwner } from "@/features/auth/utils/is-owner";
+import { AttachmentEntity } from "@/generated/enums";
 import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
 import { homePath, ticketsPath } from "@/paths";
@@ -66,12 +67,13 @@ export async function deleteTicket({
 
     await inngest.send(
       bulkDeleteAttachmentsEvent.create({
-        ticketId: id,
+        entity: AttachmentEntity.TICKET,
+        entityId: id,
         previousDeletedAt: ticket?.deletedAt,
         attachments: attachments.map((attachment) => ({
           attachmentId: attachment.id,
           organizationId: attachment.storageOrganizationId,
-          ticketId: attachment.storageTicketId,
+          entityId: attachment.storageTicketId,
           attachmentName: attachment.name,
         })),
       }),

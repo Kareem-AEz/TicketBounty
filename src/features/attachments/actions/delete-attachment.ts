@@ -64,7 +64,7 @@ export const deleteAttachment = async ({
       deleteAttachmentEvent.create({
         entity: attachment.entity,
         organizationId: attachment.storageOrganizationId,
-        ticketId: attachment.storageTicketId,
+        entityId: attachment.storageTicketId,
         attachmentId: attachment.id,
         attachmentName: attachment.name,
       }),

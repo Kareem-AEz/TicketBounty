@@ -169,8 +169,8 @@ export async function createAttachment(
 
         const key = generateS3Key({
           entity,
+          entityId,
           organizationId,
-          ticketId,
           attachmentName: name,
           attachmentId: id,
         });
