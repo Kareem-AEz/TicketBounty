@@ -190,10 +190,19 @@ model Attachment {
   storageOrganizationId String
   storageTicketId       String
 
-  ticketId String
-  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticketId  String?
+  ticket    Ticket?          @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment   TicketComment?   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  entity    AttachmentEntity
 
   @@index([ticketId])
+  @@index([commentId])
+}
+
+enum AttachmentEntity {
+  TICKET
+  COMMENT
 }
 
 model TicketComment {
@@ -205,8 +214,9 @@ model TicketComment {
   ticketId String
   ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId      String?
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  attachments Attachment[]
 
   @@index([ticketId])
   @@index([userId])
