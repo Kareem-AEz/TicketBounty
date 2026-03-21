@@ -1,6 +1,7 @@
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { eventType } from "inngest";
 import { z } from "zod/v4";
+import { AttachmentEntity } from "@/generated/enums";
 import { s3 } from "@/lib/aws";
 import { inngest } from "@/lib/inngest";
 import { generateS3Key } from "../utils/generate-s3-key";
@@ -10,6 +11,7 @@ export const deleteAttachmentEvent = eventType(
   {
     schema: z.object({
       attachmentId: z.string(),
+      entity: z.enum(AttachmentEntity),
       organizationId: z.string(),
       ticketId: z.string(),
       attachmentName: z.string(),
@@ -23,9 +25,10 @@ export const eventDeleteAttachment = inngest.createFunction(
     triggers: [deleteAttachmentEvent],
   },
   async ({ event, step }) => {
-    const { attachmentId, organizationId, ticketId, attachmentName } =
+    const { attachmentId, entity, organizationId, ticketId, attachmentName } =
       event.data;
     const key = generateS3Key({
+      entity,
       organizationId,
       ticketId,
       attachmentName,

@@ -121,6 +121,7 @@ async function page({ params }: TicketPageProps) {
         <Attachments
           ticketId={ticketId}
           isOwner={isOwner(user?.id ?? "", ticket.userId ?? undefined)}
+          entity={"TICKET"}
         />
       </div>
 

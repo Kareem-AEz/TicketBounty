@@ -23,6 +23,7 @@ export async function getAttachmentPreview(attachmentId: string) {
     }
 
     const key = generateS3Key({
+      entity: attachment.entity,
       organizationId: attachment.storageOrganizationId,
       ticketId: attachment.storageTicketId,
       attachmentName: attachment.name,

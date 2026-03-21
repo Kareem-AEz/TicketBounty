@@ -9,6 +9,7 @@ import { EMPTY_ACTION_STATE } from "@/components/form/utils/to-action-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { AttachmentEntity } from "@/generated/enums";
 import { usePatchedToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { createAttachment } from "../actions/create-attachment";
@@ -20,10 +21,14 @@ import {
 import { useAttachmentUpload } from "../hooks/use-attachment-upload";
 
 type AttachmentFormProps = {
-  ticketId: string;
+  entityId: string;
+  entity: AttachmentEntity;
 };
 
-export default function AttachmentForm({ ticketId }: AttachmentFormProps) {
+export default function AttachmentForm({
+  entityId,
+  entity,
+}: AttachmentFormProps) {
   const { toast } = usePatchedToast();
   const {
     state: {
@@ -45,7 +50,8 @@ export default function AttachmentForm({ ticketId }: AttachmentFormProps) {
       handleSubmit,
     },
   } = useAttachmentUpload({
-    action: (state, formData) => createAttachment(ticketId, state, formData),
+    action: (state, formData) =>
+      createAttachment({ entityId, entity }, state, formData),
     initialActionState: EMPTY_ACTION_STATE,
   });
 
