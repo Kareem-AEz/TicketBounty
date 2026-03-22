@@ -8,12 +8,16 @@ import {
 } from "@/components/form/utils/to-action-state";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import { isOwner } from "@/features/auth/utils/is-owner";
-import { Ticket, TicketComment } from "@/generated/client";
 import { AttachmentEntity } from "@/generated/enums";
 import { s3 } from "@/lib/aws";
 import prisma from "@/lib/prisma";
 import { ticketPath } from "@/paths";
 import { MAX_ATTACHMENT_COUNT } from "../constants";
+import {
+  CommentSubjectAttachment,
+  isTicketSubjectAttachment,
+  TicketSubjectAttachment,
+} from "../types";
 import { generateS3Key } from "../utils/generate-s3-key";
 import { processAttachments } from "../utils/process-attachments";
 
@@ -47,21 +51,34 @@ export async function createAttachment(
     // 2. DB Transaction (DB-bound) - Create records and return IDs
     const { createdAttachments, organizationId, ticketId } =
       await prisma.$transaction(async (tx) => {
-        const [subject, attachments] = await Promise.all([
+        // -- FETCH SUBJECT + EXISTING ATTACHMENTS IN PARALLEL --
+        // We attach the `entity` discriminant so the result becomes an
+        // `AttachmentSubject` union that the type guards below can narrow.
+        const subjectPromise =
           entity === AttachmentEntity.TICKET
-            ? tx.ticket.findUnique({
-                where: {
-                  id: entityId,
-                },
-              })
-            : tx.ticketComment.findUnique({
-                where: {
-                  id: entityId,
-                },
-                include: {
-                  ticket: true,
-                },
-              }),
+            ? tx.ticket
+                .findUnique({
+                  where: { id: entityId },
+                  select: { id: true, organizationId: true, userId: true },
+                })
+                .then((t): TicketSubjectAttachment | null =>
+                  t ? { ...t, entity: AttachmentEntity.TICKET } : null,
+                )
+            : tx.ticketComment
+                .findUnique({
+                  where: { id: entityId },
+                  select: {
+                    id: true,
+                    userId: true,
+                    ticket: { select: { id: true, organizationId: true } },
+                  },
+                })
+                .then((c): CommentSubjectAttachment | null =>
+                  c ? { ...c, entity: AttachmentEntity.COMMENT } : null,
+                );
+
+        const [subject, existingAttachments] = await Promise.all([
+          subjectPromise,
           tx.attachment.findMany({
             where: {
               [entity === AttachmentEntity.TICKET ? "ticketId" : "commentId"]:
@@ -70,41 +87,33 @@ export async function createAttachment(
           }),
         ]);
 
-        const entityName = AttachmentEntity[entity];
-        let organizationId: string | undefined;
-        let ticketId: string | undefined;
+        if (!subject) throw new Error("Not found");
 
-        if (attachments.length >= MAX_ATTACHMENT_COUNT)
+        if (existingAttachments.length >= MAX_ATTACHMENT_COUNT)
           throw new Error(
             `Maximum number of attachments (${MAX_ATTACHMENT_COUNT}) reached`,
           );
 
-        if (entityName === "TICKET") {
-          const ticket = subject as Ticket;
+        let organizationId: string;
+        let ticketId: string;
 
-          if (!ticket) throw new Error("Ticket not found");
-          if (!ticket.organizationId)
+        if (isTicketSubjectAttachment(subject)) {
+          if (!subject.organizationId)
             throw new Error("Ticket is not associated with an organization");
-          if (!isOwner(userId, ticket.userId ?? undefined))
+          if (!isOwner(userId, subject.userId ?? undefined))
             throw new Error("You are not the owner of this ticket");
 
-          organizationId = ticket.organizationId;
-          ticketId = ticket.id;
-        } else if (entityName === "COMMENT") {
-          const comment = subject as TicketComment & { ticket: Ticket };
-
-          if (!comment) throw new Error("Comment not found");
-          if (!isOwner(userId, comment.userId ?? undefined))
+          organizationId = subject.organizationId;
+          ticketId = subject.id;
+        } else {
+          if (!isOwner(userId, subject.userId ?? undefined))
             throw new Error("You are not the owner of this comment");
-          if (!comment.ticket.organizationId)
+          if (!subject.ticket.organizationId)
             throw new Error("Comment is not associated with an organization");
 
-          organizationId = comment.ticket.organizationId;
-          ticketId = comment.ticketId;
+          organizationId = subject.ticket.organizationId;
+          ticketId = subject.ticket.id;
         }
-
-        if (!organizationId || !ticketId)
-          throw new Error("Missing required subject data");
 
         // -- DE-DUPLICATE ATTACHMENTS BY HASH --
         // We want to ensure that within this upload batch (toAdd), no two attachments have the same hash.
@@ -121,7 +130,9 @@ export async function createAttachment(
             return true;
           })
           .map((attachment) => ({
-            ticketId,
+            ...(entity === AttachmentEntity.TICKET
+              ? { ticketId: entityId }
+              : { commentId: entityId }),
             entity,
             name: attachment.file.name,
             hash: attachment.hash,
@@ -130,7 +141,7 @@ export async function createAttachment(
             mimeType: attachment.mimeType,
           }));
 
-        const duplicateAttachments = attachments.filter((attachment) =>
+        const duplicateAttachments = existingAttachments.filter((attachment) =>
           attachmentsData.some((a) => a.hash === attachment.hash),
         );
 
@@ -139,7 +150,8 @@ export async function createAttachment(
             `Duplicate attachments found: ${duplicateAttachments.map((a) => a.name).join(", ")}`,
           );
 
-        const availableAttachments = MAX_ATTACHMENT_COUNT - attachments.length;
+        const availableAttachments =
+          MAX_ATTACHMENT_COUNT - existingAttachments.length;
 
         if (attachmentsData.length > availableAttachments)
           attachmentsData = attachmentsData.slice(0, availableAttachments);
