@@ -22,10 +22,26 @@ export async function getAttachmentPreview(attachmentId: string) {
       throw new Error("Attachment not found");
     }
 
+    // -- ENFORCE SINGLE FK INVARIANT --
+    // Each attachment must belong to exactly one entity. If both FKs are set
+    // or neither is, the record is corrupt and we should not serve it.
+    const hasTicket = attachment.ticketId != null;
+    const hasComment = attachment.commentId != null;
+
+    if (hasTicket === hasComment) {
+      throw new Error(
+        hasTicket
+          ? "Data integrity error: attachment is linked to both a ticket and a comment"
+          : "Data integrity error: attachment has no entity reference",
+      );
+    }
+
+    const entityId = (attachment.ticketId ?? attachment.commentId) as string;
+
     const key = generateS3Key({
+      entityId,
       entity: attachment.entity,
       organizationId: attachment.storageOrganizationId,
-      ticketId: attachment.storageTicketId,
       attachmentName: attachment.name,
       attachmentId: attachment.id,
     });
