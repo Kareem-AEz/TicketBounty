@@ -1,7 +1,7 @@
-import { LucideHeart } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Separator } from "./ui/separator";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export default async function Footer({
   ...props
@@ -16,7 +16,25 @@ export default async function Footer({
       <div className="flex flex-col items-center justify-center py-12">
         <p className="text-muted-foreground flex items-center gap-x-1 text-sm">
           <span>Built with </span>
-          <LucideHeart className="size-5 stroke-3 text-red-500 dark:stroke-2" />
+
+          <Tooltip>
+            <TooltipTrigger asChild aria-label="Built with love">
+              <span className="relative inline-block size-5 -translate-y-0.5 align-middle">
+                {/* This spans underneath the heart and expands/fades in a loop */}
+                <span className="absolute inset-0 -translate-y-px animate-ping rounded-full bg-rose-400/40" />
+                {/* The heart sits above, glowing */}
+                <HeartIcon className="glow-heart relative size-5 text-red-500 drop-shadow" />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                <span className="font-bold text-rose-500">Built with love</span>
+                <span className="ml-1 font-mono text-xs text-amber-600 dark:text-amber-400">
+                  and pixel magic
+                </span>
+              </p>
+            </TooltipContent>
+          </Tooltip>
 
           <span>
             by
@@ -87,6 +105,29 @@ function TwitterIcon({ className }: { className?: string }) {
     >
       <title>X</title>
       <path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z" />
+    </svg>
+  );
+}
+
+function HeartIcon({
+  className,
+  style,
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <svg
+      className={cn("size-5", className)}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      style={style}
+    >
+      <path
+        d="M12 4.32781C12.1935 4.18729 12.4386 4.02609 12.7319 3.86553C13.5214 3.43347 14.6725 3 16.1111 3C17.5979 3 19.0829 3.5977 20.1921 4.78484C21.3047 5.97563 22 7.71515 22 9.9375C22 13.2536 19.6489 16.0247 17.3927 17.8948C16.2446 18.8464 15.0735 19.6049 14.1357 20.1276C13.6669 20.3889 13.2492 20.5954 12.9151 20.7391C12.7487 20.8106 12.5947 20.8702 12.4603 20.9134C12.3511 20.9485 12.1754 21 12 21C11.8246 21 11.6489 20.9485 11.5397 20.9134C11.4053 20.8702 11.2513 20.8106 11.0849 20.7391C10.7508 20.5954 10.3331 20.3889 9.86432 20.1276C8.92652 19.6049 7.75539 18.8464 6.60732 17.8948C4.35114 16.0247 2 13.2536 2 9.9375C2 7.71515 2.69528 5.97563 3.80789 4.78484C4.91708 3.5977 6.40208 3 7.88889 3C9.32752 3 10.4786 3.43347 11.2681 3.86553C11.5614 4.02609 11.8065 4.18729 12 4.32781Z"
+        fill="currentColor"
+      />
     </svg>
   );
 }
