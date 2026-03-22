@@ -38,6 +38,7 @@ export const deleteAttachment = async ({
         comment: {
           select: {
             userId: true,
+            ticketId: true,
           },
         },
       },
@@ -68,9 +69,13 @@ export const deleteAttachment = async ({
         attachmentId: attachment.id,
         attachmentName: attachment.name,
       }),
-
-      revalidatePath(ticketPath(attachment.ticket?.id ?? "")),
     );
+
+    if (attachment.entity === AttachmentEntity.TICKET) {
+      revalidatePath(ticketPath(attachment.ticket?.id ?? ""));
+    } else if (attachment.entity === AttachmentEntity.COMMENT) {
+      revalidatePath(ticketPath(attachment.comment?.ticketId ?? ""));
+    }
 
     return toSuccessActionState({
       status: "SUCCESS",
