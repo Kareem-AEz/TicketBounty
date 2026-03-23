@@ -5,7 +5,10 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { FieldError } from "@/components/form/field-error";
 import { useActionFeedback } from "@/components/form/hooks/useActionFeedback";
-import { EMPTY_ACTION_STATE } from "@/components/form/utils/to-action-state";
+import {
+  ActionState,
+  EMPTY_ACTION_STATE,
+} from "@/components/form/utils/to-action-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -23,11 +26,15 @@ import { useAttachmentUpload } from "../hooks/use-attachment-upload";
 type AttachmentFormProps = {
   entityId: string;
   entity: AttachmentEntity;
+  buttons?: React.ReactNode;
+  onSuccess?: (actionState: ActionState) => void;
 };
 
 export default function AttachmentForm({
   entityId,
   entity,
+  buttons,
+  onSuccess,
 }: AttachmentFormProps) {
   const { toast } = usePatchedToast();
   const {
@@ -66,9 +73,10 @@ export default function AttachmentForm({
   };
 
   useActionFeedback(actionState, {
-    onSuccess: () => {
+    onSuccess: ({ actionState }) => {
       toast.success("Attachments uploaded successfully");
       setAttachments([]);
+      onSuccess?.(actionState);
     },
     onError: ({ actionState }) => {
       toast.error(actionState.message || "Failed to upload attachments");
@@ -76,16 +84,16 @@ export default function AttachmentForm({
   });
   return (
     <div className="flex flex-col gap-y-8">
-      {/* -- THE ATTACHMENT FORM -- */}
-      <div className="flex flex-col gap-y-3">
-        {/* -- THE FORM CONTAINER -- */}
-        <form onSubmit={handleSubmit}>
+      {/* -- THE FORM CONTAINER -- */}
+      <form onSubmit={handleSubmit}>
+        {/* -- THE ATTACHMENT FORM -- */}
+        <div className="flex flex-col gap-y-4">
           {/* -- THE DROP ZONE -- */}
-          <div className="bg-card z-10 flex flex-col items-center gap-y-3">
+          <div className="z-10 flex flex-col items-center gap-y-3">
             <div
               ref={dropZoneRef}
               className={cn(
-                "border-muted-foreground/20 hover:border-primary/40 group/drop-zone hover:bg-muted/10 focus-visible:ring-ring/50 flex h-48 w-full cursor-pointer flex-col items-center justify-center gap-y-3 rounded-xl border-2 border-dashed transition-all focus-visible:ring-3 focus-visible:outline-none",
+                "border-muted-foreground/20 bg-card hover:border-primary/40 group/drop-zone hover:bg-muted/10 focus-visible:ring-ring/50 flex h-48 w-full cursor-pointer flex-col items-center justify-center gap-y-3 rounded-xl border-2 border-dashed transition-all focus-visible:ring-3 focus-visible:outline-none",
                 isDragging &&
                   !isMaxAttachmentsReached &&
                   "border-primary/50 bg-primary/5",
@@ -140,9 +148,33 @@ export default function AttachmentForm({
               </div>
             </div>
 
+            {/* -- THE ATTACHMENT LIMIT INFO -- */}
+            <div className="flex w-full items-center justify-between">
+              <p className="text-muted-foreground/60 font-mono text-xs tracking-wider">
+                Images & PDF up to{" "}
+                {(MAX_ATTACHMENT_SIZE / 1024 / 1024).toFixed(0)}
+                MB
+              </p>
+
+              <div
+                ref={attachmentLimitInfoRef}
+                className="flex items-center gap-x-1 font-mono text-xs tracking-wider"
+              >
+                <span className="text-muted-foreground">
+                  {attachments.length}
+                </span>
+                <span className="text-muted-foreground">/</span>
+                <span className="text-muted-foreground/60">
+                  {MAX_ATTACHMENT_COUNT}
+                </span>
+              </div>
+            </div>
+
             {/* -- THE FIELD ERROR -- */}
             <FieldError actionState={actionState} name="attachment" />
+          </div>
 
+          {buttons || (
             <Button
               type="submit"
               className="w-full cursor-pointer"
@@ -152,38 +184,19 @@ export default function AttachmentForm({
               <Plus className="size-4" />
               Add attachments
             </Button>
-          </div>
-        </form>
-
-        {/* -- THE ATTACHMENT LIMIT INFO -- */}
-        <div className="flex items-center justify-between">
-          <p className="text-muted-foreground/60 font-mono text-xs tracking-wider">
-            Images & PDF up to {(MAX_ATTACHMENT_SIZE / 1024 / 1024).toFixed(0)}
-            MB
-          </p>
-
-          <div
-            ref={attachmentLimitInfoRef}
-            className="flex items-center gap-x-1 font-mono text-xs tracking-wider"
-          >
-            <span className="text-muted-foreground">{attachments.length}</span>
-            <span className="text-muted-foreground">/</span>
-            <span className="text-muted-foreground/60">
-              {MAX_ATTACHMENT_COUNT}
-            </span>
-          </div>
+          )}
         </div>
-      </div>
+      </form>
 
       {attachments.length > 0 && <Separator className="bg-accent" />}
       {/* -- THE ATTACHMENTS LIST -- */}
       {attachments.length > 0 && (
-        <div role="list" className="flex flex-col gap-y-3 overflow-hidden">
+        <div role="list" className="flex flex-col gap-y-2 overflow-hidden">
           {attachments.map((attachment, index) => (
             <div
               key={attachment.url}
               role="listitem"
-              className="bg-card flex w-full items-center gap-x-3 rounded-lg transition-colors"
+              className="bg-card flex w-full items-center gap-x-3 rounded-lg p-3 transition-colors"
             >
               <div className="flex size-10 shrink-0 items-center justify-center rounded-md">
                 {attachment.file.type.startsWith("image/") && (
