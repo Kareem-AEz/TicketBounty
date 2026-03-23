@@ -24,26 +24,19 @@ export async function commentDelete(commentId: string) {
       throw new Error("You are not the owner of this comment");
     }
 
-    await prisma.ticketComment.delete({
-      where: { id: commentId },
-    });
+    const entityId = comment.id;
 
     await inngest.send(
       bulkDeleteAttachmentsEvent.create({
         entity: AttachmentEntity.COMMENT,
-        entityId: commentId,
+        entityId,
         previousDeletedAt: comment.deletedAt,
         attachments: comment.attachments.map((attachment) => ({
           attachmentId: attachment.id,
           organizationId: attachment.storageOrganizationId,
-          entityId: attachment.commentId,
+          entityId,
           attachmentName: attachment.name,
-        })) as {
-          attachmentId: string;
-          organizationId: string;
-          entityId: string;
-          attachmentName: string;
-        }[],
+        })),
       }),
     );
 

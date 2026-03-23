@@ -200,7 +200,7 @@ export default function Comments({
           </CardContent>
         </Card>
 
-        <div className="relative space-y-6">
+        <div className="relative space-y-8">
           <AnimatePresence mode="popLayout" initial={false}>
             {comments.map((comment) => (
               <motion.div

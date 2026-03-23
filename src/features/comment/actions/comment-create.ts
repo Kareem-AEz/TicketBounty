@@ -47,6 +47,7 @@ export default async function commentUpsert({
             username: true,
           },
         },
+        attachments: true,
       },
     });
 
