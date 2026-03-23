@@ -72,9 +72,12 @@ export const deleteAttachment = async ({
     );
 
     if (attachment.entity === AttachmentEntity.TICKET) {
-      revalidatePath(ticketPath(attachment.ticket?.id ?? ""));
+      if (!attachment.ticket?.id) throw new Error("Something went wrong");
+      revalidatePath(ticketPath(attachment.ticket.id));
     } else if (attachment.entity === AttachmentEntity.COMMENT) {
-      revalidatePath(ticketPath(attachment.comment?.ticketId ?? ""));
+      if (!attachment.comment?.ticketId)
+        throw new Error("Something went wrong");
+      revalidatePath(ticketPath(attachment.comment.ticketId));
     }
 
     return toSuccessActionState({

@@ -16,6 +16,11 @@ export default async function Attachments({
   entity,
 }: AttachmentsProps) {
   const attachments = await getAttachments(ticketId, entity);
+  const isEmpty = attachments.length === 0;
+
+  if (isEmpty && !isOwner) {
+    return null;
+  }
   return (
     <div className="flex w-full flex-col gap-y-4">
       <div className="flex flex-col">
@@ -26,7 +31,11 @@ export default async function Attachments({
       </div>
       <div className="flex flex-col gap-y-2">
         {attachments.map((attachment) => (
-          <AttachmentItem key={attachment.id} attachment={attachment} />
+          <AttachmentItem
+            key={attachment.id}
+            attachment={attachment}
+            isOwner={isOwner}
+          />
         ))}
       </div>
       <CardCompact

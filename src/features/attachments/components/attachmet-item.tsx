@@ -8,9 +8,13 @@ import AttachmentDeleteButton from "./attachment-delete-button";
 
 type AttachmentItemProps = {
   attachment: Attachment;
+  isOwner: boolean;
 };
 
-export default function AttachmentItem({ attachment }: AttachmentItemProps) {
+export default function AttachmentItem({
+  attachment,
+  isOwner,
+}: AttachmentItemProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const isImage = attachment.mimeType.startsWith("image/");
   const previewApiUrl = attachmentPreviewPath(attachment.id);
@@ -53,9 +57,11 @@ export default function AttachmentItem({ attachment }: AttachmentItemProps) {
         </span>
       </a>
 
-      <div className="ml-auto">
-        <AttachmentDeleteButton attachmentId={attachment.id} />
-      </div>
+      {isOwner && (
+        <div className="ml-auto">
+          <AttachmentDeleteButton attachmentId={attachment.id} />
+        </div>
+      )}
     </div>
   );
 }

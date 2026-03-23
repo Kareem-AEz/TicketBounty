@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { MAX_ATTACHMENT_LIVE_TIME_PREVIEW } from "@/features/attachments/constants";
 import { generateS3Key } from "@/features/attachments/utils/generate-s3-key";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
+import { AttachmentEntity } from "@/generated/enums";
 import { s3 } from "@/lib/aws";
 import prisma from "@/lib/prisma";
 
@@ -35,10 +36,26 @@ export async function GET(
       throw new Error("Attachment not found");
     }
 
+    let entityId: string;
+    switch (attachment.entity) {
+      case AttachmentEntity.TICKET:
+        if (!attachment.ticketId)
+          throw new Error("Attachment with entity TICKET has no ticketId");
+        entityId = attachment.ticketId;
+        break;
+      case AttachmentEntity.COMMENT:
+        if (!attachment.commentId)
+          throw new Error("Attachment with entity COMMENT has no commentId");
+        entityId = attachment.commentId;
+        break;
+      default:
+        throw new Error("Invalid attachment entity");
+    }
+
     const key = generateS3Key({
       entity: attachment.entity,
       organizationId: attachment.storageOrganizationId,
-      entityId: attachment.storageTicketId,
+      entityId,
       attachmentName: attachment.name,
       attachmentId: attachment.id,
     });
