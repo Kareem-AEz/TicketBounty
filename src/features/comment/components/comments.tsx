@@ -14,6 +14,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import AttachmentDeleteButton from "@/features/attachments/components/attachment-delete-button";
+import AttachmentsList from "@/features/attachments/components/attachments-list";
+import { isOwner } from "@/features/auth/utils/is-owner";
+import { Attachment } from "@/generated/client";
 import { getComments } from "../queries/get-comments";
 import CommentForm from "./comment-form";
 import CommentItem from "./comment-item";
@@ -129,6 +133,47 @@ export default function Comments({
     }, 1000);
   };
 
+  const handleDeleteAttachment = (attachmentId: string) => {
+    queryClient.setQueryData(queryKey, (oldData: typeof commentsData) => {
+      if (!oldData) return oldData;
+      return {
+        pages: oldData.pages.map((page) => ({
+          ...page,
+          data: page.data.map((comment) => ({
+            ...comment,
+            attachments: comment.attachments.filter(
+              (a) => a.id !== attachmentId,
+            ),
+          })),
+        })),
+        pageParams: oldData.pageParams,
+      };
+    });
+  };
+
+  const handleAttachmentSuccess = (
+    commentId: string,
+    newAttachments: Attachment[],
+  ) => {
+    queryClient.setQueryData(queryKey, (oldData: typeof commentsData) => {
+      if (!oldData) return oldData;
+      return {
+        pages: oldData.pages.map((page) => ({
+          ...page,
+          data: page.data.map((comment) =>
+            comment.id === commentId
+              ? {
+                  ...comment,
+                  attachments: [...comment.attachments, ...newAttachments],
+                }
+              : comment,
+          ),
+        })),
+        pageParams: oldData.pageParams,
+      };
+    });
+  };
+
   const LoadingSpinner = (
     <motion.div
       key={"loading-more-comments"}
@@ -200,23 +245,47 @@ export default function Comments({
           </CardContent>
         </Card>
 
-        <div className="relative space-y-8">
+        <div className="relative space-y-6">
           <AnimatePresence mode="popLayout" initial={false}>
             {comments.map((comment) => (
-              <motion.div
-                key={comment.id}
-                layout="position"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <CommentItem
-                  comment={comment}
-                  isOwner={user?.id === comment.userId}
-                  onDelete={handleDeleteComment}
-                  onUpdate={handleUpsertComment}
-                />
-              </motion.div>
+              <div key={comment.id} className="flex flex-col gap-y-2">
+                <motion.div
+                  layout="position"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  key={`comment-${comment.id}`}
+                >
+                  <CommentItem
+                    comment={comment}
+                    isOwner={user?.id === comment.userId}
+                    onDelete={handleDeleteComment}
+                    onUpdate={handleUpsertComment}
+                    onAttachmentSuccess={handleAttachmentSuccess}
+                  />
+                </motion.div>
+
+                <motion.div
+                  layout="position"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <AttachmentsList
+                    attachments={comment.attachments}
+                    buttons={(attachmentId) =>
+                      isOwner(user?.id, comment.userId ?? undefined) && (
+                        <div className="ml-auto">
+                          <AttachmentDeleteButton
+                            attachmentId={attachmentId}
+                            onDelete={handleDeleteAttachment}
+                          />
+                        </div>
+                      )
+                    }
+                  />
+                </motion.div>
+              </div>
             ))}
           </AnimatePresence>
 

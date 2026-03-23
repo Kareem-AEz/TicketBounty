@@ -1,6 +1,7 @@
 import { CardCompact } from "@/components/card-compact";
 import { AttachmentEntity } from "@/generated/enums";
 import { getAttachments } from "../queries/get-attachments";
+import AttachmentDeleteButton from "./attachment-delete-button";
 import AttachmentForm from "./attachment-form";
 import AttachmentItem from "./attachmet-item";
 
@@ -34,7 +35,13 @@ export default async function Attachments({
           <AttachmentItem
             key={attachment.id}
             attachment={attachment}
-            isOwner={isOwner}
+            buttons={
+              isOwner && (
+                <div className="ml-auto">
+                  <AttachmentDeleteButton attachmentId={attachment.id} />
+                </div>
+              )
+            }
           />
         ))}
       </div>

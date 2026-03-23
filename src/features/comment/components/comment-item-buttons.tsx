@@ -5,6 +5,7 @@ import React from "react";
 import DeleteButton from "@/components/delete-button";
 import { Button } from "@/components/ui/button";
 import AttachmentCreateButton from "@/features/attachments/components/attachment-create-button";
+import { Attachment } from "@/generated/client";
 import { commentDelete } from "../actions/comment-delete";
 
 type CommentItemButtonsProps = {
@@ -12,6 +13,7 @@ type CommentItemButtonsProps = {
   isMine: boolean;
   onEdit?: () => void;
   onDelete?: (commentId: string) => void;
+  onAttachmentSuccess?: (attachments: Attachment[]) => void;
 };
 
 export default function CommentItemButtons({
@@ -19,12 +21,17 @@ export default function CommentItemButtons({
   isMine,
   onEdit,
   onDelete,
+  onAttachmentSuccess,
 }: CommentItemButtonsProps) {
   if (!isMine) return null;
 
   return (
     <div className="flex flex-col gap-y-2 p-1">
-      <AttachmentCreateButton entity="COMMENT" entityId={commentId} />
+      <AttachmentCreateButton
+        entity="COMMENT"
+        entityId={commentId}
+        onSuccess={onAttachmentSuccess}
+      />
 
       <Button
         variant={"outline"}

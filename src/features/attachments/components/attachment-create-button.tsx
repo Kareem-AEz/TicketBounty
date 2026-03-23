@@ -1,6 +1,7 @@
 import { LucidePaperclip } from "lucide-react";
 import { useState } from "react";
 import SubmitButton from "@/components/form/submit-button";
+import { ActionState } from "@/components/form/utils/to-action-state";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,15 +12,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Attachment } from "@/generated/client";
 import { AttachmentEntity } from "@/generated/enums";
 import AttachmentForm from "./attachment-form";
 
 export default function AttachmentCreateButton({
   entity,
   entityId,
+  onSuccess,
 }: {
   entity: AttachmentEntity;
   entityId: string;
+  onSuccess?: (attachments: Attachment[]) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -27,8 +31,9 @@ export default function AttachmentCreateButton({
     setOpen(false);
   };
 
-  const handleSuccess = () => {
+  const handleSuccess = (actionState: ActionState) => {
     setOpen(false);
+    onSuccess?.((actionState.data as Attachment[]) ?? []);
   };
 
   return (
