@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import AttachmentItem from "@/features/attachments/components/attachmet-item";
+import { Attachment } from "@/generated/client";
 import { Comment } from "../type";
 import CommentForm from "./comment-form";
 import CommentItemButtons from "./comment-item-buttons";
@@ -23,16 +23,17 @@ export default function CommentItem({
   isOwner,
   onDelete,
   onUpdate,
+  onAttachmentSuccess,
 }: {
   comment: Comment;
   isOwner: boolean;
   onDelete?: (commentId: string) => void;
   onUpdate?: (comment?: Comment) => void;
+  onAttachmentSuccess?: (commentId: string, attachments: Attachment[]) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const isDeleted = !comment.user;
   const [ref, { height }] = useMeasure();
-  const attachments = comment.attachments ?? [];
 
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
@@ -188,26 +189,15 @@ export default function CommentItem({
                     onEdit={handleEdit}
                     commentId={comment.id}
                     onDelete={onDelete}
+                    onAttachmentSuccess={(attachments) =>
+                      onAttachmentSuccess?.(comment.id, attachments)
+                    }
                   />
                 </div>
               )}
             </AnimatePresence>
           </div>
         </motion.div>
-
-        {attachments.length > 0 && (
-          <div className="flex flex-col gap-y-2">
-            {attachments.map((attachment) => {
-              return (
-                <AttachmentItem
-                  key={attachment.id}
-                  attachment={attachment}
-                  isOwner={isOwner}
-                />
-              );
-            })}
-          </div>
-        )}
       </div>
     </MotionConfig>
   );

@@ -7,10 +7,12 @@ import { deleteAttachment } from "../actions/delete-attachment";
 
 type AttachmentDeleteButtonProps = {
   attachmentId: string;
+  onDelete?: (attachmentId: string) => void;
 };
 
 export default function AttachmentDeleteButton({
   attachmentId,
+  onDelete,
 }: AttachmentDeleteButtonProps) {
   const button = (isPending: boolean) => (
     <Button
@@ -31,6 +33,9 @@ export default function AttachmentDeleteButton({
     loadingLabel: "Deleting attachment...",
     trigger: (isPending) => button(isPending),
     action: deleteAttachment.bind(null, { attachmentId }),
+    onSuccess: () => {
+      onDelete?.(attachmentId);
+    },
   });
 
   return (

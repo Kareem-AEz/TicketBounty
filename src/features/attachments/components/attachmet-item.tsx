@@ -4,16 +4,15 @@ import { useState } from "react";
 import { Attachment } from "@/generated/client";
 import { cn } from "@/lib/utils";
 import { attachmentDownloadPath, attachmentPreviewPath } from "@/paths";
-import AttachmentDeleteButton from "./attachment-delete-button";
 
 type AttachmentItemProps = {
   attachment: Attachment;
-  isOwner: boolean;
+  buttons: React.ReactNode;
 };
 
 export default function AttachmentItem({
   attachment,
-  isOwner,
+  buttons,
 }: AttachmentItemProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const isImage = attachment.mimeType.startsWith("image/");
@@ -57,11 +56,7 @@ export default function AttachmentItem({
         </span>
       </a>
 
-      {isOwner && (
-        <div className="ml-auto">
-          <AttachmentDeleteButton attachmentId={attachment.id} />
-        </div>
-      )}
+      {buttons}
     </div>
   );
 }

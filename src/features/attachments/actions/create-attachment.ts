@@ -211,6 +211,7 @@ export async function createAttachment(
     return toSuccessActionState({
       status: "SUCCESS",
       message: "Attachment created",
+      data: createdAttachments,
     });
   } catch (error) {
     return toErrorActionState(error, formData);
