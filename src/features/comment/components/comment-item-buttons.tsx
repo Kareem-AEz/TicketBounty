@@ -4,6 +4,7 @@ import { LucidePencil, LucideTrash2 } from "lucide-react";
 import React from "react";
 import DeleteButton from "@/components/delete-button";
 import { Button } from "@/components/ui/button";
+import AttachmentCreateButton from "@/features/attachments/components/attachment-create-button";
 import { commentDelete } from "../actions/comment-delete";
 
 type CommentItemButtonsProps = {
@@ -23,14 +24,8 @@ export default function CommentItemButtons({
 
   return (
     <div className="flex flex-col gap-y-2 p-1">
-      {/* <Button
-        variant={"outline"}
-        size={"icon"}
-        onClick={onDelete}
-        aria-label="Delete comment"
-      >
-        <LucideTrash2 />
-      </Button> */}
+      <AttachmentCreateButton entity="COMMENT" entityId={commentId} />
+
       <Button
         variant={"outline"}
         size={"icon"}

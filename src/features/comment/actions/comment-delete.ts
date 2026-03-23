@@ -1,7 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bulkDeleteAttachmentsEvent } from "@/features/attachments/events/bulk-delete-attachments.event";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
+import { AttachmentEntity } from "@/generated/enums";
+import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
 import { ticketPath } from "@/paths";
 
@@ -10,6 +13,9 @@ export async function commentDelete(commentId: string) {
   try {
     const comment = await prisma.ticketComment.findUnique({
       where: { id: commentId },
+      include: {
+        attachments: true,
+      },
     });
     if (!comment) {
       throw new Error("Comment not found");
@@ -21,6 +27,25 @@ export async function commentDelete(commentId: string) {
     await prisma.ticketComment.delete({
       where: { id: commentId },
     });
+
+    await inngest.send(
+      bulkDeleteAttachmentsEvent.create({
+        entity: AttachmentEntity.COMMENT,
+        entityId: commentId,
+        previousDeletedAt: comment.deletedAt,
+        attachments: comment.attachments.map((attachment) => ({
+          attachmentId: attachment.id,
+          organizationId: attachment.storageOrganizationId,
+          entityId: attachment.commentId,
+          attachmentName: attachment.name,
+        })) as {
+          attachmentId: string;
+          organizationId: string;
+          entityId: string;
+          attachmentName: string;
+        }[],
+      }),
+    );
 
     revalidatePath(ticketPath(comment.ticketId));
     return {
