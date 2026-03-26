@@ -8,12 +8,14 @@ import { formSchema } from "../schema";
 
 type CommentUpsertPropsType = {
   content: string;
+  attachments: File[];
   ticketId: string;
   commentId?: string;
 };
 
 export default async function commentUpsert({
   content,
+  attachments,
   ticketId,
   commentId,
 }: CommentUpsertPropsType) {

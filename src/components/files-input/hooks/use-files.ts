@@ -7,6 +7,10 @@ type UseFilesProps = {
   maxFiles: number;
   maxSize: number;
   acceptedTypes: string[];
+  disabled: boolean;
+  onRemoveFile?: (file: ProcessedFileWithPreview) => void;
+  onChange?: (files: File[]) => void;
+  onError?: (errors: { message: string; file: File }[]) => void;
 };
 
 /**
@@ -14,12 +18,16 @@ type UseFilesProps = {
  * @param maxFiles - The maximum number of files that can be selected
  * @param maxSize - The maximum size of the files
  * @param acceptedTypes - The accepted types of the files
- * @returns
+ * @param disabled - Whether the files input is disabled
  */
 export default function useFiles({
   maxFiles,
   maxSize,
   acceptedTypes,
+  disabled,
+  onRemoveFile,
+  onChange,
+  onError,
 }: UseFilesProps) {
   // -- STATE --
   const [isDragging, setIsDragging] = useState(false);
@@ -33,9 +41,11 @@ export default function useFiles({
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  //   -- HANDLERS --
+  const filesRef = useRef<ProcessedFileWithPreview[]>([]);
 
+  //   -- HANDLERS --
   const handleAddFiles = async (files: File[]) => {
+    if (disabled) return;
     const { toAdd, errors } = await processFiles({
       newFiles: files,
       existingFiles: processedFilesWithPreviews,
@@ -44,6 +54,7 @@ export default function useFiles({
     // -- ERROR HANDLING --
     if (errors.length > 0) {
       setErrors(errors);
+      onError?.(errors);
     }
     // -- PROCESS FILES --
     if (toAdd.length === 0) return;
@@ -59,40 +70,57 @@ export default function useFiles({
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    if (disabled) return;
     if (!isDragging) setIsDragging(true);
   };
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    if (disabled) return;
     if (!e.currentTarget.contains(e.relatedTarget as Node)) {
       setIsDragging(false);
     }
   };
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    if (disabled) return;
     setIsDragging(false);
     const files = Array.from(e.dataTransfer.files);
     handleAddFiles(files);
   };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     const files = Array.from(e.target.files ?? []);
     handleAddFiles(files);
     e.target.value = "";
   };
 
-  const handleRemoveFile = (file: File) => {
+  const handleRemoveFile = (file: ProcessedFileWithPreview) => {
+    if (disabled) return;
+    onRemoveFile?.(file);
     setProcessedFilesWithPreviews((currentFilesWithPreviews) =>
-      currentFilesWithPreviews.filter((f) => f.file !== file),
+      currentFilesWithPreviews.filter((f) => f.hash !== file.hash),
     );
+    URL.revokeObjectURL(file.objectUrl);
+  };
+
+  // -- RESET --
+  const reset = () => {
+    setProcessedFilesWithPreviews([]);
+    setErrors([]);
+    filesRef.current.forEach((f) => URL.revokeObjectURL(f.objectUrl));
   };
 
   //   -- EFFECTS --
   useEffect(() => {
+    filesRef.current = processedFilesWithPreviews;
+    const files = processedFilesWithPreviews.map((f) => f.file);
+    onChange?.(files);
+  }, [processedFilesWithPreviews, onChange]);
+
+  useEffect(() => {
     return () => {
-      processedFilesWithPreviews.forEach((f) => {
-        URL.revokeObjectURL(f.objectUrl);
-      });
+      filesRef.current.forEach((f) => URL.revokeObjectURL(f.objectUrl));
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
@@ -115,6 +143,9 @@ export default function useFiles({
     refs: {
       dropZoneRef,
       inputRef,
+    },
+    actions: {
+      reset,
     },
   };
 }
