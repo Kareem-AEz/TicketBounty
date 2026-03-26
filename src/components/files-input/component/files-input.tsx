@@ -2,15 +2,19 @@
 
 import { X } from "lucide-react";
 import { motion } from "motion/react";
-import { useRef, useState } from "react";
-import useMeasure from "react-use-measure";
+import { useImperativeHandle, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import useFileInputNavigation from "../hooks/use-file-input-navigation";
 import useFiles from "../hooks/use-files";
+import { ProcessedFileWithPreview } from "../types";
 import { fileExtentionFromMime } from "../utils/file-extention-from-mime";
+
+export type FilesInputHandle = {
+  reset: () => void;
+};
 
 type FilesInputProps = {
   // -- DATA --
@@ -26,7 +30,11 @@ type FilesInputProps = {
   disabled?: boolean;
   className?: string;
 
+  //   -- REF --
+  ref?: React.Ref<{ reset: () => void }>;
+
   //  -- OPTIONAL: ERROR HANDLING --
+  onError?: (errors: { message: string; file: File }[]) => void;
 };
 
 export default function FilesInput({
@@ -34,18 +42,20 @@ export default function FilesInput({
   maxSize = 4 * 1024 * 1024, // 4MB
   acceptedTypes = ["image/png", "image/jpeg", "application/pdf"],
   disabled = false,
+  onChange,
+  onError,
+  ref,
 }: FilesInputProps) {
   //   -- IMAGE LOADED MAP --
   const [imageLoadedMap, setImageLoadedMap] = useState<Record<string, boolean>>(
     {},
   );
 
-  //  -- REFS --
-  const filesLimitInfoRef = useRef<HTMLDivElement>(null);
-  const filesListRef = useRef<HTMLDivElement>(null);
-  const [ref, { height }] = useMeasure();
-
-  console.log(height);
+  // -- HANDLER: REMOVE FILE --
+  const handleRemove = (file: ProcessedFileWithPreview) => {
+    handleRemoveFile(file);
+    handleRemoveFileFocus();
+  };
 
   // -- USE FILES HOOK --
   const {
@@ -57,25 +67,31 @@ export default function FilesInput({
       handleFileChange,
       handleRemoveFile,
     },
-    state: {
-      processedFilesWithPreviews,
-      isDragging,
-      isMaxFilesReached,
-      errors,
-    },
+    actions: { reset },
+    state: { processedFilesWithPreviews, isDragging, isMaxFilesReached },
   } = useFiles({
     maxFiles,
     maxSize,
     acceptedTypes,
+    disabled,
+    onChange,
+    onError,
   });
+
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      reset();
+    },
+  }));
 
   // -- USE FILE INPUT NAVIGATION HOOK --
   const {
     state: { activeDeleteIndex },
-    handlers: { setActiveDeleteIndex },
+    handlers: { setActiveDeleteIndex, handleRemoveFileFocus },
     refs: { deleteButtonRefs },
   } = useFileInputNavigation({
     processedFilesWithPreviews,
+    dropZoneRef,
   });
 
   const isDisabled = isMaxFilesReached || disabled;
@@ -179,8 +195,7 @@ export default function FilesInput({
       {processedFilesWithPreviews.length > 0 && (
         <div role="list" className="flex flex-col gap-y-2 overflow-hidden">
           {processedFilesWithPreviews.map((processedFileWithPreview, index) => (
-            <motion.div
-              layout="position"
+            <div
               key={processedFileWithPreview.hash}
               role="listitem"
               className="bg-card flex w-full items-center gap-x-3 rounded-lg p-3 transition-colors"
@@ -249,7 +264,7 @@ export default function FilesInput({
                 size="icon"
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent clicking the card behind it
-                  handleRemoveFile(processedFileWithPreview.file);
+                  handleRemove(processedFileWithPreview);
                 }}
                 onFocus={() => setActiveDeleteIndex(index)}
                 onKeyDown={(e) => {
@@ -275,13 +290,13 @@ export default function FilesInput({
                     e.key === "Enter"
                   ) {
                     e.preventDefault();
-                    handleRemoveFile(processedFileWithPreview.file);
+                    handleRemove(processedFileWithPreview);
                   }
                 }}
               >
                 <X className="size-4" />
               </Button>
-            </motion.div>
+            </div>
           ))}
         </div>
       )}

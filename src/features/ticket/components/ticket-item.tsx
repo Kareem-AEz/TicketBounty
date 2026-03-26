@@ -231,7 +231,7 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                         <CardContent className="w-full">
                           <p
                             className={cn(
-                              "text-muted-foreground line-clamp-2 text-sm break-words whitespace-pre-wrap",
+                              "text-muted-foreground line-clamp-2 text-sm wrap-break-word whitespace-pre-wrap",
                               ticket.status === "DONE" && "line-through",
                               isDetail && "line-clamp-none",
                             )}
@@ -333,7 +333,6 @@ function TicketItem({ ticket, isDetail = false, user }: TicketItemProps) {
                                         "Ticket deleted successfully",
                                     );
                                     if (isDetail) redirect(ticketsPath());
-                                    console.log(isDetail);
                                     return {
                                       success: true,
                                       message: result.message,
