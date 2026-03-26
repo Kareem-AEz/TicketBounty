@@ -20,6 +20,7 @@
     "**/features/**/hooks/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
     "**/features/**/utils/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
     "**/features/**/emails/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
+    "**/features/**/service/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
     "**/components/**/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
     "**/lib/hooks/*.{tsx,ts,jsx,js}": "${dirname} | ${filename}",
     "**/emails/**/*.{tsx,ts,jsx,js}": "📧 ${dirname} | ${filename}",
