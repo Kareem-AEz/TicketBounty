@@ -84,7 +84,7 @@ export default async function commentUpsert({
     try {
       comment = await prisma.$transaction(async (tx) => {
         const upsertedComment = await tx.ticketComment.upsert({
-          where: { id: commentId || "" },
+          where: { id: commentId },
           update: { content: validatedContent },
           create: { content: validatedContent, ticketId, userId: user.id },
           select: { id: true },
