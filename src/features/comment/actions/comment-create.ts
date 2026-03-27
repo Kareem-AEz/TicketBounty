@@ -56,8 +56,12 @@ export default async function commentUpsert({
     if (errors.length > 0) throw new Error("Invalid attachments");
 
     // -- PHASE 2: PRE-GENERATE IDs --
-    // The same ID drives both the S3 key and the DB record, so the two
-    // stores are always in sync without any post-hoc reconciliation.
+    // Pre-generate the comment ID so both the S3 key and the DB record share
+    // the same commentId. This is required because the S3 upload (Phase 3)
+    // must happen before the transaction (Phase 4), but the S3 key for a
+    // COMMENT attachment must use the commentId — not the ticketId.
+    const targetCommentId = commentId ?? createId();
+
     const toUpload = toAdd.map((a) => ({
       id: createId(),
       file: a.file,
@@ -69,39 +73,40 @@ export default async function commentUpsert({
     // -- PHASE 3: S3 UPLOADS --
     // No DB records exist at this point.
     // If this throws, there is nothing to compensate in the DB.
-    const uploadedKeys = await attachmentsService.createAttachments({
+    // We use uploadAttachments (S3-only) because the attachment DB records
+    // must be created inside the same transaction as the comment upsert below.
+    const uploadedKeys = await attachmentsService.uploadAttachments({
       attachments: toUpload,
       entity: AttachmentEntity.COMMENT,
-      entityId: ticketId,
+      entityId: targetCommentId,
       organizationId,
     });
 
     // -- PHASE 4: DB WRITES --
     // Upsert the comment, then create attachment records in one transaction.
+    // We call createAttachments with the transaction client so the attachment
+    // writes are atomic with the comment upsert. S3 was already handled above,
+    // so the service skips uploading and only performs the DB write.
     // On failure we compensate by deleting the S3 objects we already uploaded —
     // an orphaned S3 object is invisible to users; an orphaned DB record is not.
     let comment;
     try {
       comment = await prisma.$transaction(async (tx) => {
         const upsertedComment = await tx.ticketComment.upsert({
-          where: { id: commentId },
+          where: { id: targetCommentId },
           update: { content: validatedContent },
-          create: { content: validatedContent, ticketId, userId: user.id },
+          create: { id: targetCommentId, content: validatedContent, ticketId, userId: user.id },
           select: { id: true },
         });
 
         if (toUpload.length > 0) {
-          await tx.attachment.createMany({
-            data: toUpload.map(({ id, file, hash, mimeType }) => ({
-              id,
-              commentId: upsertedComment.id,
-              entity: AttachmentEntity.COMMENT,
-              name: file.name,
-              hash,
-              mimeType,
-              storageOrganizationId: organizationId,
-              storageTicketId: ticketId,
-            })),
+          await attachmentsService.createAttachments({
+            attachments: toUpload,
+            entity: AttachmentEntity.COMMENT,
+            entityId: upsertedComment.id,
+            organizationId,
+            storageTicketId: ticketId,
+            options: { tx },
           });
         }
 
@@ -124,7 +129,8 @@ export default async function commentUpsert({
       });
     } catch (dbError) {
       // -- COMPENSATION --
-      // Delete the S3 objects uploaded in Phase 3 so they don't accumulate.
+      // The service does not compensate S3 when a transaction is provided,
+      // so we own the cleanup here. Delete the objects uploaded in Phase 3.
       // Promise.allSettled ensures all deletes are attempted even if some fail.
       await Promise.allSettled(
         uploadedKeys.map((key) =>

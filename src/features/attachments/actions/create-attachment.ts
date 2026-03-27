@@ -1,5 +1,4 @@
 "use server";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { createId } from "@paralleldrive/cuid2";
 import { revalidatePath } from "next/cache";
 import {
@@ -10,7 +9,6 @@ import {
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import { isOwner } from "@/features/auth/utils/is-owner";
 import { AttachmentEntity } from "@/generated/enums";
-import { s3 } from "@/lib/aws";
 import prisma from "@/lib/prisma";
 import { ticketPath } from "@/paths";
 import { MAX_ATTACHMENT_COUNT } from "../constants";
@@ -124,55 +122,16 @@ export async function createAttachment(
       .slice(0, available)
       .map((a) => ({ ...a, id: createId() }));
 
-    // -- PHASE 4: S3 UPLOADS (I/O-bound) --
-    // At this point no DB records exist yet.
-    // If this step fails entirely, there is nothing to clean up in the DB.
-    // The returned keys are held in memory for compensation in Phase 5.
-    const uploadedKeys = await createAttachments({
+    // -- PHASE 4: S3 UPLOAD + DB WRITE --
+    // Delegates to the service which uploads to S3, writes the DB records,
+    // and compensates by deleting S3 objects if the DB write fails.
+    const createdAttachments = await createAttachments({
       attachments: toUpload,
       entity,
       entityId,
       organizationId,
+      storageTicketId: ticketId,
     });
-
-    // -- PHASE 5: WRITE TRANSACTION --
-    // S3 uploads are confirmed — now create the DB records.
-    // This transaction is intentionally short: no I/O beyond the DB write.
-    // On failure we compensate by deleting the S3 objects we just uploaded.
-    // An orphaned S3 object is invisible to users; an orphaned DB record is not.
-    let createdAttachments;
-    try {
-      createdAttachments = await prisma.attachment.createManyAndReturn({
-        data: toUpload.map(({ id, file, hash, mimeType }) => ({
-          id,
-          ...(entity === AttachmentEntity.TICKET
-            ? { ticketId: entityId }
-            : { commentId: entityId }),
-          entity,
-          name: file.name,
-          hash,
-          mimeType,
-          storageOrganizationId: organizationId,
-          storageTicketId: ticketId,
-        })),
-      });
-    } catch (dbError) {
-      // -- COMPENSATION --
-      // The DB write failed. Delete the S3 objects we already uploaded so
-      // we don't accumulate unreferenced files. These objects have no DB
-      // record yet, so this failure path is invisible to users regardless.
-      await Promise.allSettled(
-        uploadedKeys.map((key) =>
-          s3.send(
-            new DeleteObjectCommand({
-              Bucket: process.env.R2_BUCKET_NAME,
-              Key: key,
-            }),
-          ),
-        ),
-      );
-      throw dbError;
-    }
 
     revalidatePath(ticketPath(ticketId));
 
