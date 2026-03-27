@@ -1,5 +1,12 @@
 import { AttachmentEntity, Prisma } from "@/generated/client";
 
+export type ProcessedAttachmentData = {
+  file: File;
+  buffer: Buffer;
+  hash: string;
+  mimeType: string;
+};
+
 export type TicketSubjectAttachment = Prisma.TicketGetPayload<{
   select: {
     id: true;
