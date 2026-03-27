@@ -4,6 +4,7 @@ import {
   MAX_ATTACHMENT_COUNT,
   MAX_ATTACHMENT_SIZE,
 } from "../constants";
+import { ProcessedAttachmentData } from "../types";
 import { hashFile } from "./hash-file";
 
 type ProcessAttachmentsProps = {
@@ -11,18 +12,11 @@ type ProcessAttachmentsProps = {
   newAttachments: File[];
 };
 
-export type ProcessedAttachment = {
-  file: File;
-  buffer: Buffer;
-  hash: string;
-  mimeType: string;
-};
-
 export const processAttachments = async ({
   existingAttachments = [],
   newAttachments,
 }: ProcessAttachmentsProps) => {
-  const toAdd: ProcessedAttachment[] = [];
+  const toAdd: ProcessedAttachmentData[] = [];
   const errors: { message: string; attachment: File }[] = [];
 
   // -- PROCESS ATTACHMENTS --

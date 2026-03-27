@@ -1,5 +1,6 @@
 "use server";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { createId } from "@paralleldrive/cuid2";
 import { revalidatePath } from "next/cache";
 import {
   ActionState,
@@ -13,12 +14,9 @@ import { s3 } from "@/lib/aws";
 import prisma from "@/lib/prisma";
 import { ticketPath } from "@/paths";
 import { MAX_ATTACHMENT_COUNT } from "../constants";
-import {
-  CommentSubjectAttachment,
-  isTicketSubjectAttachment,
-  TicketSubjectAttachment,
-} from "../types";
-import { generateS3Key } from "../utils/generate-s3-key";
+import { createAttachments } from "../service/create-attachments";
+import { getAttachmentSubject } from "../service/get-attachment-subject";
+import { isTicketSubjectAttachment } from "../types";
 import { processAttachments } from "../utils/process-attachments";
 
 type CreateAttachmentArgs = {
@@ -34,7 +32,8 @@ export async function createAttachment(
   const { id: userId } = await getAuthOrRedirect();
 
   try {
-    // 1. Process Files (CPU-bound) - Perform before transaction to minimize lock time
+    // -- PHASE 1: PROCESS FILES (CPU-bound) --
+    // Hash and validate files before touching the DB.
     const attachments = Array.from(formData.getAll("attachment"));
     if (attachments.some((att) => typeof att === "string")) {
       throw new Error(
@@ -48,48 +47,27 @@ export async function createAttachment(
 
     if (errors.length > 0) throw new Error("Invalid attachments");
 
-    // 2. DB Transaction (DB-bound) - Create records and return IDs
-    const { createdAttachments, organizationId, ticketId } =
+    // -- PHASE 2: READ-ONLY VALIDATION TRANSACTION --
+    // Validate ownership, check limits, and extract the storage context
+    // (organizationId, ticketId) needed to generate S3 keys.
+    // No records are created here — the transaction stays as short as possible.
+    const { organizationId, ticketId, existingCount, existingHashes } =
       await prisma.$transaction(async (tx) => {
-        // -- FETCH SUBJECT + EXISTING ATTACHMENTS IN PARALLEL --
-        // We attach the `entity` discriminant so the result becomes an
-        // `AttachmentSubject` union that the type guards below can narrow.
-        const subjectPromise =
-          entity === AttachmentEntity.TICKET
-            ? tx.ticket
-                .findUnique({
-                  where: { id: entityId },
-                  select: { id: true, organizationId: true, userId: true },
-                })
-                .then((t): TicketSubjectAttachment | null =>
-                  t ? { ...t, entity: AttachmentEntity.TICKET } : null,
-                )
-            : tx.ticketComment
-                .findUnique({
-                  where: { id: entityId },
-                  select: {
-                    id: true,
-                    userId: true,
-                    ticket: { select: { id: true, organizationId: true } },
-                  },
-                })
-                .then((c): CommentSubjectAttachment | null =>
-                  c ? { ...c, entity: AttachmentEntity.COMMENT } : null,
-                );
-
         const [subject, existingAttachments] = await Promise.all([
-          subjectPromise,
+          getAttachmentSubject({ entityId, entity, options: { tx } }),
           tx.attachment.findMany({
             where: {
               [entity === AttachmentEntity.TICKET ? "ticketId" : "commentId"]:
                 entityId,
             },
+            select: { hash: true },
           }),
         ]);
 
-        if (!subject) throw new Error("Not found");
+        if (!subject) throw new Error("Subject not found");
 
-        if (existingAttachments.length >= MAX_ATTACHMENT_COUNT)
+        const existingCount = existingAttachments.length;
+        if (existingCount >= MAX_ATTACHMENT_COUNT)
           throw new Error(
             `Maximum number of attachments (${MAX_ATTACHMENT_COUNT}) reached`,
           );
@@ -115,96 +93,86 @@ export async function createAttachment(
           ticketId = subject.ticket.id;
         }
 
-        // -- DE-DUPLICATE ATTACHMENTS BY HASH --
-        // We want to ensure that within this upload batch (toAdd), no two attachments have the same hash.
-        // If a duplicate hash is found, we filter it out here (keeps only the first occurrence).
-        // This only blocks *new* duplicates within this upload, not existing ones in the DB (checked later).
-        const seenHashes = new Set<string>();
-        let attachmentsData = toAdd
-          .filter((attachment) => {
-            if (seenHashes.has(attachment.hash)) {
-              // Skip attachments with duplicate hash in this batch
-              return false;
-            }
-            seenHashes.add(attachment.hash);
-            return true;
-          })
-          .map((attachment) => ({
-            ...(entity === AttachmentEntity.TICKET
-              ? { ticketId: entityId }
-              : { commentId: entityId }),
-            entity,
-            name: attachment.file.name,
-            hash: attachment.hash,
-            storageOrganizationId: organizationId,
-            storageTicketId: ticketId,
-            mimeType: attachment.mimeType,
-          }));
-
-        const duplicateAttachments = existingAttachments.filter((attachment) =>
-          attachmentsData.some((a) => a.hash === attachment.hash),
-        );
-
-        if (duplicateAttachments.length > 0)
-          throw new Error(
-            `Duplicate attachments found: ${duplicateAttachments.map((a) => a.name).join(", ")}`,
-          );
-
-        const availableAttachments =
-          MAX_ATTACHMENT_COUNT - existingAttachments.length;
-
-        if (attachmentsData.length > availableAttachments)
-          attachmentsData = attachmentsData.slice(0, availableAttachments);
-
-        const createdAttachments = await tx.attachment.createManyAndReturn({
-          data: attachmentsData,
-        });
-
-        return { createdAttachments, organizationId, ticketId };
+        return {
+          organizationId,
+          ticketId,
+          existingCount,
+          existingHashes: new Set(existingAttachments.map((a) => a.hash)),
+        };
       });
 
-    // 3. S3 Uploads (I/O-bound) - Perform after transaction commits
+    // -- PHASE 3: PREPARE BATCH (in-memory) --
+    // De-duplicate within this batch, reject conflicts with existing hashes,
+    // apply the slot limit, and pre-generate a stable UUID for each file.
+    // These IDs will be used for both the S3 key and the DB record, so we
+    // never need to reconcile the two after the fact.
+    const seenHashes = new Set<string>();
+    const dedupedToAdd = toAdd.filter((a) => {
+      if (seenHashes.has(a.hash)) return false;
+      seenHashes.add(a.hash);
+      return true;
+    });
 
-    const fileMap = new Map(toAdd.map((a) => [a.file.name, a]));
-    console.log(fileMap);
+    const duplicates = dedupedToAdd.filter((a) => existingHashes.has(a.hash));
+    if (duplicates.length > 0)
+      throw new Error(
+        `Duplicate attachments found: ${duplicates.map((a) => a.file.name).join(", ")}`,
+      );
 
-    await Promise.all(
-      createdAttachments.map(async (attachment) => {
-        const { id, name } = attachment;
-        const original = fileMap.get(name);
+    const available = MAX_ATTACHMENT_COUNT - existingCount;
+    const toUpload = dedupedToAdd
+      .slice(0, available)
+      .map((a) => ({ ...a, id: createId() }));
 
-        if (!original) {
-          // Should not happen if data integrity is maintained
-          console.error(`Attachment correlation failed for ${name}`);
-          return;
-        }
+    // -- PHASE 4: S3 UPLOADS (I/O-bound) --
+    // At this point no DB records exist yet.
+    // If this step fails entirely, there is nothing to clean up in the DB.
+    // The returned keys are held in memory for compensation in Phase 5.
+    const uploadedKeys = await createAttachments({
+      attachments: toUpload,
+      entity,
+      entityId,
+      organizationId,
+    });
 
-        const key = generateS3Key({
+    // -- PHASE 5: WRITE TRANSACTION --
+    // S3 uploads are confirmed — now create the DB records.
+    // This transaction is intentionally short: no I/O beyond the DB write.
+    // On failure we compensate by deleting the S3 objects we just uploaded.
+    // An orphaned S3 object is invisible to users; an orphaned DB record is not.
+    let createdAttachments;
+    try {
+      createdAttachments = await prisma.attachment.createManyAndReturn({
+        data: toUpload.map(({ id, file, hash, mimeType }) => ({
+          id,
+          ...(entity === AttachmentEntity.TICKET
+            ? { ticketId: entityId }
+            : { commentId: entityId }),
           entity,
-          entityId,
-          organizationId,
-          attachmentName: name,
-          attachmentId: id,
-        });
-
-        try {
-          await s3.send(
-            new PutObjectCommand({
+          name: file.name,
+          hash,
+          mimeType,
+          storageOrganizationId: organizationId,
+          storageTicketId: ticketId,
+        })),
+      });
+    } catch (dbError) {
+      // -- COMPENSATION --
+      // The DB write failed. Delete the S3 objects we already uploaded so
+      // we don't accumulate unreferenced files. These objects have no DB
+      // record yet, so this failure path is invisible to users regardless.
+      await Promise.allSettled(
+        uploadedKeys.map((key) =>
+          s3.send(
+            new DeleteObjectCommand({
               Bucket: process.env.R2_BUCKET_NAME,
               Key: key,
-              Body: original.buffer,
-              ContentType: original.mimeType,
             }),
-          );
-        } catch (error) {
-          console.error(`Failed to upload attachment ${id}:`, error);
-          // Compensation: Delete the record if upload fails
-          await prisma.attachment.delete({
-            where: { id },
-          });
-        }
-      }),
-    );
+          ),
+        ),
+      );
+      throw dbError;
+    }
 
     revalidatePath(ticketPath(ticketId));
 
