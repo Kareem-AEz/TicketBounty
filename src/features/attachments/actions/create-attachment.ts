@@ -137,24 +137,53 @@ export async function createAttachment(
 
     // -- PHASE 5: WRITE TRANSACTION --
     // S3 uploads are confirmed — now create the DB records.
-    // This transaction is intentionally short: no I/O beyond the DB write.
+    // We re-query count and hashes inside the same transaction that performs
+    // the insert so validation and write are atomic. Any concurrent upload
+    // that slipped in between Phase 2 and here will be caught here.
     // On failure we compensate by deleting the S3 objects we just uploaded.
     // An orphaned S3 object is invisible to users; an orphaned DB record is not.
     let createdAttachments;
     try {
-      createdAttachments = await prisma.attachment.createManyAndReturn({
-        data: toUpload.map(({ id, file, hash, mimeType }) => ({
-          id,
-          ...(entity === AttachmentEntity.TICKET
-            ? { ticketId: entityId }
-            : { commentId: entityId }),
-          entity,
-          name: file.name,
-          hash,
-          mimeType,
-          storageOrganizationId: organizationId,
-          storageTicketId: ticketId,
-        })),
+      createdAttachments = await prisma.$transaction(async (tx) => {
+        const entityFilter = {
+          [entity === AttachmentEntity.TICKET ? "ticketId" : "commentId"]:
+            entityId,
+        };
+
+        const currentAttachments = await tx.attachment.findMany({
+          where: entityFilter,
+          select: { hash: true },
+        });
+
+        if (currentAttachments.length >= MAX_ATTACHMENT_COUNT)
+          throw new Error(
+            `Maximum number of attachments (${MAX_ATTACHMENT_COUNT}) reached`,
+          );
+
+        const currentHashes = new Set(currentAttachments.map((a) => a.hash));
+        const raceDuplicates = toUpload.filter((a) => currentHashes.has(a.hash));
+        if (raceDuplicates.length > 0)
+          throw new Error(
+            `Duplicate attachments found: ${raceDuplicates.map((a) => a.file.name).join(", ")}`,
+          );
+
+        const slots = MAX_ATTACHMENT_COUNT - currentAttachments.length;
+        const batch = toUpload.slice(0, slots);
+
+        return tx.attachment.createManyAndReturn({
+          data: batch.map(({ id, file, hash, mimeType }) => ({
+            id,
+            ...(entity === AttachmentEntity.TICKET
+              ? { ticketId: entityId }
+              : { commentId: entityId }),
+            entity,
+            name: file.name,
+            hash,
+            mimeType,
+            storageOrganizationId: organizationId,
+            storageTicketId: ticketId,
+          })),
+        });
       });
     } catch (dbError) {
       // -- COMPENSATION --
