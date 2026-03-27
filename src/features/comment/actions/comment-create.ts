@@ -87,15 +87,7 @@ export default async function commentUpsert({
           where: { id: commentId || "" },
           update: { content: validatedContent },
           create: { content: validatedContent, ticketId, userId: user.id },
-          select: {
-            id: true,
-            content: true,
-            createdAt: true,
-            userId: true,
-            ticketId: true,
-            user: { select: { username: true } },
-            attachments: true,
-          },
+          select: { id: true },
         });
 
         if (toUpload.length > 0) {
@@ -113,7 +105,22 @@ export default async function commentUpsert({
           });
         }
 
-        return upsertedComment;
+        // -- RE-FETCH AFTER WRITES --
+        // Reading the comment before createMany completes would return an
+        // empty attachments array. We fetch here so the returned snapshot
+        // is consistent with everything written in this transaction.
+        return tx.ticketComment.findUniqueOrThrow({
+          where: { id: upsertedComment.id },
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            userId: true,
+            ticketId: true,
+            user: { select: { username: true } },
+            attachments: true,
+          },
+        });
       });
     } catch (dbError) {
       // -- COMPENSATION --
