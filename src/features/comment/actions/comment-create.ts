@@ -15,6 +15,7 @@ import { AttachmentEntity } from "@/generated/enums";
 import { s3 } from "@/lib/aws";
 import prisma from "@/lib/prisma";
 import { ticketPath } from "@/paths";
+import { createComment } from "../db";
 import { formSchema } from "../schema";
 
 type CommentUpsertPropsType = {
@@ -92,11 +93,12 @@ export default async function commentUpsert({
     let comment;
     try {
       comment = await prisma.$transaction(async (tx) => {
-        const upsertedComment = await tx.ticketComment.upsert({
-          where: { id: targetCommentId },
-          update: { content: validatedContent },
-          create: { id: targetCommentId, content: validatedContent, ticketId, userId: user.id },
-          select: { id: true },
+        const upsertedComment = await createComment({
+          content: validatedContent,
+          ticketId,
+          userId: user.id,
+          id: targetCommentId,
+          options: { tx },
         });
 
         if (toUpload.length > 0) {
