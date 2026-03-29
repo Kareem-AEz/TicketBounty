@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from "@/generated/client";
 import { AttachmentEntity } from "@/generated/enums";
 import prisma from "@/lib/prisma";
-import { fromComment, fromTicket } from "../dto";
+import { attachmentSubjectDTO } from "../dto";
 
 type GetAttachmentSubjectArgs = {
   entityId: string;
@@ -31,7 +31,7 @@ export async function getAttachmentSubject({
         })
         .then((t) => (t ? { ...t, entity: AttachmentEntity.TICKET } : null));
 
-      return fromTicket(ticket);
+      return attachmentSubjectDTO.fromTicket(ticket);
 
     case AttachmentEntity.COMMENT:
       const comment = await db.ticketComment
@@ -48,7 +48,7 @@ export async function getAttachmentSubject({
         })
         .then((c) => (c ? { ...c, entity: AttachmentEntity.COMMENT } : null));
 
-      return fromComment(comment);
+      return attachmentSubjectDTO.fromComment(comment);
 
     default:
       return null;
