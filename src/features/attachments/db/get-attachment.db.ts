@@ -17,8 +17,6 @@ const ATTACHMENT_INCLUDE_COMMENT = {
     select: {
       id: true,
       userId: true,
-    },
-    include: {
       ticket: {
         select: {
           userId: true,

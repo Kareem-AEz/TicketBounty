@@ -101,11 +101,3 @@ export const createComment = async <T extends IncludeOptions>({
 
   return upsertedComment as ReturnType<T>;
 };
-
-const {} = await createComment({
-  content: "Hello, world!",
-  ticketId: "123",
-  userId: "456",
-  id: "789",
-  include: { user: true, ticket: true },
-});

@@ -2,11 +2,12 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NextResponse } from "next/server";
 import { MAX_ATTACHMENT_LIVE_TIME_PREVIEW } from "@/features/attachments/constants";
+import { attachmentsDB } from "@/features/attachments/db";
+import { attachmentSubjectDTO } from "@/features/attachments/dto";
 import { generateS3Key } from "@/features/attachments/utils/generate-s3-key";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import { AttachmentEntity } from "@/generated/enums";
 import { s3 } from "@/lib/aws";
-import prisma from "@/lib/prisma";
 
 type PreviewAttachmentRouteProps = {
   params: Promise<{
@@ -27,35 +28,44 @@ export async function GET(
       throw new Error("Unauthorized");
     }
 
-    const attachment = await prisma.attachment.findUnique({
-      where: {
-        id: attachmentId,
+    const attachment = await attachmentsDB.getAttachment({
+      attachmentId,
+      include: {
+        ticket: true,
+        comment: true,
       },
     });
     if (!attachment) {
       throw new Error("Attachment not found");
     }
 
-    let entityId: string;
+    let subject;
+
     switch (attachment.entity) {
       case AttachmentEntity.TICKET:
-        if (!attachment.ticketId)
-          throw new Error("Attachment with entity TICKET has no ticketId");
-        entityId = attachment.ticketId;
+        if (!attachment.ticket) throw new Error("Ticket not found");
+        const ticket = {
+          ...attachment.ticket,
+          entity: AttachmentEntity.TICKET,
+        };
+        subject = attachmentSubjectDTO.fromTicket(ticket);
         break;
       case AttachmentEntity.COMMENT:
-        if (!attachment.commentId)
-          throw new Error("Attachment with entity COMMENT has no commentId");
-        entityId = attachment.commentId;
+        if (!attachment.comment) throw new Error("Comment not found");
+        const comment = {
+          ...attachment.comment,
+          entity: AttachmentEntity.COMMENT,
+        };
+        subject = attachmentSubjectDTO.fromComment(comment);
         break;
-      default:
-        throw new Error("Invalid attachment entity");
     }
+
+    if (!subject) throw new Error("Subject not found");
 
     const key = generateS3Key({
       entity: attachment.entity,
       organizationId: attachment.storageOrganizationId,
-      entityId,
+      entityId: subject.entityId,
       attachmentName: attachment.name,
       attachmentId: attachment.id,
     });
