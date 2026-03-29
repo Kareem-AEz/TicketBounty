@@ -11,6 +11,8 @@ import { AttachmentEntity } from "@/generated/enums";
 import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
 import { ticketPath } from "@/paths";
+import { attachmentsDB } from "../db";
+import { attachmentSubjectDTO } from "../dto";
 import { deleteAttachmentEvent } from "../events/delete-attachment.event";
 
 type DeleteAttachmentProps = {
@@ -26,35 +28,46 @@ export const deleteAttachment = async ({
   }
 
   try {
-    const attachment = await prisma.attachment.findUnique({
-      where: { id: attachmentId },
+    const attachment = await attachmentsDB.getAttachment({
+      attachmentId,
       include: {
-        ticket: {
-          select: {
-            userId: true,
-            id: true,
-          },
-        },
-        comment: {
-          select: {
-            userId: true,
-            ticketId: true,
-          },
-        },
+        comment: true,
+        ticket: true,
       },
     });
+
     if (!attachment) {
       return toErrorActionState(new Error("Attachment not found"));
     }
 
-    if (attachment.entity === AttachmentEntity.TICKET) {
-      if (!isOwner(user.id, attachment.ticket?.userId ?? undefined)) {
-        throw new Error("You are not the owner of this attachment");
-      }
-    } else if (attachment.entity === AttachmentEntity.COMMENT) {
-      if (!isOwner(user.id, attachment.comment?.userId ?? undefined)) {
-        throw new Error("You are not the owner of this attachment");
-      }
+    let subject = null;
+    switch (attachment.entity) {
+      case AttachmentEntity.TICKET:
+        if (attachment.ticket) {
+          subject = attachmentSubjectDTO.fromTicket({
+            ...attachment.ticket,
+            entity: AttachmentEntity.TICKET,
+          });
+        }
+        break;
+      case AttachmentEntity.COMMENT:
+        if (attachment.comment) {
+          subject = attachmentSubjectDTO.fromComment({
+            ...attachment.comment,
+            entity: AttachmentEntity.COMMENT,
+          });
+        }
+        break;
+    }
+
+    if (!subject) {
+      return toErrorActionState(new Error("Attachment not found"));
+    }
+
+    if (!isOwner(user.id, subject.userId ?? undefined)) {
+      return toErrorActionState(
+        new Error("You are not the owner of this attachment"),
+      );
     }
 
     await prisma.attachment.deleteMany({
@@ -63,22 +76,15 @@ export const deleteAttachment = async ({
 
     await inngest.send(
       deleteAttachmentEvent.create({
-        entity: attachment.entity,
+        entity: subject.entity,
         organizationId: attachment.storageOrganizationId,
-        entityId: attachment.storageTicketId,
-        attachmentId: attachment.id,
+        entityId: subject.entityId,
+        attachmentId: attachmentId,
         attachmentName: attachment.name,
       }),
     );
 
-    if (attachment.entity === AttachmentEntity.TICKET) {
-      if (!attachment.ticket?.id) throw new Error("Something went wrong");
-      revalidatePath(ticketPath(attachment.ticket.id));
-    } else if (attachment.entity === AttachmentEntity.COMMENT) {
-      if (!attachment.comment?.ticketId)
-        throw new Error("Something went wrong");
-      revalidatePath(ticketPath(attachment.comment.ticketId));
-    }
+    revalidatePath(ticketPath(subject.ticketId));
 
     return toSuccessActionState({
       status: "SUCCESS",
