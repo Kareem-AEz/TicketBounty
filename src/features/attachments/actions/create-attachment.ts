@@ -14,7 +14,6 @@ import { ticketPath } from "@/paths";
 import { MAX_ATTACHMENT_COUNT } from "../constants";
 import { createAttachments } from "../service/create-attachments";
 import { getAttachmentSubject } from "../service/get-attachment-subject";
-import { isTicketSubjectAttachment } from "../types";
 import { processAttachments } from "../utils/process-attachments";
 
 type CreateAttachmentArgs = {
@@ -64,36 +63,25 @@ export async function createAttachment(
 
         if (!subject) throw new Error("Subject not found");
 
+        if (!subject.organizationId)
+          throw new Error(
+            `This ${entity.toLowerCase()} is not associated with an organization`,
+          );
+
         const existingCount = existingAttachments.length;
         if (existingCount >= MAX_ATTACHMENT_COUNT)
           throw new Error(
             `Maximum number of attachments (${MAX_ATTACHMENT_COUNT}) reached`,
           );
 
-        let organizationId: string;
-        let ticketId: string;
-
-        if (isTicketSubjectAttachment(subject)) {
-          if (!subject.organizationId)
-            throw new Error("Ticket is not associated with an organization");
-          if (!isOwner(userId, subject.userId ?? undefined))
-            throw new Error("You are not the owner of this ticket");
-
-          organizationId = subject.organizationId;
-          ticketId = subject.id;
-        } else {
-          if (!isOwner(userId, subject.userId ?? undefined))
-            throw new Error("You are not the owner of this comment");
-          if (!subject.ticket.organizationId)
-            throw new Error("Comment is not associated with an organization");
-
-          organizationId = subject.ticket.organizationId;
-          ticketId = subject.ticket.id;
-        }
+        if (!isOwner(userId, subject.userId ?? undefined))
+          throw new Error(
+            `You are not the owner of this ${entity.toLowerCase()}`,
+          );
 
         return {
-          organizationId,
-          ticketId,
+          organizationId: subject.organizationId,
+          ticketId: subject.ticketId,
           existingCount,
           existingHashes: new Set(existingAttachments.map((a) => a.hash)),
         };
