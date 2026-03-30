@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from "@/generated/client";
 import prisma from "@/lib/prisma";
 
-const ATTACHMENT_INCLUDE = {
+export const ATTACHMENT_INCLUDE = {
   ticket: {
     select: {
       userId: true,
@@ -9,10 +9,6 @@ const ATTACHMENT_INCLUDE = {
       organizationId: true,
     },
   },
-} satisfies Prisma.AttachmentInclude;
-type TicketIncludeType = typeof ATTACHMENT_INCLUDE;
-
-const ATTACHMENT_INCLUDE_COMMENT = {
   comment: {
     select: {
       id: true,
@@ -26,43 +22,25 @@ const ATTACHMENT_INCLUDE_COMMENT = {
       },
     },
   },
-} satisfies Prisma.AttachmentInclude;
-type CommentIncludeType = typeof ATTACHMENT_INCLUDE_COMMENT;
+} as const satisfies Prisma.AttachmentInclude;
 
-type Include = {
-  ticket?: boolean;
-  comment?: boolean;
-};
-
-type GetAttachmentArgs<T extends Include> = {
+type GetAttachmentArgs<T extends Prisma.AttachmentInclude> = {
   attachmentId: string;
-  options?: {
-    tx?: PrismaClient | Prisma.TransactionClient;
-  };
+  options?: { tx?: PrismaClient | Prisma.TransactionClient };
   include?: T;
 };
 
-// prettier-ignore
-type ReturnType<T extends Include> = 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-((T["ticket"] extends true ? Prisma.AttachmentGetPayload<{ include: TicketIncludeType }> : {}) &
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-(T["comment"] extends true ? Prisma.AttachmentGetPayload<{ include: CommentIncludeType }> : {})
-)
-export const getAttachment = async <T extends Include>({
+export const getAttachment = async <T extends Prisma.AttachmentInclude>({
   attachmentId,
   options,
   include,
-}: GetAttachmentArgs<T>): Promise<ReturnType<T>> => {
+}: GetAttachmentArgs<T>): Promise<Prisma.AttachmentGetPayload<{
+  include: T;
+}> | null> => {
   const db = options?.tx ?? prisma;
 
-  const includeTicket = include?.ticket ? ATTACHMENT_INCLUDE : {};
-  const includeComment = include?.comment ? ATTACHMENT_INCLUDE_COMMENT : {};
-
-  const attachment = await db.attachment.findUnique({
+  return (await db.attachment.findUnique({
     where: { id: attachmentId },
-    include: { ...includeTicket, ...includeComment },
-  });
-
-  return attachment as ReturnType<T>;
+    include,
+  })) as Prisma.AttachmentGetPayload<{ include: T }> | null;
 };

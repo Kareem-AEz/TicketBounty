@@ -31,8 +31,8 @@ export async function GET(
     const attachment = await attachmentsDB.getAttachment({
       attachmentId,
       include: {
-        ticket: true,
-        comment: true,
+        ticket: attachmentsDB.ATTACHMENT_INCLUDE.ticket,
+        comment: attachmentsDB.ATTACHMENT_INCLUDE.comment,
       },
     });
     if (!attachment) {

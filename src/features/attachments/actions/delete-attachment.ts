@@ -31,8 +31,8 @@ export const deleteAttachment = async ({
     const attachment = await attachmentsDB.getAttachment({
       attachmentId,
       include: {
-        comment: true,
-        ticket: true,
+        comment: attachmentsDB.ATTACHMENT_INCLUDE.comment,
+        ticket: attachmentsDB.ATTACHMENT_INCLUDE.ticket,
       },
     });
 
