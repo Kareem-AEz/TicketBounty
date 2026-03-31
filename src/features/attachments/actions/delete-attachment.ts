@@ -7,7 +7,6 @@ import {
 } from "@/components/form/utils/to-action-state";
 import { getAuthOrRedirect } from "@/features/auth/queries/get-auth-or-redirect";
 import { isOwner } from "@/features/auth/utils/is-owner";
-import { AttachmentEntity } from "@/generated/enums";
 import { inngest } from "@/lib/inngest";
 import prisma from "@/lib/prisma";
 import { ticketPath } from "@/paths";
@@ -40,25 +39,7 @@ export const deleteAttachment = async ({
       return toErrorActionState(new Error("Attachment not found"));
     }
 
-    let subject = null;
-    switch (attachment.entity) {
-      case AttachmentEntity.TICKET:
-        if (attachment.ticket) {
-          subject = attachmentSubjectDTO.fromTicket({
-            ...attachment.ticket,
-            entity: AttachmentEntity.TICKET,
-          });
-        }
-        break;
-      case AttachmentEntity.COMMENT:
-        if (attachment.comment) {
-          subject = attachmentSubjectDTO.fromComment({
-            ...attachment.comment,
-            entity: AttachmentEntity.COMMENT,
-          });
-        }
-        break;
-    }
+    const subject = attachmentSubjectDTO.fromAttachment(attachment);
 
     if (!subject) {
       return toErrorActionState(new Error("Attachment not found"));

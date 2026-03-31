@@ -1,4 +1,5 @@
-import { AttachmentEntity } from "@/generated/enums";
+import { AttachmentEntity } from "@/generated/client";
+import { AttachmentWithSubject } from "../db/get-attachment.db";
 import {
   AttachmentSubject,
   isCommentSubjectAttachment,
@@ -46,4 +47,26 @@ export const fromComment = (
     ticketId: comment.ticket.id,
     commentId: comment.id,
   };
+};
+
+export const fromAttachment = (attachment: AttachmentWithSubject) => {
+  if (!attachment) {
+    return null;
+  }
+
+  if (attachment.entity === AttachmentEntity.TICKET && attachment.ticket) {
+    return fromTicket({
+      ...attachment.ticket,
+      entity: AttachmentEntity.TICKET,
+    });
+  }
+
+  if (attachment.entity === AttachmentEntity.COMMENT && attachment.comment) {
+    return fromComment({
+      ...attachment.comment,
+      entity: AttachmentEntity.COMMENT,
+    });
+  }
+
+  return null;
 };

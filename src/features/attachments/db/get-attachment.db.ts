@@ -44,3 +44,7 @@ export const getAttachment = async <T extends Prisma.AttachmentInclude>({
     include,
   })) as Prisma.AttachmentGetPayload<{ include: T }> | null;
 };
+
+export type AttachmentWithSubject = Awaited<
+  ReturnType<typeof getAttachment<typeof ATTACHMENT_INCLUDE>>
+>;
